@@ -4,6 +4,7 @@ namespace ProyectoFinalAplicada.Models;
 
 public class Admin
 {
+    //El alpha el jefe el animal the best
     [Key]
     public int Id_Admin {  get; set; }
 
