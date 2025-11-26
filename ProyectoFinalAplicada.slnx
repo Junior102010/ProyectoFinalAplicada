@@ -1,6 +1,3 @@
 <Solution>
-  <Project Path="ProyectoFinalAplicada/ProyectoFinalAplicada.csproj">
-    <Build Solution="Debug|*" Project="false" />
-  </Project>
   <Project Path="ProyectoFinalAplicada1/ProyectoFinalAplicada1.csproj" Id="5dc02d30-c988-46cb-9ab4-6f410d0bad06" />
 </Solution>

@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ProyectoFinalAplicada.Models;
 
-namespace ProyectoFinalAplicada.DAL;
+namespace ProyectoFinalAplicada1.DAL;
 
 public class Context : DbContext
 {
