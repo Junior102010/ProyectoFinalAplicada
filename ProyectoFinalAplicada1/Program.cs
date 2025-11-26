@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using ProyectoFinalAplicada.Services;
 using ProyectoFinalAplicada1.Components;
 using ProyectoFinalAplicada1.Components.Account;
 using ProyectoFinalAplicada1.DAL;
@@ -42,6 +43,8 @@ var ConStr = builder.Configuration.GetConnectionString("ConStr");
 builder.Services.AddDbContextFactory<Context>(c => c.UseSqlite(ConStr));
 
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
+
+builder.Services.AddScoped<ProductosServices>();
 
 var app = builder.Build();
 
