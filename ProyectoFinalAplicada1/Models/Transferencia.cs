@@ -6,14 +6,19 @@ namespace ProyectoFinalAplicada.Models;
 public class Transferencia
 {
     [Key]
-    public int Id_Transferencia { get; set; }
+    public int TransferenciaId { get; set; }
 
     [Required]
-    public string NumTransferencia { get; set; }
-
+    public DateTime Fecha { get; set; } = DateTime.Now;
     [Required]
-    public DateTime FechaTransferencia { get; set; }
-
-    [ForeignKey("Id_Pedido")]
-    public ICollection<Pedido> DetalleTransferencia { get; set; } = new List<Pedido>();
+    public string Origen { get; set; }
+    [Required]
+    public string Destino { get; set; }
+    [Required]
+    public double Monto { get; set; }
+    [Required]
+    public string Observaciones { get; set; }
+    public int UsuarioId { get; set; }
+    [ForeignKey("UsuarioId")]
+    public Usuario? Usuario { get; set; }
 }

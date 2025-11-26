@@ -1,38 +1,30 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using ProyectoFinalAplicada1.Models;
 
 namespace ProyectoFinalAplicada.Models;
 
 public class Pedido
 {
     [Key]
-    public int Id_Pedido { get; set; }
+    public int PedidoId { get; set; }
 
     [Required]
-    public string NombreCliente { get; set; }
-
+    public DateTime FechaPedido { get; set; } = DateTime.Now;
     [Required]
-    public string TelefonoCliente { get; set; }
-
+    public int ClienteId { get; set; }
     [Required]
-    public string RefSitio { get; set; }
 
-    [Required]
-    public DateTime FechaPedido { get; set; }
-
-    [Required]
-    public string Estado { get; set; }
-
-    [Required]
-    public double Cantidad { get; set; }
-
+    [ForeignKey("ClienteId")]
+    public Cliente? Cliente { get; set; }
     [Required]
     public double MontoTotal { get; set; }
-
     [Required]
-    public bool Deliveri { get; set; }
-
-    [ForeignKey("Id_Producto")]
-    public ICollection<Producto> DetallePedido { get; set; } = new List<Producto>();
+    public string Estado { get; set; } = "Pendiente";
+    [Required]
+    public bool Delivery { get; set; }
+    [Required]
+    public string? ReferenciaSitio { get; set; }
+    public ICollection<PedidoDetalle> Detalles { get; set; } = new List<PedidoDetalle>();
 
 }

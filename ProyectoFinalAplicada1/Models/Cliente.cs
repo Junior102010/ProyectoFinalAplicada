@@ -5,7 +5,7 @@ namespace ProyectoFinalAplicada.Models;
 public class Cliente
 {
     [Key]
-    public int Id_Cliente { get; set; }
+    public int ClienteId { get; set; }
 
     [Required]
     public string NombreCliente { get; set; }
@@ -26,7 +26,7 @@ public class Cliente
     public string CalleCliente { get; set; }
 
     [Required]
-    public string NumViviendaCliente { get; set; }
+    public string ViviendaCliente { get; set; }
 
     [Required]
     public string DescripcionCliente { get; set; }

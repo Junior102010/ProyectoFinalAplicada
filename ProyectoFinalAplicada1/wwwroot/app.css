@@ -1,5 +1,6 @@
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    background-color: #F4EAD6
 }
 
 a, .btn-link {
@@ -58,3 +59,25 @@ h1:focus {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
     text-align: start;
 }
+
+
+
+/*Estilo de la pagina*/
+table.table thead tr th,
+.table thead tr th,
+table thead tr > th {
+    background-color: rgba(217, 181, 154, 0.5) !important; /* #D9B59A */
+    border-bottom: 2px solid #E3C8B1 !important;
+    border-right: 1px solid #E3C8B1 !important;
+    font-weight: 600;
+    padding: 12px;
+}
+
+
+table thead th:last-child {
+    border-right: none !important;
+}
+
+
+table {
+    border-top: 2px solid #E3C8B1 !important;

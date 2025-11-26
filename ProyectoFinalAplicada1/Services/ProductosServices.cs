@@ -10,14 +10,14 @@ public class ProductosServices(IDbContextFactory<Context> DbFactory)
     public async Task<bool> Existe(int idProducto)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
-        return await contexto.Producto.AnyAsync(c => c.Id_Producto == idProducto);
+        return await contexto.Producto.AnyAsync(c => c.ProductoId == idProducto);
     }
 
     public async Task<Producto?> Buscar(int id)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
 
-        return await contexto.Producto.FirstOrDefaultAsync(e => e.Id_Producto == id);
+        return await contexto.Producto.FirstOrDefaultAsync(e => e.ProductoId == id);
     }
 
     public async Task<List<Producto>> Listar(Expression<Func<Producto, bool>> criterio)
@@ -37,7 +37,7 @@ public class ProductosServices(IDbContextFactory<Context> DbFactory)
     public async Task<bool> SumarProductos(Producto producto)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
-        var productoExistente = await contexto.Producto.FirstOrDefaultAsync(e => e.Id_Producto == producto.Id_Producto);
+        var productoExistente = await contexto.Producto.FirstOrDefaultAsync(e => e.ProductoId == producto.ProductoId);
         productoExistente.Existencia += producto.Existencia;
         return await contexto.SaveChangesAsync() > 0;
     }
@@ -45,7 +45,7 @@ public class ProductosServices(IDbContextFactory<Context> DbFactory)
     public async Task<bool> RestarProductos(Producto producto)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
-        var productoExistente = await contexto.Producto.FirstOrDefaultAsync(e => e.Id_Producto == producto.Id_Producto);
+        var productoExistente = await contexto.Producto.FirstOrDefaultAsync(e => e.ProductoId == producto.ProductoId);
         productoExistente.Existencia -= producto.Existencia;
         return await contexto.SaveChangesAsync() > 0;
     }
