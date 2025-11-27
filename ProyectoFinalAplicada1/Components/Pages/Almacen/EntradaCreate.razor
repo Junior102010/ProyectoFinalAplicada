@@ -1,0 +1,202 @@
+﻿@page "/Entrada/Create"
+@rendermode InteractiveServer
+
+@inject EntradasServices entradasService
+@inject ProductosServices productosService
+@inject NavigationManager navigationManager
+
+<PageTitle>Crear Entrada</PageTitle>
+
+<div class="container">
+    <div class="card card-glass rounded-4 p-2">
+        <div class="card-header bg-transparent text-center border-0 pt-3">
+            <h3 class="m-0 fw-bold">Registro de Entrada</h3>
+        </div>
+
+        <EditForm Model="Entrada" OnValidSubmit="Guardar">
+            <DataAnnotationsValidator />
+
+            <div class="card-body">
+                @* --- CABECERA --- *@
+                <div class="row mb-4">
+                    @* Fecha *@
+                    <div class="col-md-3">
+                        <label class="form-label text-muted small fw-bold mb-1">Fecha Entrada</label>
+                        <InputDate class="form-control input-glass" @bind-Value="Entrada.FechaEntrada" />
+                        <ValidationMessage For="(() => Entrada.FechaEntrada)" />
+                    </div>
+
+                    @* Proveedor *@
+                    <div class="col-md-4">
+                        <label class="form-label text-muted small fw-bold mb-1">Proveedor</label>
+                        <InputSelect class="form-select input-glass" @bind-Value="Entrada.ProveedorId">
+                            <option value="0" selected disabled>Seleccione un proveedor</option>
+                            @foreach (var prov in ListaProveedores)
+                            {
+                                <option value="@prov.ProveedorId">@prov.Nombre</option>
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="(() => Entrada.ProveedorId)" />
+                    </div>
+
+                    @* Concepto *@
+                    <div class="col-md-5">
+                        <label class="form-label text-muted small fw-bold mb-1">Concepto</label>
+                        <InputText class="form-control input-glass" @bind-Value="Entrada.Concepto" placeholder="Concepto de la entrada" />
+                        <ValidationMessage For="(() => Entrada.Concepto)" />
+                    </div>
+                </div>
+
+                <hr class="border-secondary opacity-25" />
+
+                @* --- DETALLE --- *@
+                <div class="row align-items-end mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label text-muted small fw-bold mb-1">Producto</label>
+                        <InputSelect class="form-select input-glass" @bind-Value="Detalle.ProductoId">
+                            <option value="0" selected disabled>Seleccione un producto</option>
+                            @foreach (var prod in ListaProductos)
+                            {
+                                <option value="@prod.ProductoId">@prod.NombreProducto</option>
+                            }
+                        </InputSelect>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label text-muted small fw-bold mb-1">Cantidad</label>
+                        <InputNumber class="form-control input-glass" @bind-Value="Detalle.Cantidad" />
+                    </div>
+                    <div class="col-md-3">
+                        <button type="button" class="btn btn-gradiente w-100" @onclick="AgregarDetalle">
+                            <span class="bi bi-plus-lg"></span> Agregar
+                        </button>
+                    </div>
+                </div>
+
+                @* --- TABLA --- *@
+                <div class="table-responsive mt-4">
+                    <table class="table table-hover bg-transparent align-middle">
+                        <thead class="text-black" style="background-color: rgba(0,0,0,0.03);">
+                            <tr>
+                                <th class="ps-3">Producto</th>
+                                <th class="text-center">Cantidad</th>
+                                <th class="text-center">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Entrada.EntradaDetalles)
+                            {
+                                var prod = ListaProductos.FirstOrDefault(p => p.ProductoId == item.ProductoId);
+                                <tr style="border-bottom: 1px solid rgba(0,0,0,0.05);">
+                                    <td class="ps-3">@(prod?.NombreProducto ?? "No encontrado")</td>
+                                    <td class="text-center fw-bold" style="color: #3D5D35;">@item.Cantidad</td>
+                                    <td class="text-center">
+                                        <button type="button" class="btn btn-sm btn-outline-danger border-0 bi bi-trash fs-5" @onclick="() => EliminarDetalle(item)"></button>
+                                    </td>
+                                </tr>
+                            }
+                            @if (Entrada.EntradaDetalles.Count == 0)
+                            {
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted py-3">No hay productos agregados.</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                @* Mensaje de error/validación manual *@
+                @if (!string.IsNullOrEmpty(Mensaje))
+                {
+                    <div class="alert alert-danger mt-3 text-center" role="alert">
+                        @Mensaje
+                    </div>
+                }
+            </div>
+
+            <div class="card-footer bg-transparent border-top-0 d-flex justify-content-between align-items-center mt-2 pt-0 pb-3 px-4">
+                <a href="/Producto/Index" class="btn btn-outline-secondary px-3">Volver</a>
+                <button type="submit" class="btn btn-gradiente px-4"> <span class="bi bi-floppy"></span> Guardar</button>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    public Entrada Entrada { get; set; } = new Entrada();
+    public EntradaDetalle Detalle { get; set; } = new EntradaDetalle();
+
+    public List<Producto> ListaProductos { get; set; } = new List<Producto>();
+    public List<Proveedor> ListaProveedores { get; set; } = new List<Proveedor>();
+
+    public string Mensaje { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        ListaProductos = await productosService.Listar(p => p.ProductoId > 0);
+        ListaProveedores = await entradasService.ListarProveedores();
+        Entrada.FechaEntrada = DateTime.Now;
+    }
+
+    public void AgregarDetalle()
+    {
+        Mensaje = string.Empty; // Limpiar mensaje
+
+        if (Detalle.ProductoId <= 0)
+        {
+            Mensaje = "Debe seleccionar un producto.";
+            return;
+        }
+        if (Detalle.Cantidad <= 0)
+        {
+            Mensaje = "La cantidad debe ser mayor a 0.";
+            return;
+        }
+
+        var existente = Entrada.EntradaDetalles.FirstOrDefault(d => d.ProductoId == Detalle.ProductoId);
+        if (existente != null)
+        {
+            existente.Cantidad += Detalle.Cantidad;
+        }
+        else
+        {
+            Entrada.EntradaDetalles.Add(new EntradaDetalle
+            {
+                ProductoId = Detalle.ProductoId,
+                Cantidad = Detalle.Cantidad
+            });
+        }
+        Detalle = new EntradaDetalle(); 
+    }
+
+    public void EliminarDetalle(EntradaDetalle item)
+    {
+        Entrada.EntradaDetalles.Remove(item);
+    }
+
+    public async Task Guardar()
+    {
+        Mensaje = string.Empty;
+
+        if (Entrada.ProveedorId <= 0)
+        {
+            Mensaje = "Debe seleccionar un proveedor.";
+            return;
+        }
+        if (Entrada.EntradaDetalles.Count == 0)
+        {
+            Mensaje = "Debe agregar al menos un producto al detalle.";
+            return;
+        }
+
+        var guardado = await entradasService.Guardar(Entrada);
+
+        if (guardado)
+        {
+            navigationManager.NavigateTo("/Producto/Index");
+        }
+        else
+        {
+            Mensaje = "Error al intentar guardar la entrada.";
+        }
+    }
+}

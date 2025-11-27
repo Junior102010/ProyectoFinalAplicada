@@ -7,6 +7,7 @@ using ProyectoFinalAplicada1.Components.Account;
 using ProyectoFinalAplicada1.DAL;
 using ProyectoFinalAplicada1.Data;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -45,6 +46,7 @@ builder.Services.AddDbContextFactory<Context>(c => c.UseSqlite(ConStr));
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 
 builder.Services.AddScoped<ProductosServices>();
+builder.Services.AddScoped<EntradasServices>();
 
 var app = builder.Build();
 

@@ -1,0 +1,192 @@
+﻿@page "/Producto/Edit/{ProductoId:int}"
+
+@rendermode InteractiveServer
+
+@inject ProductosServices productosService
+@inject NavigationManager navigationManager
+
+<PageTitle>Editar Producto</PageTitle>
+
+<SectionContent SectionName="TituloPagina">
+    <div class="d-flex justify-content-center w-100">
+        <h3 class="m-0 fw-bold">Editar Producto</h3>
+    </div>
+</SectionContent>
+
+<div class="container">
+    <div class="card card-glass rounded-4 p-2">
+        
+        <EditForm Model="Producto" OnValidSubmit="Guardar" FormName="EditarProductoForm">
+            <DataAnnotationsValidator />
+            
+            <div class="card-body">
+                
+                @* --- FILA 1: DATOS BÁSICOS --- *@
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label text-muted small fw-bold mb-1">Nombre</label>
+                        <InputText class="form-control input-glass" @bind-Value="Producto.NombreProducto" />
+                        <ValidationMessage For="(() => Producto.NombreProducto)" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label text-muted small fw-bold mb-1">Categoría</label>
+                        <InputSelect class="form-select input-glass" @bind-Value="Producto.Categoria">
+                            <option value="" selected disabled>Seleccione...</option>
+                            <option value="Granos">Granos</option>
+                            <option value="Víveres">Víveres</option>
+                            <option value="Lácteos">Lácteos</option>
+                            <option value="Carnes">Carnes</option>
+                            <option value="Embutidos">Embutidos</option>
+                            <option value="Limpieza">Limpieza</option>
+                            <option value="Bebidas">Bebidas</option>
+                            <option value="Otros">Otros</option>
+                        </InputSelect>
+                        <ValidationMessage For="(() => Producto.Categoria)" />
+                    </div>
+                </div>
+
+                @* --- FILA 2: COSTOS Y PRECIOS --- *@
+                <div class="row mb-3">
+                    @* Costo *@
+                    <div class="col-md-4">
+                        <label class="form-label text-muted small fw-bold mb-1">Costo (Compra)</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-transparent border-end-0 text-muted">$</span>
+                            <InputNumber class="form-control input-glass border-start-0" @bind-Value="Producto.Costo" />
+                        </div>
+                        <ValidationMessage For="(() => Producto.Costo)" />
+                    </div>
+
+                    @* Precio *@
+                    <div class="col-md-4">
+                        <label class="form-label text-muted small fw-bold mb-1">Precio (Venta)</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-transparent border-end-0 text-muted">$</span>
+                            <InputNumber class="form-control input-glass border-start-0" @bind-Value="Producto.Precio" />
+                        </div>
+                        <ValidationMessage For="(() => Producto.Precio)" />
+                    </div>
+
+                    @* Visualizador de Ganancia (Calculado) *@
+                    <div class="col-md-4 d-flex flex-column justify-content-end pb-2">
+                        <span class="small text-muted">Margen estimado:</span>
+                        <h5 class="m-0 @(ObtenerColorGanancia())">
+                            @((Producto.Precio - Producto.Costo).ToString("C2"))
+                        </h5>
+                    </div>
+                </div>
+
+                <hr class="border-secondary opacity-25" />
+
+                @* --- FILA 3: AJUSTE DE INVENTARIO --- *@
+                <div class="row mb-3 align-items-end">
+                    
+                    <div class="col-md-4">
+                        <label class="form-label text-muted small fw-bold mb-1">Unidad de Medida</label>
+                        <InputSelect class="form-select input-glass" @bind-Value="Producto.UnidadMedida">
+                            <option value="LB">Libra (LB)</option>
+                            <option value="UNID">Unidad (UNID)</option>
+                            <option value="KG">Kilogramo (KG)</option>
+                            <option value="LITRO">Litro</option>
+                            <option value="PAQ">Paquete</option>
+                            <option value="CAJA">Caja</option>
+                            <option value="SACO">Saco</option>
+                        </InputSelect>
+                    </div>
+
+                    @* EXISTENCIA EDITABLE *@
+                    <div class="col-md-4">
+                        <label class="form-label text-muted small fw-bold mb-1">Existencia Actual</label>
+                        <InputNumber class="form-control input-glass fw-bold" style="color: #3D5D35;" @bind-Value="Producto.Existencia" />
+                        <div class="form-text text-danger small fst-italic">
+                            <i class="bi bi-exclamation-triangle"></i> Ajustar solo por daños o errores.
+                        </div>
+                    </div>
+                </div>
+
+                @if (!string.IsNullOrEmpty(Mensaje))
+                {
+                    <div class="alert alert-danger mt-3 text-center py-2" role="alert">
+                        <small>@Mensaje</small>
+                    </div>
+                }
+            </div>
+
+            @* --- FOOTER --- *@
+            <div class="card-footer bg-transparent border-top-0 d-flex justify-content-between align-items-center mt-2 pt-0 pb-3 px-4">
+                <a href="/Producto/Index" class="btn btn-outline-secondary px-4">
+                    <span class="bi bi-arrow-left"></span> Volver
+                </a>
+                
+                @* Botón Guardar Cambios *@
+                <button type="submit" class="btn btn-gradiente px-5">
+                    <span class="bi bi-pencil-square"></span> Guardar Cambios
+                </button>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int ProductoId { get; set; }
+
+    [SupplyParameterFromForm]
+    public Producto Producto { get; set; } = new Producto();
+    
+    public string Mensaje { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Cargamos el producto solo si es la primera vez (para no sobrescribir lo que escribas si hay error)
+        if (Producto.ProductoId == 0)
+        {
+            var encontrado = await productosService.Buscar(ProductoId);
+            if (encontrado != null)
+            {
+                Producto = encontrado;
+            }
+            else
+            {
+                Mensaje = "El producto no fue encontrado.";
+            }
+        }
+    }
+
+    public async Task Guardar()
+    {
+        Mensaje = string.Empty;
+
+        // Validaciones básicas
+        if (Producto.Costo < 0 || Producto.Precio < 0)
+        {
+            Mensaje = "Los valores monetarios no pueden ser negativos.";
+            return;
+        }
+        if (Producto.Existencia < 0)
+        {
+            Mensaje = "La existencia no puede ser negativa.";
+            return;
+        }
+
+        var modificado = await productosService.Guardar(Producto);
+
+        if (modificado)
+        {
+            navigationManager.NavigateTo("/Producto/Index");
+        }
+        else
+        {
+            Mensaje = "No se pudo actualizar el producto.";
+        }
+    }
+
+    // Pequeño helper para el color del margen
+    private string ObtenerColorGanancia()
+    {
+        if (Producto.Precio < Producto.Costo) return "text-danger"; // Pierdes dinero
+        if (Producto.Precio == Producto.Costo) return "text-warning"; // No ganas nada
+        return "text-success"; // Ganas dinero
+    }
+}
