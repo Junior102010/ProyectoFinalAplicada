@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using ProyectoFinalAplicada1.DAL;
 using ProyectoFinalAplicada.Models;
+using ProyectoFinalAplicada1.Components.Pages;
+using ProyectoFinalAplicada1.DAL;
 using System.Linq.Expressions;
 
 namespace ProyectoFinalAplicada.Services;
@@ -34,19 +35,28 @@ public class ProductosServices(IDbContextFactory<Context> DbFactory)
         return await contexto.SaveChangesAsync() > 0;
     }
 
-    public async Task<bool> SumarProductos(Producto producto)
+    public async Task<bool> Guardar(Producto producto)
+    {
+        if (!await Existe(producto.ProductoId))
+        {
+
+            return await Insertar(producto);
+        }
+        else
+        {
+            return await Modificar(producto);
+        }
+    }
+
+    public async Task<bool> Modificar(Producto producto)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
-        var productoExistente = await contexto.Producto.FirstOrDefaultAsync(e => e.ProductoId == producto.ProductoId);
-        productoExistente.Existencia += producto.Existencia;
+
+        
+        contexto.Update(producto);
+
+        
         return await contexto.SaveChangesAsync() > 0;
     }
 
-    public async Task<bool> RestarProductos(Producto producto)
-    {
-        await using var contexto = await DbFactory.CreateDbContextAsync();
-        var productoExistente = await contexto.Producto.FirstOrDefaultAsync(e => e.ProductoId == producto.ProductoId);
-        productoExistente.Existencia -= producto.Existencia;
-        return await contexto.SaveChangesAsync() > 0;
-    }
 }

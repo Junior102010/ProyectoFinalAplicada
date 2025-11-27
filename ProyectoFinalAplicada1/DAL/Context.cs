@@ -11,7 +11,7 @@ public class Context : DbContext
 
     public DbSet<Pedido> Pedido { get; set; }
 
-    public DbSet< Usuario> Admin { get; set; }
+    public DbSet<Usuario> Usuario { get; set; }
 
     public DbSet<Producto> Producto { get; set; }
 
@@ -21,7 +21,7 @@ public class Context : DbContext
 
     public DbSet<Proveedor> Proveedor { get; set; }
 
-    public DbSet<Categoria> TipoProducto { get; set; }
+    public DbSet<Categoria> Categoria { get; set; }
 
     public DbSet<Transferencia> Transferencia { get; set; }
 
