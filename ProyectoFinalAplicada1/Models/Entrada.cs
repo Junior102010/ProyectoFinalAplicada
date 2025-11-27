@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using ProyectoFinalAplicada1.Models;
 
 namespace ProyectoFinalAplicada.Models;
 
@@ -12,8 +13,10 @@ public class Entrada
     public DateTime FechaEntrada { get; set; }
 
     [Required]
-    public string Referencia { get; set; }
+    public string Concepto { get; set; } = string.Empty;
+    [Required]
+    public int ProveedorId { get; set; }
 
-    [ForeignKey("ProveedorId")]
-    public ICollection<Proveedor> DetalleEntrada { get; set; } = new List<Proveedor>();
+    [ForeignKey("EntradaId")]
+    public ICollection<EntradaDetalle> EntradaDetalles { get; set; } = new List<EntradaDetalle>();
 }

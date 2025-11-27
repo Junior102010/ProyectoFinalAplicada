@@ -5,7 +5,7 @@
 
 <PageTitle>Registro de Productos</PageTitle>
 
-@* Título Centrado en el Layout *@
+
 <SectionContent SectionName="TituloPagina">
     <div class="d-flex justify-content-center w-100">
         <h3 class="m-0 fw-bold">Registro de Productos</h3>
@@ -14,16 +14,15 @@
 
 <div class="container">
 
-    @* Card Glass sin Header separado, todo unido *@
+   
     <div class="card card-glass rounded-4 p-2">
 
         <div class="card-body">
 
-            @* Fila Única de Controles (Filtros + Botones) *@
-            @* Usamos 'align-items-end' para que los botones se alineen con los inputs, no con los labels *@
+            
             <div class="row align-items-end mb-4">
 
-                @* Columna 1: Filtro Dropdown *@
+              
                 <div class="col-md-3">
                     <label class="form-label text-muted small fw-bold mb-1">Filtrar por</label>
                     <InputSelect class="form-select input-glass" @bind-Value="Filtro">
@@ -33,7 +32,7 @@
                     </InputSelect>
                 </div>
 
-                @* Columna 2: Búsqueda *@
+               
                 <div class="col-md-4">
                     <label class="form-label text-muted small fw-bold mb-1">Búsqueda</label>
                     <div class="input-group">
@@ -43,10 +42,9 @@
                     </div>
                 </div>
 
-                @* Columna 3: Espacio vacío para separar (opcional) *@
+              
                 <div class="col-md-1"></div>
 
-                @* Columna 4: Botones de Acción (Alineados a la derecha y abajo) *@
                 <div class="col-md-4 text-end">
                     <div class="d-flex justify-content-end gap-2">
                         @* Botón Añadir *@
@@ -97,7 +95,7 @@
             </div>
         </div>
 
-        @* Footer Integrado (Glass) *@
+        
         <div class="card-footer bg-transparent border-top-0 d-flex justify-content-between text-muted mt-2 pt-0 pb-3 px-4">
             <small class="fw-bold">Cantidad: @ListaProductos.Count()</small>
             <small class="fw-bold">Total Inventario: <span style="color: #3D5D35;">@ListaProductos.Sum(p => p.Precio * p.Existencia).ToString("C2")</span></small>

@@ -1,0 +1,156 @@
+﻿@page "/Producto/Create"
+
+@inject ProductosServices productosService
+@inject NavigationManager navigationManager
+@rendermode InteractiveServer
+
+<PageTitle>Crear Producto</PageTitle>
+
+<SectionContent SectionName="TituloPagina">
+    <div class="d-flex justify-content-center w-100">
+        <h3 class="m-0 fw-bold">Nuevo Producto</h3>
+    </div>
+</SectionContent>
+
+<div class="container">
+
+    <div class="card card-glass rounded-4 p-2">
+        
+        <EditForm Model="Producto" OnValidSubmit="Guardar">
+            <DataAnnotationsValidator />
+            
+            <div class="card-body">
+                
+ 
+                <div class="row mb-4">
+                    @* Nombre *@
+                    <div class="col-md-6">
+                        <label class="form-label text-muted small fw-bold mb-1">Nombre del Producto</label>
+                        <InputText class="form-control input-glass" @bind-Value="Producto.NombreProducto" placeholder="Ej: Arroz Super Selecto" />
+                        <ValidationMessage For="(() => Producto.NombreProducto)" />
+                    </div>
+
+                    @* Categoría *@
+                    <div class="col-md-6">
+                        <label class="form-label text-muted small fw-bold mb-1">Categoría</label>
+                        <InputSelect class="form-select input-glass" @bind-Value="Producto.Categoria">
+                            <option value="" selected disabled>Seleccione una categoría</option>
+                            <option value="Granos">Granos</option>
+                            <option value="Víveres">Víveres</option>
+                            <option value="Lácteos">Lácteos</option>
+                            <option value="Carnes">Carnes</option>
+                            <option value="Embutidos">Embutidos</option>
+                            <option value="Limpieza">Limpieza</option>
+                            <option value="Bebidas">Bebidas</option>
+                            <option value="Otros">Otros</option>
+                        </InputSelect>
+                        <ValidationMessage For="(() => Producto.Categoria)" />
+                    </div>
+                </div>
+
+                <hr class="border-secondary opacity-25" />
+
+                <div class="row mb-3">
+
+                    <div class="col-md-4">
+                        <label class="form-label text-muted small fw-bold mb-1">Costo (Compra)</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-transparent border-end-0 text-muted">$</span>
+                            <InputNumber class="form-control input-glass border-start-0" @bind-Value="Producto.Costo" />
+                        </div>
+                        <ValidationMessage For="(() => Producto.Costo)" />
+                    </div>
+
+
+                    <div class="col-md-4">
+                        <label class="form-label text-muted small fw-bold mb-1">Precio (Venta)</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-transparent border-end-0 text-muted">$</span>
+                            <InputNumber class="form-control input-glass border-start-0" @bind-Value="Producto.Precio" />
+                        </div>
+                        <ValidationMessage For="(() => Producto.Precio)" />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label text-muted small fw-bold mb-1">Unidad de Medida</label>
+                        <InputSelect class="form-select input-glass" @bind-Value="Producto.UnidadMedida">
+                            <option value="" selected disabled>Elija unidad</option>
+                            <option value="LB">Libra (LB)</option>
+                            <option value="UNID">Unidad (UNID)</option>
+                            <option value="KG">Kilogramo (KG)</option>
+                            <option value="LITRO">Litro</option>
+                            <option value="PAQ">Paquete</option>
+                            <option value="CAJA">Caja</option>
+                            <option value="SACO">Saco</option>
+                        </InputSelect>
+                        <ValidationMessage For="(() => Producto.UnidadMedida)" />
+                    </div>
+                </div>
+
+
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label class="form-label text-muted small fw-bold mb-1">Existencia Inicial</label>
+                        <InputNumber class="form-control input-glass bg-transparent text-muted" @bind-Value="Producto.Existencia" disabled />
+                        <div class="form-text text-muted small fst-italic">
+                            * La existencia se gestiona mediante Entradas.
+                        </div>
+                    </div>
+                </div>
+
+              
+                @if (!string.IsNullOrEmpty(Mensaje))
+                {
+                    <div class="alert alert-danger mt-3 text-center py-2" role="alert">
+                        <small>@Mensaje</small>
+                    </div>
+                }
+            </div>
+
+            @* --- FOOTER --- *@
+            <div class="card-footer bg-transparent border-top-0 d-flex justify-content-between align-items-center mt-2 pt-0 pb-3 px-4">
+                <a href="/Producto/Index" class="btn btn-outline-secondary px-4">
+                    <span class="bi bi-arrow-left"></span> Volver
+                </a>
+                <button type="submit" class="btn btn-gradiente px-5">
+                    <span class="bi bi-floppy"></span> Guardar
+                </button>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    public Producto Producto { get; set; } = new Producto();
+    public string Mensaje { get; set; } = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        
+        Producto.Existencia = 0; 
+    }
+
+    public async Task Guardar()
+    {
+        Mensaje = string.Empty;
+
+        
+        if (Producto.Costo < 0 || Producto.Precio < 0)
+        {
+            Mensaje = "El costo y el precio no pueden ser negativos.";
+            return;
+        }
+
+        
+        var guardado = await productosService.Guardar(Producto);
+
+        if (guardado)
+        {
+            navigationManager.NavigateTo("/Producto/Index");
+        }
+        else
+        {
+            Mensaje = "Ocurrió un error al intentar guardar el producto.";
+        }
+    }
+}
