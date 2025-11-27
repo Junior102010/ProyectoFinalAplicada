@@ -11,67 +11,94 @@
 @inject NavigationManager NavigationManager
 @inject IdentityRedirectManager RedirectManager
 
-<PageTitle>Log in</PageTitle>
+<PageTitle>Iniciar Sesión</PageTitle>
 
-<h1>Log in</h1>
-<div class="row">
-    <div class="col-lg-6">
-        <section>
+@* Estructura de centrado vertical y horizontal estilo Figma *@
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 100vh;">
+
+    @* Tarjeta principal con Sombra (Shadow-lg) *@
+    <div class="card shadow-lg" style="width: 100%; max-width: 450px; border: none;">
+
+        @* HEADER: Logo y Título *@
+        <div class="card-header text-center bg-white pb-0 pt-4" style="border-bottom: none;">
+            <img src="/imagenes/Logo.png" alt="Logo" class="img-fluid mb-3" style="max-height: 80px;" />
+            <h5 class="card-title fw-bold text-primary">Bienvenido</h5>
+            <p class="text-muted small">Inicia sesión con tu cuenta local</p>
+        </div>
+
+        @* BODY: Formulario *@
+        <div class="card-body p-4">
             <StatusMessage Message="@errorMessage" />
+
             <EditForm EditContext="editContext" method="post" OnSubmit="LoginUser" FormName="login">
                 <DataAnnotationsValidator />
-                <h2>Use a local account to log in.</h2>
-                <hr />
                 <ValidationSummary class="text-danger" role="alert" />
-                <div class="form-floating mb-3">
-                    <InputText @bind-Value="Input.Email" id="Input.Email" class="form-control" autocomplete="username webauthn" aria-required="true" placeholder="name@example.com" />
-                    <label for="Input.Email" class="form-label">Email</label>
+
+                @* Email *@
+                <div class="mb-3">
+                    <label for="Input.Email" class="form-label fw-bold">Correo Electrónico</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light"><i class="bi bi-envelope"></i></span>
+                        <InputText @bind-Value="Input.Email" id="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="nombre@ejemplo.com" />
+                    </div>
                     <ValidationMessage For="() => Input.Email" class="text-danger" />
                 </div>
-                <div class="form-floating mb-3">
-                    <InputText type="password" @bind-Value="Input.Password" id="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="password" />
-                    <label for="Input.Password" class="form-label">Password</label>
+
+                @* Password *@
+                <div class="mb-3">
+                    <label for="Input.Password" class="form-label fw-bold">Contraseña</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light"><i class="bi bi-lock"></i></span>
+                        <InputText type="password" @bind-Value="Input.Password" id="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="******" />
+                    </div>
                     <ValidationMessage For="() => Input.Password" class="text-danger" />
                 </div>
-                <div class="checkbox mb-3">
-                    <label class="form-label">
-                        <InputCheckbox @bind-Value="Input.RememberMe" class="darker-border-checkbox form-check-input" />
-                        Remember me
-                    </label>
+
+                @* Remember Me *@
+                <div class="mb-3 form-check">
+                    <InputCheckbox @bind-Value="Input.RememberMe" class="form-check-input" />
+                    <label class="form-check-label text-muted">Recordarme</label>
                 </div>
-                <div>
-                    <button type="submit" class="w-100 btn btn-lg btn-primary">Log in</button>
+
+                @* Botón Submit *@
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary fw-bold shadow-sm">Iniciar Sesión</button>
                 </div>
-                <hr />
-                <div class="d-flex flex-column">
-                    <span class="text-secondary mx-auto mt-2">OR</span>
-                    <PasskeySubmit Operation="PasskeyOperation.Request" Name="Input.Passkey" EmailName="Input.Email" class="btn btn-link mx-auto">Log in with a passkey</PasskeySubmit>
+
+                @* Passkey (Mantenido del original) *@
+                <div class="d-flex flex-column mt-2 text-center">
+                    <PasskeySubmit Operation="PasskeyOperation.Request" Name="Input.Passkey" EmailName="Input.Email" class="btn btn-link text-decoration-none small">
+                        Iniciar con llave de acceso (Passkey)
+                    </PasskeySubmit>
                 </div>
-                <hr />
-                <div>
-                    <p>
-                        <a href="Account/ForgotPassword">Forgot your password?</a>
-                    </p>
-                    <p>
-                        <a href="@(NavigationManager.GetUriWithQueryParameters("Account/Register", new Dictionary<string, object?> { ["ReturnUrl"] = ReturnUrl }))">Register as a new user</a>
-                    </p>
-                    <p>
-                        <a href="Account/ResendEmailConfirmation">Resend email confirmation</a>
-                    </p>
-                </div>
+
             </EditForm>
-        </section>
-    </div>
-    <div class="col-lg-4 col-lg-offset-2">
-        <section>
-            <h3>Use another service to log in.</h3>
-            <hr />
-            <ExternalLoginPicker />
-        </section>
+
+            @* Servicios Externos (Si existen) *@
+            <hr class="my-4" />
+            <div class="text-center">
+                <ExternalLoginPicker />
+            </div>
+        </div>
+
+        @* FOOTER: Enlaces de Ayuda *@
+        <div class="card-footer text-center bg-light small py-3">
+            <p class="mb-1">
+                <a href="Account/ForgotPassword" class="text-decoration-none">¿Olvidaste tu contraseña?</a>
+            </p>
+            <p class="mb-1">
+                ¿No tienes cuenta?
+                <a href="@(NavigationManager.GetUriWithQueryParameters("Account/Register", new Dictionary<string, object?> { ["ReturnUrl"] = ReturnUrl }))" class="fw-bold text-decoration-none">Regístrate</a>
+            </p>
+            <p class="mb-0">
+                <a href="Account/ResendEmailConfirmation" class="text-decoration-none text-muted">Reenviar confirmación de email</a>
+            </p>
+        </div>
     </div>
 </div>
 
 @code {
+    // --- ESTE CÓDIGO SE MANTIENE EXACTAMENTE IGUAL AL ORIGINAL DE BLAZOR IDENTITY ---
     private string? errorMessage;
     private EditContext editContext = default!;
 
@@ -142,7 +169,7 @@
         }
         else
         {
-            errorMessage = "Error: Invalid login attempt.";
+            errorMessage = "Error: Intento de inicio de sesión inválido.";
         }
     }
 
