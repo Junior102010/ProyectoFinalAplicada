@@ -8,9 +8,36 @@ a, .btn-link {
 }
 
 .btn-primary {
-    color: #fff;
-    background-color: #1b6ec2;
-    border-color: #1861ac;
+    background-color: #4F46E5;
+    border-color: #4F46E5;
+    color: white;
+}
+    .btn-primary:hover,
+    .btn-primary:active,
+    .btn-primary:focus,
+    .btn-primary:active:focus {
+        background-color: #3730a3 !important; 
+        border-color: #3730a3 !important;
+        color: white !important;
+    }
+
+
+.btn-outline-primary {
+    color: #4F46E5 !important;
+    border-color: #4F46E5 !important;
+}
+
+  
+    .btn-outline-primary:hover,
+    .btn-outline-primary:active,
+    .btn-outline-primary:focus {
+        background-color: #4F46E5 !important;
+        border-color: #4F46E5 !important;
+        color: white !important;
+    }
+
+.text-primary {
+    color: #4F46E5 !important;
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
@@ -60,24 +87,64 @@ h1:focus {
     text-align: start;
 }
 
+/* --- Estilos Personalizados para Aplicada --- */
 
+.card-glass {
+    background-color: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+}
+
+.card-header-glass, .card-footer-glass {
+    background-color: transparent !important;
+    border-color: rgba(0, 0, 0, 0.05); 
+}
+
+
+.btn-gradiente {
+    background: linear-gradient(90deg, #3D5D35 0%, #639658 100%);
+    border: none;
+    color: white;
+    font-weight: 500;
+}
+    .btn-gradiente:hover {
+        background: linear-gradient(90deg, #2e4628 0%, #4f7846 100%);
+        color: white;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+
+.input-glass {
+    background-color: rgba(255, 255, 255, 0.7) !important;
+    border: 1px solid rgba(0,0,0,0.1);
+    box-shadow: none;
+}
+    .input-glass:focus {
+        background-color: #fff !important;
+        box-shadow: 0 0 0 0.25rem rgba(61, 93, 53, 0.25);
+        border-color: #3D5D35;
+    }
 
 /*Estilo de la pagina*/
 table.table thead tr th,
 .table thead tr th,
 table thead tr > th {
-    background-color: rgba(217, 181, 154, 0.5) !important; /* #D9B59A */
-    border-bottom: 2px solid #E3C8B1 !important;
-    border-right: 1px solid #E3C8B1 !important;
+    background-color: rgba(217, 181, 154, 0.5);
+    border-bottom: 2px solid #E3C8B1;
+    border-right: 1px solid #E3C8B1;
     font-weight: 600;
     padding: 12px;
 }
 
 
 table thead th:last-child {
-    border-right: none !important;
+    border-right: none;
 }
 
 
 table {
-    border-top: 2px solid #E3C8B1 !important;
+    border-top: 2px solid #E3C8B1;
+}
+
+
