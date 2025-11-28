@@ -14,9 +14,6 @@ public class Proveedor
     [Required]
     public string Telefono { get; set; }
 
-    [Required]
-    public int CategoriaId { get; set; }
-
     [ForeignKey("CategoriaId")]
     public ICollection<Categoria> ProveedorDetalle { get; set; } = new List<Categoria>();
 
