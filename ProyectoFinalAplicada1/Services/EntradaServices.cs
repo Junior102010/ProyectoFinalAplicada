@@ -76,6 +76,7 @@ public class EntradasServices(IDbContextFactory<Context> DbFactory)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
         return await contexto.Entrada
+            .Include(e => e.Proveedor)
             .Include(e => e.EntradaDetalles)
             .ThenInclude(d => d.Producto)
             .FirstOrDefaultAsync(e => e.EntradaId == id);
@@ -85,6 +86,7 @@ public class EntradasServices(IDbContextFactory<Context> DbFactory)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
         return await contexto.Entrada
+            .Include(e => e.Proveedor)
             .Include(e => e.EntradaDetalles)
             .Where(criterio)
             .AsNoTracking()

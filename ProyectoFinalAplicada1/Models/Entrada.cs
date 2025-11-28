@@ -17,6 +17,9 @@ public class Entrada
     [Required]
     public int ProveedorId { get; set; }
 
+    [ForeignKey("ProveedorId")]
+    public Proveedor? Proveedor { get; set; }
+
     [ForeignKey("EntradaId")]
     public ICollection<EntradaDetalle> EntradaDetalles { get; set; } = new List<EntradaDetalle>();
 }
