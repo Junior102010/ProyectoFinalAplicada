@@ -26,6 +26,16 @@
     justify-content: center;
 }
 
+/* Centra el elemento de bloque horizontalmente */
+.logo-centrado {
+    display: block; /* Asegura que se comporta como un bloque */
+    margin-left: auto; /* Margen automático a la izquierda */
+    margin-right: auto; /* Margen automático a la derecha */
+
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+
 .navbar-brand {
     font-size: 1.5rem;
     margin: 0;
@@ -42,6 +52,21 @@
     margin-right: 0.75rem;
     top: -1px;
     background-size: cover;
+}
+
+/* 1. Hace que el NavLink sea un contenedor flexible */
+.nav-link {
+    display: flex;
+    align-items: center; /* ALINEACIÓN CLAVE: Centra verticalmente el contenido */
+}
+
+/* 2. Aplica espaciado a la DERECHA de CUALQUIER ícono de Bootstrap (clase 'bi') 
+que esté DENTRO de un .nav-link */
+.nav-link .bi {
+    margin-right: .75rem; /* Ajusta el espacio entre el ícono y el texto */
+    /* Opcional: Asegura que el tamaño del ícono sea consistente */
+    font-size: 1.60rem;
+    line-height: 1; /* Ayuda a la alineación del texto del ícono */
 }
 
 .bi-house-door-fill-nav-menu {

@@ -1,7 +1,7 @@
 ﻿@page "/"
 
-<PageTitle>Home</PageTitle>
+@inject NavigationManager NavigationManager
 
-<h1>Hello, world!</h1>
-
-Welcome to your new app.
+@{
+    NavigationManager.NavigateTo("Account/Login", forceLoad: true);
+}
