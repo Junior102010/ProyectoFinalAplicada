@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ProyectoFinalAplicada.Models;
-using ProyectoFinalAplicada1.Components.Pages;
 using ProyectoFinalAplicada1.DAL;
 using System.Linq.Expressions;
 
@@ -18,13 +17,22 @@ public class PedidosServices(IDbContextFactory<Context> DbFactory)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
 
-        return await contexto.Pedido.FirstOrDefaultAsync(e => e.PedidoId == id);
+        return await contexto.Pedido
+            .Include(p => p.Cliente)
+            .Include(p => p.Detalles)
+            .ThenInclude(d => d.Producto)
+            .FirstOrDefaultAsync(e => e.PedidoId == id);
     }
 
     public async Task<List<Pedido>> Listar(Expression<Func<Pedido, bool>> criterio)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
-        return await contexto.Pedido.Where(criterio).AsNoTracking().ToListAsync();
+        return await contexto.Pedido
+            .Include(p => p.Cliente)         
+            .Include(p => p.Detalles)
+            .Where(criterio)
+            .AsNoTracking()
+            .ToListAsync();
 
     }
 
@@ -58,5 +66,15 @@ public class PedidosServices(IDbContextFactory<Context> DbFactory)
 
         return await contexto.SaveChangesAsync() > 0;
     }
-
+    public async Task<bool> CambiarEstado(int pedidoId, string nuevoEstado)
+    {
+        await using var contexto = await DbFactory.CreateDbContextAsync();
+        var pedido = await contexto.Pedido.FindAsync(pedidoId);
+        if (pedido != null)
+        {
+            pedido.Estado = nuevoEstado;
+            return await contexto.SaveChangesAsync() > 0;
+        }
+        return false;
+    }
 }

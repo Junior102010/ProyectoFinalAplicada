@@ -44,9 +44,12 @@ var ConStr = builder.Configuration.GetConnectionString("ConStr");
 builder.Services.AddDbContextFactory<Context>(c => c.UseSqlite(ConStr));
 
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
-
+//Services
 builder.Services.AddScoped<ProductosServices>();
 builder.Services.AddScoped<EntradasServices>();
+builder.Services.AddScoped<PedidosServices>();
+builder.Services.AddScoped<UsuarioServices>();
+builder.Services.AddScoped<ClientesServices>();
 
 var app = builder.Build();
 
