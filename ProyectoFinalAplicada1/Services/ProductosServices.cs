@@ -59,4 +59,13 @@ public class ProductosServices(IDbContextFactory<Context> DbFactory)
         return await contexto.SaveChangesAsync() > 0;
     }
 
+    public async Task<List<Producto>> ListarProductosBajoStock(int limite = 10)
+    {
+        await using var contexto = await DbFactory.CreateDbContextAsync();
+        return await contexto.Producto
+            .Where(p => p.Existencia <= limite)
+            .AsNoTracking()
+            .ToListAsync();
+    }
+
 }

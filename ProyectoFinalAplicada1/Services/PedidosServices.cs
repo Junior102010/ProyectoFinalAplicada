@@ -77,4 +77,18 @@ public class PedidosServices(IDbContextFactory<Context> DbFactory)
         }
         return false;
     }
+    public async Task<double> CalcularIngresosTotales()
+    {
+        await using var contexto = await DbFactory.CreateDbContextAsync();
+        return await contexto.Pedido
+            .Where(p => p.Estado == "Entregado")
+            .SumAsync(p => p.MontoTotal);
+    }
+
+    public async Task<int> ContarPedidosPendientes()
+    {
+        await using var contexto = await DbFactory.CreateDbContextAsync();
+        return await contexto.Pedido
+            .CountAsync(p => p.Estado == "Pendiente" || p.Estado == "En Proceso");
+    }
 }

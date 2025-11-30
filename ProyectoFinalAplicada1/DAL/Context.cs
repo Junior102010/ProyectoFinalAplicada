@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ProyectoFinalAplicada.Models;
-using ProyectoFinalAplicada1.Models;
+
 
 namespace ProyectoFinalAplicada1.DAL;
 

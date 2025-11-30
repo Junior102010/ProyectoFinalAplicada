@@ -247,3 +247,71 @@ table {
 }
 
 
+.cart-list {
+    max-height: 350px;
+    overflow-y: auto;
+}
+
+.product-card {
+    transition: transform 0.2s ease-in-out;
+}
+
+    .product-card:hover {
+        transform: translateY(-5px);
+        border: 1px solid #3D5D35 !important;
+    }
+
+
+
+
+
+
+
+
+/* --- ESTILOS PARA EL DASHBOARD (Adaptado a tu diseño) --- */
+
+/* Borde de color a la izquierda (Como SB Admin) */
+.border-left-primary {
+    border-left: 0.25rem solid #4e73df !important;
+}
+
+.border-left-success {
+    border-left: 0.25rem solid #3D5D35 !important;
+}
+/* Tu verde */
+.border-left-info {
+    border-left: 0.25rem solid #36b9cc !important;
+}
+
+.border-left-warning {
+    border-left: 0.25rem solid #f6c23e !important;
+}
+
+.border-left-danger {
+    border-left: 0.25rem solid #e74a3b !important;
+}
+
+/* Texto pequeño de título */
+.text-xs {
+    font-size: .7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .05rem;
+    margin-bottom: 0.25rem;
+}
+
+/* El icono grande gris a la derecha */
+.icon-dashboard {
+    color: #dddfeb;
+    font-size: 2.5rem;
+    opacity: 0.6;
+}
+
+/* Ajuste para que tus cards Glass se comporten bien en el dashboard */
+.card-dashboard {
+    transition: transform 0.2s;
+}
+
+    .card-dashboard:hover {
+        transform: translateY(-3px); /* Pequeño efecto al pasar el mouse */
+    }

@@ -17,9 +17,6 @@ public class Cliente
     public string TelefonoCliente { get; set; }
 
     [Required]
-    public string ContrasenaCliente { get; set; }
-
-    [Required]
     public string Sector { get; set; }
 
     [Required]
