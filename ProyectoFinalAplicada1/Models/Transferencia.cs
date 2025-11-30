@@ -18,7 +18,8 @@ public class Transferencia
     public double Monto { get; set; }
     [Required]
     public string Observaciones { get; set; }
-    public int UsuarioId { get; set; }
-    [ForeignKey("UsuarioId")]
-    public Usuario? Usuario { get; set; }
+    
+
+    //[ForeignKey("UsuarioId")]
+    //public Usuario? Usuario { get; set; }
 }
