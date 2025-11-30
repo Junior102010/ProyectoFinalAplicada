@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using ProyectoFinalAplicada1.Data;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ProyectoFinalAplicada.Models;
@@ -9,6 +10,13 @@ public class Cliente
     public int ClienteId { get; set; }
 
     [Required]
+    public string UserId { get; set; } // Enlaza con ApplicationUser.Id
+
+    // Propiedad de navegación (Opcional, pero útil)
+    [ForeignKey(nameof(UserId))]
+    public ApplicationUser User { get; set; } = null!;
+
+    [Required]
     public string NombreCliente { get; set; }
 
     [Required]
@@ -16,9 +24,6 @@ public class Cliente
 
     [Required]
     public string TelefonoCliente { get; set; }
-
-    [Required]
-    public string ContrasenaCliente { get; set; }
 
     [Required]
     public string Sector { get; set; }

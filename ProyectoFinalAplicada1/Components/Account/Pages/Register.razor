@@ -6,6 +6,7 @@
 @using Microsoft.AspNetCore.Identity
 @using Microsoft.AspNetCore.WebUtilities
 @using ProyectoFinalAplicada1.Data
+@inject ProyectoFinalAplicada1.DAL.Context DbContext
 
 @inject UserManager<ApplicationUser> UserManager
 @inject IUserStore<ApplicationUser> UserStore
@@ -24,7 +25,7 @@
         <StatusMessage Message="@Message" />
         <EditForm Model="Input" method="post" OnValidSubmit="RegisterUser" FormName="register">
             <DataAnnotationsValidator />
-            <h2>Create a new account.</h2>
+            <h3 class="mt-4">Información del Cliente</h3>
             <hr />
             <ValidationSummary class="text-danger" role="alert" />
             <div class="form-floating mb-3">
@@ -42,6 +43,48 @@
                 <label for="Input.ConfirmPassword">Confirm Password</label>
                 <ValidationMessage For="() => Input.ConfirmPassword" class="text-danger" />
             </div>
+
+
+            
+
+            @* --- Client Fields --- *@
+            <div class="form-floating mb-3">
+                <InputText @bind-Value="Input.NombreCliente" id="Input.NombreCliente" class="form-control" placeholder="Nombre" />
+                <label for="Input.NombreCliente">Nombre</label>
+                <ValidationMessage For="() => Input.NombreCliente" class="text-danger" />
+            </div>
+            <div class="form-floating mb-3">
+                <InputText @bind-Value="Input.ApellidoCliente" id="Input.ApellidoCliente" class="form-control" placeholder="Apellido" />
+                <label for="Input.ApellidoCliente">Apellido</label>
+                <ValidationMessage For="() => Input.ApellidoCliente" class="text-danger" />
+            </div>
+            <div class="form-floating mb-3">
+                <InputText @bind-Value="Input.TelefonoCliente" id="Input.TelefonoCliente" class="form-control" placeholder="Teléfono" />
+                <label for="Input.TelefonoCliente">Teléfono</label>
+                <ValidationMessage For="() => Input.TelefonoCliente" class="text-danger" />
+            </div>
+            <div class="form-floating mb-3">
+                <InputText @bind-Value="Input.Sector" id="Input.Sector" class="form-control" placeholder="Sector" />
+                <label for="Input.Sector">Sector</label>
+                <ValidationMessage For="() => Input.Sector" class="text-danger" />
+            </div>
+            <div class="form-floating mb-3">
+                <InputText @bind-Value="Input.CalleCliente" id="Input.CalleCliente" class="form-control" placeholder="Calle" />
+                <label for="Input.CalleCliente">Calle</label>
+                <ValidationMessage For="() => Input.CalleCliente" class="text-danger" />
+            </div>
+            <div class="form-floating mb-3">
+                <InputText @bind-Value="Input.ViviendaCliente" id="Input.ViviendaCliente" class="form-control" placeholder="Vivienda/Número" />
+                <label for="Input.ViviendaCliente">Vivienda/Número</label>
+                <ValidationMessage For="() => Input.ViviendaCliente" class="text-danger" />
+            </div>
+            <div class="form-floating mb-3">
+                <InputTextArea @bind-Value="Input.DescripcionCliente" id="Input.DescripcionCliente" class="form-control" placeholder="Descripción adicional" style="height: 100px;" />
+                <label for="Input.DescripcionCliente">Descripción Adicional</label>
+                <ValidationMessage For="() => Input.DescripcionCliente" class="text-danger" />
+            </div>
+
+
             <button type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
         </EditForm>
     </div>
@@ -72,40 +115,75 @@
 
     public async Task RegisterUser(EditContext editContext)
     {
+        // 1. Crear el usuario de Identity (ApplicationUser)
         var user = CreateUser();
 
         await UserStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
         var emailStore = GetEmailStore();
         await emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
+
+        // Crear el usuario de Identity en la BD (La clave foránea del cliente apunta aquí)
         var result = await UserManager.CreateAsync(user, Input.Password);
 
-        if (!result.Succeeded)
+        if (result.Succeeded)
         {
-            identityErrors = result.Errors;
-            return;
-        }
+            // 2. Obtener el ID del usuario recién creado
+            var userId = await UserManager.GetUserIdAsync(user);
 
-        Logger.LogInformation("User created a new account with password.");
+            // --- INICIO DE LA LÓGICA DE CLIENTE ---
 
-        var userId = await UserManager.GetUserIdAsync(user);
-        var code = await UserManager.GenerateEmailConfirmationTokenAsync(user);
-        code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-        var callbackUrl = NavigationManager.GetUriWithQueryParameters(
-            NavigationManager.ToAbsoluteUri("Account/ConfirmEmail").AbsoluteUri,
-            new Dictionary<string, object?> { ["userId"] = userId, ["code"] = code, ["returnUrl"] = ReturnUrl });
+            // 3. Crear el objeto Cliente y enlazarlo
+            var newCliente = new ProyectoFinalAplicada.Models.Cliente
+            {
+                UserId = userId, // 🔑 ENLACE CLAVE: El valor de esta FK ya debe existir en AspNetUsers
+                NombreCliente = Input.NombreCliente,
+                ApellidoCliente = Input.ApellidoCliente,
+                TelefonoCliente = Input.TelefonoCliente,
+                Sector = Input.Sector,
+                CalleCliente = Input.CalleCliente,
+                ViviendaCliente = Input.ViviendaCliente,
+                DescripcionCliente = Input.DescripcionCliente,
+            };
 
-        await EmailSender.SendConfirmationLinkAsync(user, Input.Email, HtmlEncoder.Default.Encode(callbackUrl));
+            // 4. Guardar el objeto Cliente en la BD (Aquí se dispara el DbContext.SaveChanges)
+            // Si UserManager.CreateAsync no había terminado la transacción,
+            // esto causaría el error. Ahora confiamos en que Identity terminó.
+            DbContext.Cliente.Add(newCliente);
+            await DbContext.SaveChangesAsync(); // <-- Si falla aquí, la FK es el problema.
 
-        if (UserManager.Options.SignIn.RequireConfirmedAccount)
-        {
-            RedirectManager.RedirectTo(
-                "Account/RegisterConfirmation",
-                new() { ["email"] = Input.Email, ["returnUrl"] = ReturnUrl });
+            // 5. Asignar el rol "Cliente" (Ahora se asigna después de que Cliente está guardado)
+            await UserManager.AddToRoleAsync(user, "Cliente");
+
+            // --- FIN DE LA LÓGICA DE CLIENTE ---
+
+            Logger.LogInformation("User, Cliente record, and Role assigned successfully.");
+
+            // ... (Resto del código para confirmación de email y redirección) ...
+            var code = await UserManager.GenerateEmailConfirmationTokenAsync(user);
+            code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+            var callbackUrl = NavigationManager.GetUriWithQueryParameters(
+                NavigationManager.ToAbsoluteUri("Account/ConfirmEmail").AbsoluteUri,
+                new Dictionary<string, object?> { ["userId"] = userId, ["code"] = code, ["returnUrl"] = ReturnUrl });
+
+            await EmailSender.SendConfirmationLinkAsync(user, Input.Email, HtmlEncoder.Default.Encode(callbackUrl));
+
+            if (UserManager.Options.SignIn.RequireConfirmedAccount)
+            {
+                RedirectManager.RedirectTo(
+                    "Account/RegisterConfirmation",
+                    new() { ["email"] = Input.Email, ["returnUrl"] = ReturnUrl });
+            }
+            else
+            {
+                await SignInManager.SignInAsync(user, isPersistent: false);
+                RedirectManager.RedirectTo(ReturnUrl);
+            }
+
         }
         else
         {
-            await SignInManager.SignInAsync(user, isPersistent: false);
-            RedirectManager.RedirectTo(ReturnUrl);
+            identityErrors = result.Errors;
+            return;
         }
     }
 
@@ -139,6 +217,34 @@
         public string Email { get; set; } = "";
 
         [Required]
+        [Display(Name = "Nombre")]
+        public string NombreCliente { get; set; } = "";
+
+        [Required]
+        [Display(Name = "Apellido")]
+        public string ApellidoCliente { get; set; } = "";
+
+        [Required]
+        [Display(Name = "Teléfono")]
+        public string TelefonoCliente { get; set; } = "";
+
+        [Required]
+        [Display(Name = "Sector")]
+        public string Sector { get; set; } = "";
+
+        [Required]
+        [Display(Name = "Calle")]
+        public string CalleCliente { get; set; } = "";
+
+        [Required]
+        [Display(Name = "Vivienda/Número")]
+        public string ViviendaCliente { get; set; } = "";
+
+        [Required]
+        [Display(Name = "Descripción Adicional")]
+        public string DescripcionCliente { get; set; } = "";
+
+        [Required]
         [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
         [DataType(DataType.Password)]
         [Display(Name = "Password")]
@@ -148,5 +254,7 @@
         [Display(Name = "Confirm password")]
         [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; } = "";
+
+        
     }
 }
