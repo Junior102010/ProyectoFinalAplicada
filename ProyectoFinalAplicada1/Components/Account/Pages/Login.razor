@@ -11,6 +11,7 @@
 @inject ILogger<Login> Logger
 @inject NavigationManager NavigationManager
 @inject IdentityRedirectManager RedirectManager
+@inject NavigationManager navigation
 
 <PageTitle>Iniciar Sesión</PageTitle>
 
@@ -121,7 +122,8 @@
         if (result.Succeeded)
         {
             Logger.LogInformation("User logged in.");
-            RedirectManager.RedirectTo(ReturnUrl);
+            // RedirectManager.RedirectTo(ReturnUrl);
+            navigation.NavigateTo("/Bienvenida");
         }
         else if (result.RequiresTwoFactor)
         {

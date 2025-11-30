@@ -94,7 +94,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        PageTitleService.SetTitle("Registro de Productos");
+        PageTitleService.SetTitle("Productos");
         ListaProductos = await productosService.Listar(p => p.ProductoId > 0);
     }
 
