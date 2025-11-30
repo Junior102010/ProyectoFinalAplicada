@@ -1,0 +1,162 @@
+﻿@page "/transferencias/crear"
+@using ProyectoFinalAplicada.Models
+@using ProyectoFinalAplicada.Services
+@using Microsoft.AspNetCore.Components.Forms
+@using ProyectoFinalAplicada1.Models
+@inject IWebHostEnvironment WebHostEnvironment
+@inject NavigationManager NavigationManager
+@inject TranferenciaServices TransferenciaService
+
+<h3>Nueva Transferencia Bancaria</h3>
+
+<EditForm Model="@NuevaTransferencia" OnValidSubmit="@GuardarTransferenciaCompleta">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="card p-4 shadow">
+
+        <div class="row">
+
+            <div class="col-6 mb-3">
+                <label for="origen">Cuenta/Banco Origen <span class="text-danger">*</span></label>
+                <InputSelect id="origen" class="form-select" @bind-Value="NuevaTransferencia.Origen">
+                    <option value="">-- Seleccione un Banco --</option>
+                    <option value="Banreservas">Banreservas</option>
+                    <option value="Popular">Popular</option>
+                    <option value="BHD">BHD</option>
+                    <option value="Qik - Banco digital">Qik - Banco digital</option>
+                </InputSelect>
+                <ValidationMessage For="@(() => NuevaTransferencia.Origen)" />
+            </div>
+
+            <div class="col-6 mb-3">
+                <label for="destino">Cuenta/Banco Destino <span class="text-danger">*</span></label>
+                <InputSelect id="destino" class="form-select" @bind-Value="NuevaTransferencia.Destino">
+                    <option value="">-- Seleccione un Banco --</option>
+                    <option value="Banreservas">Banreservas</option>
+                    <option value="Popular">Popular</option>
+                    <option value="BHD">BHD</option>
+                    <option value="Qik - Banco digital">Qik - Banco digital</option>
+                </InputSelect>
+                <ValidationMessage For="@(() => NuevaTransferencia.Destino)" />
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-6 mb-3">
+                <label for="monto">Monto Transferido <span class="text-danger">*</span></label>
+                <InputNumber id="monto" class="form-control" @bind-Value="NuevaTransferencia.Monto" />
+            </div>
+            <div class="col-6 mb-3">
+                <label for="fecha">Fecha de la Transferencia <span class="text-danger">*</span></label>
+                <InputDate id="fecha" class="form-control" @bind-Value="NuevaTransferencia.Fecha" />
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="observaciones">Observaciones <span class="text-danger">*</span></label>
+            <InputTextArea id="observaciones" class="form-control" @bind-Value="NuevaTransferencia.Observaciones" />
+        </div>
+
+        <hr />
+        <div class="card-body">
+            <h4>📄 Adjuntar Comprobante(s)</h4>
+            <div class="mb-3">
+                <label>Seleccionar Imagen(es) (Máx @(MaxFileSize / 1024 / 1024)MB por archivo)</label>
+                <InputFile OnChange="@HandleFileSelection" multiple />
+
+                @if (selectedFiles.Count > 0)
+                {
+                    <p class="mt-2 text-success">**@selectedFiles.Count archivo(s) seleccionado(s) listo(s) para subir.**</p>
+                }
+                @if (!string.IsNullOrEmpty(errorMessage))
+                {
+                    <div class="alert alert-danger mt-2">@errorMessage</div>
+                }
+            </div>
+        </div>
+            
+        <div class="card-footer bg-transparent border-top-0 d-flex justify-content-between align-items-center mt-2 pt-0 pb-3 px-4">
+            <a href="/Almacen" class="btn btn-outline-secondary px-4">
+                <span class="bi bi-arrow-left"></span> Volver
+            </a>
+            <button type="submit" class="btn btn-gradiente px-5">
+                <span class="bi bi-floppy"></span> Guardar
+            </button>
+        </div>
+        
+    </div>
+</EditForm>
+
+@code {
+    private Transferencia NuevaTransferencia { get; set; } = new Transferencia();
+    private List<IBrowserFile> selectedFiles = new List<IBrowserFile>();
+    private string? errorMessage;
+
+    // Constante de 5 MB por archivo
+    private const long MaxFileSize = 1024 * 1024 * 5;
+
+    // Este método se llama cuando el usuario selecciona archivos
+    private void HandleFileSelection(InputFileChangeEventArgs e)
+    {
+        selectedFiles.Clear();
+        errorMessage = null;
+
+        foreach (var file in e.GetMultipleFiles())
+        {
+            if (file.Size > MaxFileSize)
+            {
+                errorMessage = $"El archivo '{file.Name}' excede el límite de 5MB.";
+                selectedFiles.Clear();
+                return;
+            }
+            selectedFiles.Add(file);
+        }
+    }
+
+    // Este método se llama al enviar el formulario
+    private async Task GuardarTransferenciaCompleta()
+    {
+        // 1. Configurar la ruta de guardado en el servidor
+        string uploadsPath = Path.Combine(WebHostEnvironment.WebRootPath, "TransferenciaUploads");
+        Directory.CreateDirectory(uploadsPath);
+
+        // 2. Procesar y guardar cada archivo físico
+        foreach (var file in selectedFiles)
+        {
+            string uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(file.Name);
+            string fullServerPath = Path.Combine(uploadsPath, uniqueFileName);
+
+            // Guardar archivo físico en wwwroot
+            await using (var stream = new FileStream(fullServerPath, FileMode.Create))
+            {
+                await file.OpenReadStream(MaxFileSize).CopyToAsync(stream);
+            }
+
+            // 3. Crear el objeto TransferenciaImagen para adjuntar al modelo
+            string relativeDbPath = $"/TransferenciaUploads/{uniqueFileName}";
+
+            var imagenRegistro = new TransferenciaImagen
+            {
+                RutaImagen = relativeDbPath
+            };
+
+            // Añadir la referencia al objeto principal
+            NuevaTransferencia.Imagenes.Add(imagenRegistro);
+        }
+
+        // 4. Llamar al servicio para guardar la Transferencia y las rutas en SQL
+        bool guardado = await TransferenciaService.Guardar(NuevaTransferencia);
+
+        if (guardado)
+        {
+            // Redireccionar o limpiar el formulario
+            NavigationManager.NavigateTo("/transferencias");
+        }
+        else
+        {
+            // Opcional: Si falla la BD, podrías considerar eliminar los archivos subidos del servidor
+            errorMessage = "Error al guardar los datos en la base de datos. Los archivos físicos pudieron haberse guardado.";
+        }
+    }
+}

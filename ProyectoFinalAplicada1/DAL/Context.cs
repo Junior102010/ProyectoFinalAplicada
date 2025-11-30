@@ -22,6 +22,8 @@ public class Context : DbContext
 
     public DbSet<Proveedor> Proveedor { get; set; }
 
+    public DbSet<TransferenciaImagen> TransferenciaImagenes { get; set; }
+
     public DbSet<Categoria> Categoria { get; set; }
 
     public DbSet<Transferencia> Transferencia { get; set; }
