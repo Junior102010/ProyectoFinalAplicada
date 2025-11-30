@@ -52,7 +52,7 @@ builder.Services.AddScoped<UsuarioServices>();
 builder.Services.AddScoped<ClientesServices>();
 builder.Services.AddScoped<ProveedoresServices>();
 builder.Services.AddSingleton<PageTitleService>();
-
+builder.Services.AddScoped<TranferenciaServices>();
 
 
 var app = builder.Build();

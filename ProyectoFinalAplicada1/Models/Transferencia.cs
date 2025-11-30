@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using ProyectoFinalAplicada1.Models;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ProyectoFinalAplicada.Models;
@@ -18,8 +19,8 @@ public class Transferencia
     public double Monto { get; set; }
     [Required]
     public string Observaciones { get; set; }
-    
 
+    public ICollection<TransferenciaImagen> Imagenes { get; set; } = new List<TransferenciaImagen>();
     //[ForeignKey("UsuarioId")]
     //public Usuario? Usuario { get; set; }
 }

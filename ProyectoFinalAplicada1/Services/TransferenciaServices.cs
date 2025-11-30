@@ -52,6 +52,12 @@ public class TranferenciaServices(IDbContextFactory<Context> DbFactory)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
 
+        var imagenesActuales = contexto.TransferenciaImagenes
+        .Where(ti => ti.TransferenciaId == transferencia.TransferenciaId);
+
+        contexto.TransferenciaImagenes.RemoveRange(imagenesActuales);
+
+        contexto.Entry(transferencia).State = EntityState.Modified;
 
         contexto.Update(transferencia);
 
