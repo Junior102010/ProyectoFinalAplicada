@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using ProyectoFinalAplicada.Models;
 
-namespace ProyectoFinalAplicada1.Models;
+namespace ProyectoFinalAplicada.Models;
 
 public class PedidoDetalle
 {

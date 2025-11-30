@@ -82,4 +82,10 @@ public class ClientesServices(IDbContextFactory<Context> DbFactory)
             .AsNoTracking()
             .FirstOrDefaultAsync(c => c.TelefonoCliente == telefono);
     }
+    public async Task<Cliente?> BuscarPorCorreo(string correo)
+    {
+        await using var contexto = await DbFactory.CreateDbContextAsync();
+        return await contexto.Cliente
+            .FirstOrDefaultAsync(c => c.NombreCliente == correo || c.DescripcionCliente.Contains(correo));
+    }
 }

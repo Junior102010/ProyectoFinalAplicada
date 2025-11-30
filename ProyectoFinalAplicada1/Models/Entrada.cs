@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using ProyectoFinalAplicada1.Models;
+
 
 namespace ProyectoFinalAplicada.Models;
 

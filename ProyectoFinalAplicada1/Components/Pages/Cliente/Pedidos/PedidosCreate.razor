@@ -1,180 +1,146 @@
 ﻿@page "/PedidoCliente/Create"
 @rendermode InteractiveServer
 
-@using ProyectoFinalAplicada1.Models
-
 @inject PedidosServices pedidosService
-@inject ProductosServices productosService
 @inject ClientesServices clientesService
+@inject CarritoService carritoService
+@inject AuthenticationStateProvider authStateProvider
 @inject NavigationManager navigationManager
 
-<PageTitle>Crear Pedido Manual</PageTitle>
+<PageTitle>Confirmar Mi Pedido</PageTitle>
 
-<SectionContent SectionName="TituloPagina">
-    <div class="d-flex justify-content-center w-100">
-        <h3 class="m-0 fw-bold">Nuevo Pedido (Manual)</h3>
-    </div>
-</SectionContent>
+<div class="container mt-4">
+    <div class="card card-glass rounded-4 p-2 shadow-lg">
 
-<div class="container">
-    <div class="card card-glass rounded-4 p-2">
-        
-        <EditForm Model="Pedido" OnValidSubmit="Guardar" FormName="CrearPedidoManual">
+        <div class="card-header bg-transparent border-bottom border-secondary border-opacity-10 pb-3">
+            <h3 class="m-0 fw-bold text-success"><i class="bi bi-bag-check-fill"></i> Confirmar Pedido</h3>
+            <small class="text-muted">Revisa tus datos y productos antes de finalizar.</small>
+        </div>
+
+        <EditForm Model="Pedido" OnValidSubmit="Guardar" FormName="ConfirmarPedidoCliente">
             <DataAnnotationsValidator />
-            
+
             <div class="card-body">
+
                 
-               
-                <h6 class="fw-bold text-muted mb-3"><i class="bi bi-person-lines-fill"></i> Datos Generales</h6>
                 <div class="row mb-4">
-                    
-                   
-                    <div class="col-md-3">
-                        <label class="form-label text-muted small fw-bold mb-1">Fecha</label>
-                        <InputDate class="form-control input-glass" @bind-Value="Pedido.FechaPedido" />
+                    <div class="col-md-12">
+                        <h6 class="fw-bold text-muted mb-3 border-bottom pb-2">
+                            <i class="bi bi-person-lines-fill"></i> Datos de Entrega
+                        </h6>
                     </div>
 
                     
-                    <div class="col-md-5">
-                        <label class="form-label text-muted small fw-bold mb-1">Cliente</label>
-                        <div class="input-group">
-                            <InputSelect class="form-select input-glass" @bind-Value="Pedido.ClienteId">
-                                <option value="0" selected disabled>Seleccione un cliente...</option>
-                                @foreach (var cliente in ListaClientes)
-                                {
-                                    <option value="@cliente.ClienteId">@cliente.NombreCliente @cliente.ApellidoCliente</option>
-                                }
-                            </InputSelect>
-                           
-                            <a href="/Cliente/Create" class="btn btn-outline-secondary" target="_blank" title="Nuevo Cliente">
-                                <i class="bi bi-plus-lg"></i>
-                            </a>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted small fw-bold mb-1">Nombre</label>
+                        <input type="text" class="form-control input-glass bg-light" value="@NombreClienteDisplay" readonly />
+                    </div>
+
+                  
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted small fw-bold mb-1">Teléfono</label>
+                        <input type="text" class="form-control input-glass bg-light" value="@TelefonoClienteDisplay" readonly />
+                    </div>
+
+                  
+                    <div class="col-md-12 mb-3">
+                        <label class="form-label text-muted small fw-bold mb-1">Dirección / Referencia de Entrega</label>
+                        <InputTextArea class="form-control input-glass" @bind-Value="Pedido.ReferenciaSitio" rows="2" placeholder="Ej: Casa azul, frente al parque..." />
+                        <ValidationMessage For="(() => Pedido.ReferenciaSitio)" />
+                        <div class="form-text text-muted small">
+                            <i class="bi bi-info-circle"></i> Verifique que la dirección sea correcta para el delivery.
                         </div>
-                        <ValidationMessage For="(() => Pedido.ClienteId)" />
                     </div>
 
-                    
-                    <div class="col-md-4 d-flex align-items-end pb-2">
-                        <div class="form-check form-switch ps-5">
-                            <InputCheckbox class="form-check-input" @bind-Value="Pedido.Delivery" id="chkDelivery" style="transform: scale(1.3);" />
-                            <label class="form-check-label fw-bold text-muted ms-2" for="chkDelivery">
-                                <i class="bi bi-bicycle"></i> ¿Es Delivery?
+                  
+                    <div class="col-md-12">
+                        <div class="form-check form-switch p-3 bg-warning bg-opacity-10 rounded border border-warning border-opacity-25">
+                            <InputCheckbox class="form-check-input"
+                                           Value="Pedido.Delivery"
+                                           ValueChanged="@((bool v) => AlCambiarDelivery(v))"
+                                           ValueExpression="@(() => Pedido.Delivery)"
+                                           style="cursor: pointer;" />
+                            <label class="form-check-label fw-bold ms-2" for="chkDelivery">
+                                <i class="bi bi-bicycle"></i> Solicitar Delivery (+RD$ 150.00)
                             </label>
                         </div>
                     </div>
                 </div>
 
-                <div class="row mb-4">
-                    <div class="col-12">
-                        <label class="form-label text-muted small fw-bold mb-1">Referencia / Dirección de Entrega</label>
-                        <InputText class="form-control input-glass" @bind-Value="Pedido.ReferenciaSitio" placeholder="Ej: Mesa 4 o Dirección de envío..." />
-                        <ValidationMessage For="(() => Pedido.ReferenciaSitio)" />
-                    </div>
-                </div>
-
-                <hr class="border-secondary opacity-25" />
-
-               
-                <h6 class="fw-bold text-muted mb-3"><i class="bi bi-cart-plus"></i> Agregar Productos</h6>
                 
-                <div class="row align-items-end mb-3 p-3 rounded-3 border border-secondary border-opacity-10 bg-light bg-opacity-10">
-                   
-                    <div class="col-md-5">
-                        <label class="form-label text-muted small fw-bold mb-1">Producto</label>
-                        <InputSelect class="form-select input-glass" 
-                                     Value="Detalle.ProductoId" 
-                                     ValueChanged="@((int id) => SeleccionarProducto(id))"
-                                     ValueExpression="@(() => Detalle.ProductoId)">
-                            <option value="0" selected disabled>Seleccione...</option>
-                            @foreach (var prod in ListaProductos)
-                            {
-                                <option value="@prod.ProductoId">@prod.NombreProducto (@prod.Existencia Disp.)</option>
-                            }
-                        </InputSelect>
-                    </div>
+                <h6 class="fw-bold text-muted mb-3 border-bottom pb-2 mt-4">
+                    <i class="bi bi-cart3"></i> Productos en Carrito
+                </h6>
 
-                    
-                    <div class="col-md-3">
-                        <label class="form-label text-muted small fw-bold mb-1">Precio</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-transparent border-end-0">$</span>
-                            <InputNumber class="form-control input-glass border-start-0" @bind-Value="Detalle.PrecioUnitario" />
-                        </div>
-                    </div>
-
-                    
-                    <div class="col-md-2">
-                        <label class="form-label text-muted small fw-bold mb-1">Cantidad</label>
-                        <InputNumber class="form-control input-glass" @bind-Value="Detalle.Cantidad" />
-                    </div>
-
-                   
-                    <div class="col-md-2">
-                        <button type="button" class="btn btn-gradiente w-100 shadow-sm" @onclick="AgregarDetalle">
-                            <i class="bi bi-plus-circle"></i> Agregar
-                        </button>
-                    </div>
-                </div>
-
-                <div class="table-responsive mt-4">
+                <div class="table-responsive">
                     <table class="table table-hover bg-transparent align-middle">
-                        <thead class="text-black" style="background-color: rgba(0,0,0,0.03);">
+                        <thead class="text-success bg-light">
                             <tr>
                                 <th class="ps-3">Producto</th>
                                 <th class="text-center">Precio</th>
                                 <th class="text-center">Cant.</th>
-                                <th class="text-end">Importe</th>
-                                <th class="text-center">Opción</th>
+                                <th class="text-end pe-3">Importe</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach (var item in Pedido.Detalles)
                             {
-                                var prod = ListaProductos.FirstOrDefault(p => p.ProductoId == item.ProductoId);
                                 <tr style="border-bottom: 1px solid rgba(0,0,0,0.05);">
-                                    <td class="ps-3">@(prod?.NombreProducto ?? "Desconocido")</td>
-                                    <td class="text-center">@item.PrecioUnitario.ToString("C2")</td>
-                                    <td class="text-center fw-bold">@item.Cantidad</td>
-                                    <td class="text-end fw-bold text-success">@item.Importe.ToString("C2")</td>
-                                    <td class="text-center">
-                                        <button type="button" class="btn btn-sm btn-outline-danger border-0" @onclick="() => EliminarDetalle(item)">
-                                            <i class="bi bi-trash-fill"></i>
-                                        </button>
+                                    <td class="ps-3 fw-bold text-secondary">
+                                        @item.Producto?.NombreProducto
                                     </td>
+                                    <td class="text-center small">@item.PrecioUnitario.ToString("C2")</td>
+                                    <td class="text-center fw-bold">@item.Cantidad</td>
+                                    <td class="text-end pe-3 fw-bold text-success">@item.Importe.ToString("C2")</td>
                                 </tr>
                             }
                             @if (!Pedido.Detalles.Any())
                             {
                                 <tr>
-                                    <td colspan="5" class="text-center text-muted py-3">No hay productos agregados.</td>
+                                    <td colspan="4" class="text-center text-muted py-4">
+                                        <i class="bi bi-basket fs-1 d-block text-muted opacity-25 mb-2"></i>
+                                        No hay productos seleccionados.
+                                        <br />
+                                        <a href="/Tienda/Catalogo" class="btn btn-link">Ir al Catálogo</a>
+                                    </td>
                                 </tr>
                             }
                         </tbody>
+                        <tfoot class="bg-light bg-opacity-50 border-top border-success">
+                            <tr>
+                                <td colspan="3" class="text-end fw-bold pt-3">Subtotal:</td>
+                                <td class="text-end pt-3 pe-3">@((Pedido.MontoTotal - (Pedido.Delivery ? 150 : 0)).ToString("C2"))</td>
+                            </tr>
+                            @if (Pedido.Delivery)
+                            {
+                                <tr class="text-muted small">
+                                    <td colspan="3" class="text-end pt-1">Costo de Envío:</td>
+                                    <td class="text-end pt-1 pe-3">+150.00</td>
+                                </tr>
+                            }
+                            <tr>
+                                <td colspan="3" class="text-end fw-bold fs-4 text-success pt-2">TOTAL A PAGAR:</td>
+                                <td class="text-end fw-bold fs-4 text-success pt-2 pe-3">@Pedido.MontoTotal.ToString("C2")</td>
+                            </tr>
+                        </tfoot>
                     </table>
-                </div>
-
-                @* --- TOTALES --- *@
-                <div class="row justify-content-end mt-3 me-2">
-                    <div class="col-md-4 text-end p-3 rounded-3 bg-light bg-opacity-25 border border-secondary border-opacity-10">
-                        <h5 class="fw-bold m-0">Total a Pagar: <span style="color: #3D5D35; font-size: 1.5rem;">@Pedido.MontoTotal.ToString("C2")</span></h5>
-                    </div>
                 </div>
 
                 @if (!string.IsNullOrEmpty(Mensaje))
                 {
-                    <div class="alert alert-danger mt-3 text-center small" role="alert">
-                        <i class="bi bi-exclamation-triangle-fill"></i> @Mensaje
+                    <div class="alert alert-info mt-3 text-center fw-bold shadow-sm">
+                        <i class="bi bi-info-circle-fill"></i> @Mensaje
                     </div>
                 }
             </div>
 
             @* --- FOOTER --- *@
             <div class="card-footer bg-transparent border-top-0 d-flex justify-content-between align-items-center mt-2 pt-0 pb-3 px-4">
-                <a href="/Pedido/Index" class="btn btn-outline-secondary px-4">
-                    <i class="bi bi-arrow-left"></i> Volver
+                <a href="/Tienda/Catalogo" class="btn btn-outline-secondary px-4">
+                    <i class="bi bi-arrow-left"></i> Seguir Comprando
                 </a>
-                <button type="submit" class="btn btn-gradiente px-5 py-2 shadow">
-                    <i class="bi bi-save"></i> Guardar Pedido
+                <button type="submit" class="btn btn-gradiente px-5 py-3 shadow fs-5" disabled="@(!Pedido.Detalles.Any())">
+                    <i class="bi bi-check-circle-fill"></i> Confirmar y Enviar
                 </button>
             </div>
         </EditForm>
@@ -184,96 +150,104 @@
 @code {
     [SupplyParameterFromForm]
     public Pedido Pedido { get; set; } = new Pedido();
-    public PedidoDetalle Detalle { get; set; } = new PedidoDetalle();
 
-    public List<Cliente> ListaClientes { get; set; } = new List<Cliente>();
-    public List<Producto> ListaProductos { get; set; } = new List<Producto>();
-    
+   
+    public string NombreClienteDisplay { get; set; } = "Cargando...";
+    public string TelefonoClienteDisplay { get; set; } = "";
+
     public string Mensaje { get; set; } = string.Empty;
+    private const double COSTO_ENVIO = 150.00;
 
     protected override async Task OnInitializedAsync()
     {
-        ListaClientes = await clientesService.Listar(c => c.ClienteId > 0);
-        ListaProductos = await productosService.Listar(p => p.ProductoId > 0);
+        
+        if (carritoService.Carrito.Any())
+        {
+            
+            Pedido.Detalles = new List<PedidoDetalle>(carritoService.Carrito);
+            CalcularTotal();
+        }
+
         Pedido.FechaPedido = DateTime.Now;
-        Pedido.Estado = "Pendiente"; // Estado inicial por defecto
-    }
 
-    private void SeleccionarProducto(int idProducto)
-    {
-        Detalle.ProductoId = idProducto;
-        var prod = ListaProductos.FirstOrDefault(p => p.ProductoId == idProducto);
-        if (prod != null)
+        
+        var authState = await authStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity != null && user.Identity.IsAuthenticated)
         {
-            Detalle.PrecioUnitario = prod.Precio; // Asignar precio de venta automáticamente
-        }
-    }
+            var nombreUsuario = user.Identity.Name; 
+            var clienteEncontrado = await clientesService.BuscarPorCorreo(nombreUsuario ?? "");
 
-    public void AgregarDetalle()
-    {
-        Mensaje = string.Empty;
+            if (clienteEncontrado != null)
+            {
+                Pedido.ClienteId = clienteEncontrado.ClienteId;
 
-        if (Detalle.ProductoId <= 0) { Mensaje = "Seleccione un producto."; return; }
-        if (Detalle.Cantidad <= 0) { Mensaje = "Cantidad inválida."; return; }
+                
+                NombreClienteDisplay = $"{clienteEncontrado.NombreCliente} {clienteEncontrado.ApellidoCliente}";
+                TelefonoClienteDisplay = clienteEncontrado.TelefonoCliente;
 
-        // Validar Stock
-        var enStock = ListaProductos.FirstOrDefault(p => p.ProductoId == Detalle.ProductoId);
-        if (enStock != null && Detalle.Cantidad > enStock.Existencia)
-        {
-            Mensaje = $"Stock insuficiente. Solo hay {enStock.Existencia}.";
-            return;
-        }
-
-        var existente = Pedido.Detalles.FirstOrDefault(d => d.ProductoId == Detalle.ProductoId);
-        if (existente != null)
-        {
-            existente.Cantidad += Detalle.Cantidad;
-            existente.Importe = existente.Cantidad * existente.PrecioUnitario;
+                
+                if (string.IsNullOrEmpty(Pedido.ReferenciaSitio))
+                {
+                    Pedido.ReferenciaSitio = $"{clienteEncontrado.CalleCliente} #{clienteEncontrado.ViviendaCliente}, {clienteEncontrado.Sector} ({clienteEncontrado.DescripcionCliente})";
+                }
+            }
+            else
+            {
+                Mensaje = "⚠️ No encontramos tus datos de cliente. Por favor contacta soporte.";
+                NombreClienteDisplay = "Cliente No Registrado";
+            }
         }
         else
         {
-            Detalle.Importe = Detalle.Cantidad * Detalle.PrecioUnitario;
-            Pedido.Detalles.Add(new PedidoDetalle
-            {
-                ProductoId = Detalle.ProductoId,
-                Cantidad = Detalle.Cantidad,
-                PrecioUnitario = Detalle.PrecioUnitario,
-                Importe = Detalle.Importe
-            });
+           
+            navigationManager.NavigateTo("Account/Login");
         }
-
-        CalcularTotal();
-        Detalle = new PedidoDetalle(); 
     }
 
-    public void EliminarDetalle(PedidoDetalle item)
+    private void AlCambiarDelivery(bool valor)
     {
-        Pedido.Detalles.Remove(item);
+        Pedido.Delivery = valor;
         CalcularTotal();
     }
 
     private void CalcularTotal()
     {
-        Pedido.MontoTotal = Pedido.Detalles.Sum(d => d.Importe);
+        double subtotal = Pedido.Detalles.Sum(d => d.Importe);
+        Pedido.MontoTotal = subtotal + (Pedido.Delivery ? COSTO_ENVIO : 0);
     }
 
     public async Task Guardar()
     {
-        if (Pedido.ClienteId <= 0 || !Pedido.Detalles.Any())
+        if (Pedido.ClienteId <= 0)
         {
-            Mensaje = "Faltan datos (Cliente o Productos).";
+            Mensaje = "Error: No se pudo identificar al cliente.";
             return;
         }
+        if (!Pedido.Detalles.Any())
+        {
+            Mensaje = "El carrito está vacío.";
+            return;
+        }
+
+       
+        Pedido.Estado = "Pendiente";
 
         var guardado = await pedidosService.Guardar(Pedido);
 
         if (guardado)
         {
-            navigationManager.NavigateTo("/Pedido/Index");
+           
+            carritoService.LimpiarCarrito();
+
+            Mensaje = "¡Pedido enviado correctamente! 🎉 Te contactaremos pronto.";
+            await Task.Delay(3000);
+            navigationManager.NavigateTo("/"); 
         }
         else
         {
-            Mensaje = "Error al guardar.";
+            Mensaje = "Hubo un error al procesar tu pedido. Intenta de nuevo.";
         }
     }
 }
