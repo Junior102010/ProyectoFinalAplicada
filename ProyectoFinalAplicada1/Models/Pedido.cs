@@ -25,6 +25,8 @@ public class Pedido
     public bool Delivery { get; set; }
     [Required]
     public string? ReferenciaSitio { get; set; }
+
+    [ForeignKey("DetalleId")]
     public ICollection<PedidoDetalle> Detalles { get; set; } = new List<PedidoDetalle>();
 
 }

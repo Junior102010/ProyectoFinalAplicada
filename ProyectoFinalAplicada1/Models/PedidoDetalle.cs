@@ -21,4 +21,7 @@ public class PedidoDetalle
     public double PrecioUnitario { get; set; }
     [Required]
     public double Importe { get; set; }
+
+    [ForeignKey("TransferenciaId")]
+    public ICollection<Transferencia> transferencia { get; set; } = new List<Transferencia>();
 }
