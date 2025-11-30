@@ -6,10 +6,12 @@
 @inject CarritoService carritoService
 @inject NavigationManager navigationManager
 
+
 <PageTitle>Almacén Virtual</PageTitle>
 
 <div class="container-fluid mt-4">
     <div class="row">
+
         
         <div class="col-lg-8">
             <div class="row">
@@ -17,18 +19,25 @@
                 {
                     <div class="col-md-4 col-sm-6 mb-4">
                         <div class="card card-glass h-100 border-0 shadow-sm product-card">
+                           
                             <div class="text-center p-3 bg-light rounded-top position-relative" style="height: 160px;">
-                                <img src="@ObtenerImagen(prod.NombreProducto)" class="img-fluid" style="max-height: 100%; object-fit: contain;" />
+                                <img src="/imagenes/Logo.png" class="img-fluid" style="max-height: 100%; object-fit: contain; opacity: 0.8;" />
                             </div>
+
                             <div class="card-body d-flex flex-column">
-                                <h5 class="fw-bold">@prod.NombreProducto</h5>
-                                <div class="d-flex justify-content-between">
-                                    <small class="text-muted">@prod.UnidadMedida</small>
-                                    <h5 class="text-success fw-bold">@prod.Precio.ToString("C0")</h5>
+                                <h5 class="fw-bold text-dark">@prod.NombreProducto</h5>
+                                <div class="d-flex justify-content-between align-items-center mt-2">
+                                    <span class="badge bg-secondary bg-opacity-25 text-dark border border-secondary border-opacity-25">
+                                        @prod.UnidadMedida
+                                    </span>
+                                    <h5 class="text-success fw-bold m-0">@prod.Precio.ToString("C0")</h5>
                                 </div>
-                                <button class="btn btn-gradiente w-100 mt-3" @onclick="() => AgregarAlCarrito(prod)">
-                                    <i class="bi bi-cart-plus"></i> Agregar
-                                </button>
+
+                                <div class="mt-auto pt-3">
+                                    <button class="btn btn-gradiente w-100 shadow-sm" @onclick="() => AgregarAlCarrito(prod)">
+                                        <i class="bi bi-cart-plus"></i> Agregar
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -36,11 +45,11 @@
             </div>
         </div>
 
-       
+        
         <div class="col-lg-4">
-            <div class="card card-glass sticky-top" style="top: 20px;">
-                <div class="card-header bg-transparent fw-bold text-success">
-                    <i class="bi bi-basket"></i> Resumen de Compra
+            <div class="card card-glass sticky-top shadow-lg" style="top: 20px; max-height: 90vh; overflow-y: auto;">
+                <div class="card-header bg-transparent fw-bold text-success border-bottom border-success border-opacity-25">
+                    <i class="bi bi-basket-fill"></i> Tu Canasta
                 </div>
                 <div class="card-body">
                     @if (carritoService.Carrito.Any())
@@ -48,28 +57,49 @@
                         <ul class="list-group list-group-flush mb-3">
                             @foreach (var item in carritoService.Carrito)
                             {
-                                <li class="list-group-item bg-transparent d-flex justify-content-between align-items-center px-0">
-                                    <div>
-                                        <span class="fw-bold">@item.Producto?.NombreProducto</span>
-                                        <small class="d-block text-muted">x @item.Cantidad</small>
+                                <li class="list-group-item bg-transparent px-0 border-bottom border-secondary border-opacity-10">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="fw-bold text-dark">@item.Producto?.NombreProducto</span>
+                                        <span class="text-success fw-bold">@item.Importe.ToString("C0")</span>
                                     </div>
-                                    <span class="text-success fw-bold">@item.Importe.ToString("C0")</span>
+
+                                    
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="btn-group btn-group-sm shadow-sm" role="group">
+                                            <button type="button" class="btn btn-light border" @onclick="() => DisminuirCantidad(item)">
+                                                <i class="bi bi-dash"></i>
+                                            </button>
+                                            <span class="btn btn-light border-top border-bottom disabled text-dark fw-bold" style="width: 40px; background-color: #fff;">
+                                                @item.Cantidad
+                                            </span>
+                                            <button type="button" class="btn btn-light border" @onclick="() => AumentarCantidad(item)">
+                                                <i class="bi bi-plus"></i>
+                                            </button>
+                                        </div>
+
+                                        <button class="btn btn-sm btn-outline-danger border-0" @onclick="() => EliminarItem(item)" title="Eliminar">
+                                            <i class="bi bi-trash-fill"></i>
+                                        </button>
+                                    </div>
                                 </li>
                             }
                         </ul>
-                        <div class="d-flex justify-content-between border-top pt-3 mb-3">
-                            <h4>Total:</h4>
+
+                        <div class="d-flex justify-content-between border-top border-success border-opacity-25 pt-3 mb-3">
+                            <h4 class="text-muted">Total:</h4>
                             <h4 class="text-success fw-bold">@carritoService.ObtenerTotal().ToString("C2")</h4>
                         </div>
 
-                       
-                        <button class="btn btn-gradiente w-100 py-2 fs-5" @onclick="IrAPagar">
-                            Ir a Pagar <i class="bi bi-arrow-right"></i>
+                        <button class="btn btn-gradiente w-100 py-2 fs-5 shadow" @onclick="IrAPagar">
+                            Procesar Pedido <i class="bi bi-arrow-right-circle-fill ms-1"></i>
                         </button>
                     }
                     else
                     {
-                        <div class="text-center text-muted py-4">Tu carrito está vacío.</div>
+                        <div class="text-center text-muted py-5">
+                            <i class="bi bi-cart-x fs-1 opacity-50"></i>
+                            <p class="mt-2">Tu carrito está vacío.</p>
+                        </div>
                     }
                 </div>
             </div>
@@ -82,29 +112,63 @@
 
     protected override async Task OnInitializedAsync()
     {
+       
         ListaProductos = await productosService.Listar(p => p.Existencia > 0);
     }
 
     private void AgregarAlCarrito(Producto prod)
     {
-        
-        var item = new PedidoDetalle
+       
+        var itemExistente = carritoService.Carrito.FirstOrDefault(p => p.ProductoId == prod.ProductoId);
+
+        if (itemExistente != null)
         {
-            ProductoId = prod.ProductoId,
-            Producto = prod, 
-            Cantidad = 1,
-            PrecioUnitario = prod.Precio,
-            Importe = prod.Precio
-        };
-        carritoService.AgregarItem(item);
+            itemExistente.Cantidad++;
+            itemExistente.Importe = itemExistente.Cantidad * itemExistente.PrecioUnitario;
+        }
+        else
+        {
+            var item = new PedidoDetalle
+            {
+                ProductoId = prod.ProductoId,
+                Producto = prod,
+                Cantidad = 1,
+                PrecioUnitario = prod.Precio,
+                Importe = prod.Precio
+            };
+            carritoService.AgregarItem(item);
+        }
+       
+    }
+
+    private void AumentarCantidad(PedidoDetalle item)
+    {
+        item.Cantidad++;
+        item.Importe = item.Cantidad * item.PrecioUnitario;
+    }
+
+    private void DisminuirCantidad(PedidoDetalle item)
+    {
+        if (item.Cantidad > 1)
+        {
+            item.Cantidad--;
+            item.Importe = item.Cantidad * item.PrecioUnitario;
+        }
+        else
+        {
+            
+            EliminarItem(item);
+        }
+    }
+
+    private void EliminarItem(PedidoDetalle item)
+    {
+        carritoService.Carrito.Remove(item);
+       
     }
 
     private void IrAPagar()
     {
-        
-
         navigationManager.NavigateTo("/PedidoCliente/Create");
     }
-
-    private string ObtenerImagen(string nombre) => "/imagenes/Logo.png"; 
 }

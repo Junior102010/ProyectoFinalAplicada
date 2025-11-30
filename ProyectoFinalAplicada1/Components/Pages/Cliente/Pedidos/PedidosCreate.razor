@@ -7,6 +7,7 @@
 @inject AuthenticationStateProvider authStateProvider
 @inject NavigationManager navigationManager
 
+
 <PageTitle>Confirmar Mi Pedido</PageTitle>
 
 <div class="container mt-4">
@@ -14,7 +15,7 @@
 
         <div class="card-header bg-transparent border-bottom border-secondary border-opacity-10 pb-3">
             <h3 class="m-0 fw-bold text-success"><i class="bi bi-bag-check-fill"></i> Confirmar Pedido</h3>
-            <small class="text-muted">Revisa tus datos y productos antes de finalizar.</small>
+            <small class="text-muted">Revisa tus datos, método de pago y productos.</small>
         </div>
 
         <EditForm Model="Pedido" OnValidSubmit="Guardar" FormName="ConfirmarPedidoCliente">
@@ -22,7 +23,7 @@
 
             <div class="card-body">
 
-                
+               
                 <div class="row mb-4">
                     <div class="col-md-12">
                         <h6 class="fw-bold text-muted mb-3 border-bottom pb-2">
@@ -30,46 +31,74 @@
                         </h6>
                     </div>
 
-                    
                     <div class="col-md-6 mb-3">
                         <label class="form-label text-muted small fw-bold mb-1">Nombre</label>
-                        <input type="text" class="form-control input-glass bg-light" value="@NombreClienteDisplay" readonly />
+                        <InputText class="form-control input-glass bg-light" @bind-Value="NombreClienteDisplay" readonly />
                     </div>
 
-                  
                     <div class="col-md-6 mb-3">
                         <label class="form-label text-muted small fw-bold mb-1">Teléfono</label>
-                        <input type="text" class="form-control input-glass bg-light" value="@TelefonoClienteDisplay" readonly />
+                        <InputText class="form-control input-glass bg-light" @bind-Value="TelefonoClienteDisplay" readonly />
                     </div>
 
-                  
                     <div class="col-md-12 mb-3">
-                        <label class="form-label text-muted small fw-bold mb-1">Dirección / Referencia de Entrega</label>
-                        <InputTextArea class="form-control input-glass" @bind-Value="Pedido.ReferenciaSitio" rows="2" placeholder="Ej: Casa azul, frente al parque..." />
+                        <label class="form-label text-muted small fw-bold mb-1">Dirección / Referencia</label>
+                        <InputTextArea class="form-control input-glass" @bind-Value="Pedido.ReferenciaSitio" rows="2" placeholder="Ej: Calle Principal #10, Casa Azul..." />
                         <ValidationMessage For="(() => Pedido.ReferenciaSitio)" />
-                        <div class="form-text text-muted small">
-                            <i class="bi bi-info-circle"></i> Verifique que la dirección sea correcta para el delivery.
-                        </div>
                     </div>
 
-                  
                     <div class="col-md-12">
                         <div class="form-check form-switch p-3 bg-warning bg-opacity-10 rounded border border-warning border-opacity-25">
-                            <InputCheckbox class="form-check-input"
-                                           Value="Pedido.Delivery"
-                                           ValueChanged="@((bool v) => AlCambiarDelivery(v))"
-                                           ValueExpression="@(() => Pedido.Delivery)"
-                                           style="cursor: pointer;" />
+                            <InputCheckbox class="form-check-input" @bind-Value="Pedido.Delivery" id="chkDelivery" style="cursor: pointer;" @oninput="ActualizarTotal" />
                             <label class="form-check-label fw-bold ms-2" for="chkDelivery">
-                                <i class="bi bi-bicycle"></i> Solicitar Delivery (+RD$ 150.00)
+                                <i class="bi bi-bicycle"></i> Solicitar Delivery (+RD$ @CostoEnvio.ToString("N2"))
                             </label>
                         </div>
                     </div>
                 </div>
 
+               
+                <div class="row mb-4">
+                    <div class="col-md-12">
+                        <h6 class="fw-bold text-muted mb-3 border-bottom pb-2">
+                            <i class="bi bi-wallet2"></i> Método de Pago
+                        </h6>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Seleccione cómo desea pagar:</label>
+                        <InputSelect class="form-select input-glass fw-bold text-primary" @bind-Value="MetodoPagoSeleccionado">
+                            <option value="Efectivo">💵 Efectivo (Contra Entrega)</option>
+                            <option value="Transferencia">🏦 Transferencia Bancaria</option>
+                        </InputSelect>
+                    </div>
+
+                    <div class="col-md-6">
+                        @if (MetodoPagoSeleccionado == "Transferencia")
+                        {
+                            <div class="alert alert-info shadow-sm mb-0">
+                                <small>
+                                    <strong><i class="bi bi-info-circle"></i> Instrucciones:</strong><br />
+                                    Su pedido quedará en estado <strong>Pendiente de Pago</strong>.
+                                    Por favor realice la transferencia y envíe el comprobante vía WhatsApp o súbalo en su perfil.
+                                </small>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="alert alert-success shadow-sm mb-0">
+                                <small>
+                                    <strong><i class="bi bi-check-circle"></i> Efectivo:</strong><br />
+                                    Pagará al momento de recibir su pedido.
+                                </small>
+                            </div>
+                        }
+                    </div>
+                </div>
+
                 
                 <h6 class="fw-bold text-muted mb-3 border-bottom pb-2 mt-4">
-                    <i class="bi bi-cart3"></i> Productos en Carrito
+                    <i class="bi bi-cart3"></i> Resumen de Productos
                 </h6>
 
                 <div class="table-responsive">
@@ -94,32 +123,21 @@
                                     <td class="text-end pe-3 fw-bold text-success">@item.Importe.ToString("C2")</td>
                                 </tr>
                             }
-                            @if (!Pedido.Detalles.Any())
-                            {
-                                <tr>
-                                    <td colspan="4" class="text-center text-muted py-4">
-                                        <i class="bi bi-basket fs-1 d-block text-muted opacity-25 mb-2"></i>
-                                        No hay productos seleccionados.
-                                        <br />
-                                        <a href="/Tienda/Catalogo" class="btn btn-link">Ir al Catálogo</a>
-                                    </td>
-                                </tr>
-                            }
                         </tbody>
                         <tfoot class="bg-light bg-opacity-50 border-top border-success">
                             <tr>
                                 <td colspan="3" class="text-end fw-bold pt-3">Subtotal:</td>
-                                <td class="text-end pt-3 pe-3">@((Pedido.MontoTotal - (Pedido.Delivery ? 150 : 0)).ToString("C2"))</td>
+                                <td class="text-end pt-3 pe-3">@((Pedido.MontoTotal - (Pedido.Delivery ? CostoEnvio : 0)).ToString("C2"))</td>
                             </tr>
                             @if (Pedido.Delivery)
                             {
                                 <tr class="text-muted small">
-                                    <td colspan="3" class="text-end pt-1">Costo de Envío:</td>
-                                    <td class="text-end pt-1 pe-3">+150.00</td>
+                                    <td colspan="3" class="text-end pt-1">Envío:</td>
+                                    <td class="text-end pt-1 pe-3">+@CostoEnvio.ToString("N2")</td>
                                 </tr>
                             }
                             <tr>
-                                <td colspan="3" class="text-end fw-bold fs-4 text-success pt-2">TOTAL A PAGAR:</td>
+                                <td colspan="3" class="text-end fw-bold fs-4 text-success pt-2">TOTAL:</td>
                                 <td class="text-end fw-bold fs-4 text-success pt-2 pe-3">@Pedido.MontoTotal.ToString("C2")</td>
                             </tr>
                         </tfoot>
@@ -128,19 +146,19 @@
 
                 @if (!string.IsNullOrEmpty(Mensaje))
                 {
-                    <div class="alert alert-info mt-3 text-center fw-bold shadow-sm">
-                        <i class="bi bi-info-circle-fill"></i> @Mensaje
+                    <div class="alert alert-warning mt-3 text-center fw-bold shadow-sm">
+                        <i class="bi bi-exclamation-triangle-fill"></i> @Mensaje
                     </div>
                 }
             </div>
 
-            @* --- FOOTER --- *@
+           
             <div class="card-footer bg-transparent border-top-0 d-flex justify-content-between align-items-center mt-2 pt-0 pb-3 px-4">
-                <a href="/Tienda/Catalogo" class="btn btn-outline-secondary px-4">
-                    <i class="bi bi-arrow-left"></i> Seguir Comprando
+                <a href="/AlmacenCliente" class="btn btn-outline-secondary px-4">
+                    <i class="bi bi-arrow-left"></i> Volver
                 </a>
                 <button type="submit" class="btn btn-gradiente px-5 py-3 shadow fs-5" disabled="@(!Pedido.Detalles.Any())">
-                    <i class="bi bi-check-circle-fill"></i> Confirmar y Enviar
+                    <i class="bi bi-check-circle-fill"></i> Finalizar Pedido
                 </button>
             </div>
         </EditForm>
@@ -151,39 +169,38 @@
     [SupplyParameterFromForm]
     public Pedido Pedido { get; set; } = new Pedido();
 
-   
+    
+    public string MetodoPagoSeleccionado { get; set; } = "Efectivo";
+
     public string NombreClienteDisplay { get; set; } = "Cargando...";
     public string TelefonoClienteDisplay { get; set; } = "";
-
     public string Mensaje { get; set; } = string.Empty;
-    private const double COSTO_ENVIO = 150.00;
+
+    private const double CostoEnvio = 150.00;
 
     protected override async Task OnInitializedAsync()
     {
         
         if (carritoService.Carrito.Any())
         {
-            
             Pedido.Detalles = new List<PedidoDetalle>(carritoService.Carrito);
             CalcularTotal();
         }
 
         Pedido.FechaPedido = DateTime.Now;
 
-        
+       
         var authState = await authStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
 
         if (user.Identity != null && user.Identity.IsAuthenticated)
         {
-            var nombreUsuario = user.Identity.Name; 
+            var nombreUsuario = user.Identity.Name;
             var clienteEncontrado = await clientesService.BuscarPorCorreo(nombreUsuario ?? "");
 
             if (clienteEncontrado != null)
             {
                 Pedido.ClienteId = clienteEncontrado.ClienteId;
-
-                
                 NombreClienteDisplay = $"{clienteEncontrado.NombreCliente} {clienteEncontrado.ApellidoCliente}";
                 TelefonoClienteDisplay = clienteEncontrado.TelefonoCliente;
 
@@ -195,8 +212,8 @@
             }
             else
             {
-                Mensaje = "⚠️ No encontramos tus datos de cliente. Por favor contacta soporte.";
-                NombreClienteDisplay = "Cliente No Registrado";
+                Mensaje = "No se encontraron datos del cliente asociado a este usuario.";
+                NombreClienteDisplay = "Cliente Desconocido";
             }
         }
         else
@@ -206,48 +223,58 @@
         }
     }
 
-    private void AlCambiarDelivery(bool valor)
+    
+    private void ActualizarTotal(ChangeEventArgs e)
     {
-        Pedido.Delivery = valor;
+        
+        bool esDelivery = (bool)(e.Value ?? false);
+        Pedido.Delivery = esDelivery;
         CalcularTotal();
     }
 
     private void CalcularTotal()
     {
         double subtotal = Pedido.Detalles.Sum(d => d.Importe);
-        Pedido.MontoTotal = subtotal + (Pedido.Delivery ? COSTO_ENVIO : 0);
+        Pedido.MontoTotal = subtotal + (Pedido.Delivery ? CostoEnvio : 0);
     }
 
     public async Task Guardar()
     {
         if (Pedido.ClienteId <= 0)
         {
-            Mensaje = "Error: No se pudo identificar al cliente.";
+           
             return;
         }
         if (!Pedido.Detalles.Any())
         {
-            Mensaje = "El carrito está vacío.";
+           
             return;
         }
 
-       
-        Pedido.Estado = "Pendiente";
+     
+        if (MetodoPagoSeleccionado == "Transferencia")
+        {
+            Pedido.Estado = "Pendiente de Pago";
+            
+           
+            Pedido.ReferenciaSitio += " [PAGO: TRANSFERENCIA]";
+        }
+        else
+        {
+            Pedido.Estado = "Pendiente"; 
+            Pedido.ReferenciaSitio += " [PAGO: EFECTIVO]";
+        }
+
+        CalcularTotal();
 
         var guardado = await pedidosService.Guardar(Pedido);
 
         if (guardado)
         {
-           
             carritoService.LimpiarCarrito();
-
-            Mensaje = "¡Pedido enviado correctamente! 🎉 Te contactaremos pronto.";
-            await Task.Delay(3000);
+            await Task.Delay(2000);
             navigationManager.NavigateTo("/"); 
         }
-        else
-        {
-            Mensaje = "Hubo un error al procesar tu pedido. Intenta de nuevo.";
-        }
+       
     }
 }
