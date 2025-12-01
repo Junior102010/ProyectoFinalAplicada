@@ -262,12 +262,6 @@ table {
     }
 
 
-
-
-
-
-
-
 /* --- ESTILOS PARA EL DASHBOARD (Adaptado a tu diseño) --- */
 
 /* Borde de color a la izquierda (Como SB Admin) */
@@ -315,3 +309,52 @@ table {
     .card-dashboard:hover {
         transform: translateY(-3px); /* Pequeño efecto al pasar el mouse */
     }
+
+
+
+
+
+
+
+/* ========================================= */
+/* ESTILOS PARA EL SCROLL DEL REGISTRO       */
+/* ========================================= */
+
+/* Hacemos que el cuerpo de la tarjeta tenga límite de altura */
+.register-scroll-area {
+    max-height: 55vh; /* Ocupa máximo el 55% de la altura de la pantalla */
+    overflow-y: auto; /* Activa el scroll vertical si se pasa */
+    overflow-x: hidden;
+    padding-right: 10px; /* Espacio para que el scroll no tape el texto */
+    margin-bottom: 15px;
+}
+
+    /* --- Personalizar la barra de scroll (Para que sea verde y fina) --- */
+    .register-scroll-area::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .register-scroll-area::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+    }
+
+    .register-scroll-area::-webkit-scrollbar-thumb {
+        background: #a5d6a7; /* Un verde suave */
+        border-radius: 10px;
+    }
+
+        .register-scroll-area::-webkit-scrollbar-thumb:hover {
+            background: #3D5D35; /* Verde oscuro al pasar el mouse */
+        }
+
+/* Ajuste para pantallas muy pequeñas (celulares) */
+@media (max-height: 700px) {
+    .register-scroll-area {
+        max-height: 45vh;
+    }
+
+    .login-card {
+        padding: 1.5rem; /* Menos relleno en pantallas chicas */
+    }
+}
