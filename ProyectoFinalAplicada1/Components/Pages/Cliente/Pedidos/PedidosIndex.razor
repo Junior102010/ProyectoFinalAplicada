@@ -4,6 +4,10 @@
 @inject PedidosServices pedidosService
 @inject NavigationManager navigationManager
 
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject ProyectoFinalAplicada1.DAL.Context _context
+@using Microsoft.EntityFrameworkCore
+
 @attribute [Authorize(Roles = "Cliente")]
 
 <PageTitle>Gestión de Pedidos</PageTitle>
@@ -142,23 +146,48 @@
 
 @code {
     public List<Pedido> ListaPedidos { get; set; } = new List<Pedido>();
-    
+
     public string ValorFiltro { get; set; } = string.Empty;
     public DateTime? FechaInicio { get; set; }
     public DateTime? FechaFin { get; set; }
+    public int ClienteLogId { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        
+
         FechaInicio = DateTime.Now.AddDays(-30);
         FechaFin = DateTime.Now;
         await Buscar();
     }
 
+    // Función que realiza todo el proceso y devuelve el ClienteId
+    public async Task<int> GetClienteIdAsync()
+    {
+        // 1. Obtener el GUID (Identity User ID)
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var identityId = authState.User
+            .FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+        if (string.IsNullOrEmpty(identityId))
+        {
+            return 0; // Usuario no logueado o ID no encontrado
+        }
+
+        // 2. Consultar la base de datos para obtener el ClienteId
+        return await _context.Cliente
+            .Where(c => c.UserId == identityId)
+            .Select(c => c.ClienteId) // Selecciona solo el ClienteId
+            .FirstOrDefaultAsync();    // Devuelve el ID (o 0 si no se encuentra)
+    }
+
     private async Task Buscar()
     {
-        
+
         var lista = await pedidosService.Listar(p => p.PedidoId > 0);
+
+        int id = await GetClienteIdAsync();
+
+        lista = lista.Where(p => p.ClienteId == id).ToList();
 
         
         if (FechaInicio.HasValue)

@@ -6,6 +6,10 @@
 @inject NavigationManager navigationManager
 @inject PageTitleService PageTitleService
 
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject ProyectoFinalAplicada1.DAL.Context _context
+@using Microsoft.EntityFrameworkCore
+
 @attribute [Authorize(Roles = "Cliente")]
 
 <PageTitle>Gestión de Transferencias</PageTitle>
@@ -126,10 +130,33 @@
         await Buscar();
     }
 
+    public async Task<int> GetClienteIdAsync()
+    {
+        // 1. Obtener el GUID (Identity User ID)
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var identityId = authState.User
+            .FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+        if (string.IsNullOrEmpty(identityId))
+        {
+            return 0; // Usuario no logueado o ID no encontrado
+        }
+
+        // 2. Consultar la base de datos para obtener el ClienteId
+        return await _context.Cliente
+            .Where(c => c.UserId == identityId)
+            .Select(c => c.ClienteId) 
+            .FirstOrDefaultAsync();    
+    }
+
     private async Task Buscar()
     {
     
         var lista = await TransferenciaService.Listar(t => t.TransferenciaId > 0);
+
+        int id = await GetClienteIdAsync();
+
+        // lista = lista.Where(p => p. == id).ToList();
 
         // 1. Filtrar por Fechas
         if (FechaInicio.HasValue)
