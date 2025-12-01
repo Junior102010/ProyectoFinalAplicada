@@ -1,12 +1,14 @@
 ﻿@page "/transferencias/crear"
+@using Microsoft.AspNetCore.Authorization
 
 @inject IWebHostEnvironment WebHostEnvironment
 @inject NavigationManager NavigationManager
 @inject TranferenciaServices TransferenciaService
 
-<h3>Nueva Transferencia Bancaria</h3>
+@attribute [Authorize(Roles = "Cliente")]
 
-<EditForm Model="@NuevaTransferencia" OnValidSubmit="@GuardarTransferenciaCompleta">
+<h3>Nueva Transferencia Bancaria</h3>
+<EditForm Model="@NuevaTransferencia" OnValidSubmit="@GuardarTransferenciaCompleta" formname="TransferenciaFormularioUnico">
     <DataAnnotationsValidator />
     <ValidationSummary />
 
@@ -72,29 +74,34 @@
                 }
             </div>
         </div>
-            
+
         <div class="card-footer bg-transparent border-top-0 d-flex justify-content-between align-items-center mt-2 pt-0 pb-3 px-4">
-            <a href="/Almacen" class="btn btn-outline-secondary px-4">
+            <a href="/TransferenciaCliente/Index" class="btn btn-outline-secondary px-4">
                 <span class="bi bi-arrow-left"></span> Volver
             </a>
             <button type="submit" class="btn btn-gradiente px-5">
                 <span class="bi bi-floppy"></span> Guardar
             </button>
         </div>
-        
+
     </div>
 </EditForm>
 
 @code {
-    private Transferencia NuevaTransferencia { get; set; } = new Transferencia();
+  
+    private Transferencia NuevaTransferencia { get; set; } = new Transferencia
+    {
+        
+        Imagenes = new List<TransferenciaImagen>()
+    };
     private List<IBrowserFile> selectedFiles = new List<IBrowserFile>();
     private string? errorMessage;
 
-    // Constante de 5 MB por archivo
-    private const long MaxFileSize = 1024 * 1024 * 5;
+  
+    private const long MaxFileSize = 1024 * 1024 * 5;
 
-    // Este método se llama cuando el usuario selecciona archivos
-    private void HandleFileSelection(InputFileChangeEventArgs e)
+    
+    private void HandleFileSelection(InputFileChangeEventArgs e)
     {
         selectedFiles.Clear();
         errorMessage = null;
@@ -111,49 +118,45 @@
         }
     }
 
-    // Este método se llama al enviar el formulario
-    private async Task GuardarTransferenciaCompleta()
+    
+    private async Task GuardarTransferenciaCompleta()
     {
-        // 1. Configurar la ruta de guardado en el servidor
-        string uploadsPath = Path.Combine(WebHostEnvironment.WebRootPath, "TransferenciaUploads");
+        string uploadsPath = Path.Combine(WebHostEnvironment.WebRootPath, "TransferenciaUploads");
         Directory.CreateDirectory(uploadsPath);
-
-        // 2. Procesar y guardar cada archivo físico
-        foreach (var file in selectedFiles)
+        foreach (var file in selectedFiles)
         {
             string uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(file.Name);
             string fullServerPath = Path.Combine(uploadsPath, uniqueFileName);
 
-            // Guardar archivo físico en wwwroot
-            await using (var stream = new FileStream(fullServerPath, FileMode.Create))
+            
+            await using (var stream = new FileStream(fullServerPath, FileMode.Create))
             {
-                await file.OpenReadStream(MaxFileSize).CopyToAsync(stream);
+                
+                await file.OpenReadStream(MaxFileSize).CopyToAsync(stream);
             }
 
-            // 3. Crear el objeto TransferenciaImagen para adjuntar al modelo
-            string relativeDbPath = $"/TransferenciaUploads/{uniqueFileName}";
+            
+            string relativeDbPath = $"/TransferenciaUploads/{uniqueFileName}";
 
             var imagenRegistro = new TransferenciaImagen
             {
                 RutaImagen = relativeDbPath
             };
 
-            // Añadir la referencia al objeto principal
-            NuevaTransferencia.Imagenes.Add(imagenRegistro);
+            
+            NuevaTransferencia.Imagenes.Add(imagenRegistro);
         }
 
-        // 4. Llamar al servicio para guardar la Transferencia y las rutas en SQL
-        bool guardado = await TransferenciaService.Guardar(NuevaTransferencia);
+        
+        bool guardado = await TransferenciaService.Guardar(NuevaTransferencia);
 
         if (guardado)
         {
-            // Redireccionar o limpiar el formulario
-            NavigationManager.NavigateTo("/transferencias");
+            NavigationManager.NavigateTo("/transferencias");
         }
         else
         {
-            // Opcional: Si falla la BD, podrías considerar eliminar los archivos subidos del servidor
-            errorMessage = "Error al guardar los datos en la base de datos. Los archivos físicos pudieron haberse guardado.";
+            errorMessage = "Error al guardar los datos en la base de datos. Los archivos físicos pudieron haberse guardado.";
         }
     }
 }

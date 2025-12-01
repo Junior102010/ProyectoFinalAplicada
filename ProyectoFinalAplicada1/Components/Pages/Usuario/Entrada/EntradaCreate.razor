@@ -1,10 +1,13 @@
 ﻿@page "/Entrada/Create"
+@using Microsoft.AspNetCore.Authorization
 @rendermode InteractiveServer
 
 @inject EntradasServices entradasService
 @inject ProductosServices productosService
 @inject NavigationManager navigationManager
 @inject PageTitleService PageTitleService
+
+@attribute [Authorize(Roles = "Administrador")]
 
 <PageTitle>Crear Entrada</PageTitle>
 
@@ -52,7 +55,7 @@
 
                 @* --- DETALLE --- *@
                 <div class="row align-items-end mb-3">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <label class="form-label text-muted small fw-bold mb-1">Producto</label>
                         <InputSelect class="form-select input-glass" @bind-Value="Detalle.ProductoId">
                             <option value="0" selected disabled>Seleccione un producto</option>
@@ -62,9 +65,14 @@
                             }
                         </InputSelect>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <label class="form-label text-muted small fw-bold mb-1">Cantidad</label>
                         <InputNumber class="form-control input-glass" @bind-Value="Detalle.Cantidad" />
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label text-muted small fw-bold mb-1">Costo</label>
+                        <InputNumber class="form-control input-glass" @bind-Value="Costo" />
                     </div>
                     <div class="col-md-3">
                         <button type="button" class="btn btn-gradiente w-100" @onclick="AgregarDetalle">
@@ -80,6 +88,7 @@
                             <tr>
                                 <th class="ps-3">Producto</th>
                                 <th class="text-center">Cantidad</th>
+                                
                                 <th class="text-center">Acción</th>
                             </tr>
                         </thead>
@@ -90,6 +99,7 @@
                                 <tr style="border-bottom: 1px solid rgba(0,0,0,0.05);">
                                     <td class="ps-3">@(prod?.NombreProducto ?? "No encontrado")</td>
                                     <td class="text-center fw-bold" style="color: #3D5D35;">@item.Cantidad</td>
+                                    
                                     <td class="text-center">
                                         <button type="button" class="btn btn-sm btn-outline-danger border-0 bi bi-trash fs-5" @onclick="() => EliminarDetalle(item)"></button>
                                     </td>
@@ -115,7 +125,7 @@
             </div>
 
             <div class="card-footer bg-transparent border-top-0 d-flex justify-content-between align-items-center mt-2 pt-0 pb-3 px-4">
-                <a href="/Producto/Index" class="btn btn-outline-secondary px-3">Volver</a>
+                <a href="/Entrada/Index" class="btn btn-outline-secondary px-3">Volver</a>
                 <button type="submit" class="btn btn-gradiente px-4"> <span class="bi bi-floppy"></span> Guardar</button>
             </div>
         </EditForm>
@@ -128,6 +138,9 @@
 
     public List<Producto> ListaProductos { get; set; } = new List<Producto>();
     public List<Proveedor> ListaProveedores { get; set; } = new List<Proveedor>();
+
+    public double Costo { get; set; } 
+
 
     public string Mensaje { get; set; } = string.Empty;
 

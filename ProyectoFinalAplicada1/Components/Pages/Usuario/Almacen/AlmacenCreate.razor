@@ -1,9 +1,12 @@
 ﻿@page "/Producto/Create"
+@using Microsoft.AspNetCore.Authorization
 
 @inject ProductosServices productosService
 @inject NavigationManager navigationManager
 @inject PageTitleService PageTitleService
 @rendermode InteractiveServer
+
+@attribute [Authorize(Roles = "Administrador")]
 
 <PageTitle>Crear Producto</PageTitle>
 

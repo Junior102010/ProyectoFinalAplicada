@@ -1,8 +1,11 @@
 ﻿@page "/Resumen"
+@using Microsoft.AspNetCore.Authorization
 
 @inject PedidosServices pedidosService
 @inject ProductosServices productosService
 @inject PageTitleService PageTitleService
+
+@attribute [Authorize(Roles = "Administrador")]
 
 <PageTitle>Resumen General</PageTitle>
 
@@ -160,7 +163,7 @@
     protected override async Task OnInitializedAsync()
     {
         
-        PageTitleService.SetTitle("<i class='bi bi-grid-fill text-primary'></i>Dashboard");
+        PageTitleService.SetTitle("Resumen");
         var todosPedidos = await pedidosService.Listar(p => p.Estado == "Entregado");
         IngresosTotales = todosPedidos.Sum(p => p.MontoTotal);
 

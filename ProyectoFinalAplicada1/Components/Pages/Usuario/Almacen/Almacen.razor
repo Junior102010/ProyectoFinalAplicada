@@ -1,8 +1,11 @@
 ﻿@page "/Almacen"
+@using Microsoft.AspNetCore.Authorization
 
 @inject ProductosServices productosService
 @inject NavigationManager navigationManager
 @inject PageTitleService PageTitleService
+
+@attribute [Authorize(Roles = "Administrador")]
 
 <PageTitle>Registro de Productos</PageTitle>
 
@@ -42,7 +45,7 @@
                         </a>
 
                         <a href="/Producto/Create" class="btn btn-gradiente px-3">
-                            <span class="bi bi-plus-square"></span> Crear 2
+                            <span class="bi bi-plus-square"></span> Crear
                         </a>
 
                     </div>
@@ -99,7 +102,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        PageTitleService.SetTitle("Productos");
+        PageTitleService.SetTitle("Almacen");
         ListaProductos = await productosService.Listar(p => p.ProductoId > 0);
     }
 

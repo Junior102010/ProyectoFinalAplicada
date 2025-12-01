@@ -1,8 +1,14 @@
 ﻿@page "/Transferencia/Index"
+@using Microsoft.AspNetCore.Authorization
 @using ProyectoFinalAplicada.Models
 @using ProyectoFinalAplicada.Services
+
 @inject TranferenciaServices TransferenciaService
 @inject NavigationManager navigationManager
+@inject PageTitleService PageTitleService
+@rendermode InteractiveServer
+
+@attribute [Authorize(Roles = "Administrador")]
 
 <PageTitle>Gestión de Transferencias</PageTitle>
 
@@ -120,7 +126,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        // Establecer el rango inicial de 30 días
+        PageTitleService.SetTitle("Transferencias");
         FechaInicio = DateTime.Now.AddDays(-30);
         FechaFin = DateTime.Now;
         await Buscar();
@@ -128,17 +134,16 @@
 
     private async Task Buscar()
     {
-        // Obtener todas las transferencias para empezar el filtrado en memoria
-        // NOTA: Para grandes volúmenes de datos, deberías hacer el filtro en la consulta SQL (en el servicio).
+        
         var lista = await TransferenciaService.Listar(t => t.TransferenciaId > 0);
 
-        // 1. Filtrar por Fechas
+       
         if (FechaInicio.HasValue)
             lista = lista.Where(t => t.Fecha.Date >= FechaInicio.Value.Date).ToList();
         if (FechaFin.HasValue)
             lista = lista.Where(t => t.Fecha.Date <= FechaFin.Value.Date).ToList();
 
-        // 2. Filtrar por Texto (Origen, Destino, Observaciones)
+       
         if (!string.IsNullOrWhiteSpace(ValorFiltro))
         {
             lista = lista.Where(t => 

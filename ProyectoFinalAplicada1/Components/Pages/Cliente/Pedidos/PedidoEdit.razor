@@ -1,8 +1,12 @@
 ﻿@page "/PedidoCliente/Edit/{PedidoId:int}"
+@using Microsoft.AspNetCore.Authorization
 @rendermode InteractiveServer
 
 @inject PedidosServices pedidosService
 @inject NavigationManager navigationManager
+@inject PageTitleService PageTitleService
+
+@attribute [Authorize(Roles = "Cliente")]
 
 <PageTitle>Gestionar Pedido</PageTitle>
 
@@ -91,7 +95,7 @@
 
       
             <div class="card-footer bg-transparent border-top-0 d-flex justify-content-between align-items-center mt-2 pt-0 pb-3 px-4">
-                <a href="/Pedido/Index" class="btn btn-outline-secondary px-4">Volver</a>
+                <a href="/PedidoCliente/Index" class="btn btn-outline-secondary px-4">Volver</a>
                 <button type="submit" class="btn btn-gradiente px-5 shadow">
                     Guardar Cambios
                 </button>
@@ -111,6 +115,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+        PageTitleService.SetTitle("Pedidos");
         if (Pedido.PedidoId == 0)
         {
             var encontrado = await pedidosService.Buscar(PedidoId);

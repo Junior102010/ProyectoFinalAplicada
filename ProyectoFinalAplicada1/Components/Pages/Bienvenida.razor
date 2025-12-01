@@ -1,7 +1,13 @@
 ﻿@page "/Bienvenida"
+@inject PageTitleService PageTitleService
 
-<h3>Bienvenida</h3>
 
 @code {
+
+    protected override async Task OnInitializedAsync()
+    {
+        PageTitleService.SetTitle("Bienvenido/a");
+        
+    }
 
 }

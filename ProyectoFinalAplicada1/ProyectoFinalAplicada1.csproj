@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\TransferenciaUploads\" />
+    <Folder Include="wwwroot\TransferenciaUploads\" />
   </ItemGroup>
 
 </Project>

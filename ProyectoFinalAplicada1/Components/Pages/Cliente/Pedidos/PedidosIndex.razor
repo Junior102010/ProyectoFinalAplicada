@@ -1,7 +1,10 @@
 ﻿@page "/PedidoCliente/Index"
+@using Microsoft.AspNetCore.Authorization
 
 @inject PedidosServices pedidosService
 @inject NavigationManager navigationManager
+
+@attribute [Authorize(Roles = "Cliente")]
 
 <PageTitle>Gestión de Pedidos</PageTitle>
 

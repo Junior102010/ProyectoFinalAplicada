@@ -1,6 +1,7 @@
 ﻿@page "/Pedido/Create"
 @rendermode InteractiveServer
 
+@using Microsoft.AspNetCore.Authorization
 @using ProyectoFinalAplicada.Models
 
 @inject PedidosServices pedidosService
@@ -9,8 +10,9 @@
 @inject NavigationManager navigationManager
 @inject PageTitleService PageTitleService
 
-<PageTitle>Crear Pedido Manual</PageTitle>
+@attribute [Authorize(Roles = "Administrador")]
 
+<PageTitle>Crear Pedido Manual</PageTitle>
 
 
 <div class="container">
@@ -170,7 +172,7 @@
                 <a href="/Pedido/Index" class="btn btn-outline-secondary px-4">
                     <i class="bi bi-arrow-left"></i> Volver
                 </a>
-                <button type="submit" class="btn btn-gradiente px-5 py-2 shadow">
+                <button type="submit" class="btn btn-gradiente px-5 py-2 shadow" @onclick="Guardar">
                     <i class="bi bi-save"></i> Guardar Pedido
                 </button>
             </div>
@@ -185,7 +187,7 @@
 
     public List<Cliente> ListaClientes { get; set; } = new List<Cliente>();
     public List<Producto> ListaProductos { get; set; } = new List<Producto>();
-    
+
     public string Mensaje { get; set; } = string.Empty;
 
     protected override async Task OnInitializedAsync()
@@ -255,6 +257,7 @@
         Pedido.MontoTotal = Pedido.Detalles.Sum(d => d.Importe);
     }
 
+
     public async Task Guardar()
     {
         if (Pedido.ClienteId <= 0 || !Pedido.Detalles.Any())
@@ -263,10 +266,21 @@
             return;
         }
 
+
         var guardado = await pedidosService.Guardar(Pedido);
 
         if (guardado)
         {
+            foreach (var producto in Pedido.Detalles)
+            {
+                if (producto.Producto != null)
+                {
+                    var pro = await productosService.Buscar(producto.Producto.ProductoId);
+                    pro.Existencia -= (int)producto.Cantidad;
+                    Console.WriteLine("aaaaaaaaa");
+                    await productosService.Modificar(pro);
+                }
+            }
             navigationManager.NavigateTo("/Pedido/Index");
         }
         else

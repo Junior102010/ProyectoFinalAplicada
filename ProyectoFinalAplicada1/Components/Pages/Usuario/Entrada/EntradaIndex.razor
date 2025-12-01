@@ -1,9 +1,12 @@
 ﻿@page "/Entrada/Index"
+@using Microsoft.AspNetCore.Authorization
 
 
 @inject EntradasServices entradasService
 @inject NavigationManager navigationManager
 @inject PageTitleService PageTitleService
+
+@attribute [Authorize(Roles = "Administrador")]
 
 <PageTitle>Registro de Entradas</PageTitle>
 
@@ -125,7 +128,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        PageTitleService.SetTitle("Registrar Entrada");
+        PageTitleService.SetTitle("Entradas");
         FechaInicio = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
         FechaFin = DateTime.Now;
 

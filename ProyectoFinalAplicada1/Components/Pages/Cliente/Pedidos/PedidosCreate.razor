@@ -1,4 +1,5 @@
 ﻿@page "/PedidoCliente/Create"
+@using Microsoft.AspNetCore.Authorization
 @rendermode InteractiveServer
 
 @inject PedidosServices pedidosService
@@ -7,6 +8,7 @@
 @inject AuthenticationStateProvider authStateProvider
 @inject NavigationManager navigationManager
 
+@attribute [Authorize(Roles = "Cliente")]
 
 <PageTitle>Confirmar Mi Pedido</PageTitle>
 
@@ -154,7 +156,7 @@
 
            
             <div class="card-footer bg-transparent border-top-0 d-flex justify-content-between align-items-center mt-2 pt-0 pb-3 px-4">
-                <a href="/AlmacenCliente" class="btn btn-outline-secondary px-4">
+                <a href="/PedidoCliente/Index" class="btn btn-outline-secondary px-4">
                     <i class="bi bi-arrow-left"></i> Volver
                 </a>
                 <button type="submit" class="btn btn-gradiente px-5 py-3 shadow fs-5" disabled="@(!Pedido.Detalles.Any())">
@@ -169,7 +171,7 @@
     [SupplyParameterFromForm]
     public Pedido Pedido { get; set; } = new Pedido();
 
-    
+
     public string MetodoPagoSeleccionado { get; set; } = "Efectivo";
 
     public string NombreClienteDisplay { get; set; } = "Cargando...";
@@ -180,7 +182,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        
+
         if (carritoService.Carrito.Any())
         {
             Pedido.Detalles = new List<PedidoDetalle>(carritoService.Carrito);
@@ -189,7 +191,7 @@
 
         Pedido.FechaPedido = DateTime.Now;
 
-       
+
         var authState = await authStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
 
@@ -204,7 +206,7 @@
                 NombreClienteDisplay = $"{clienteEncontrado.NombreCliente} {clienteEncontrado.ApellidoCliente}";
                 TelefonoClienteDisplay = clienteEncontrado.TelefonoCliente;
 
-                
+
                 if (string.IsNullOrEmpty(Pedido.ReferenciaSitio))
                 {
                     Pedido.ReferenciaSitio = $"{clienteEncontrado.CalleCliente} #{clienteEncontrado.ViviendaCliente}, {clienteEncontrado.Sector} ({clienteEncontrado.DescripcionCliente})";
@@ -218,15 +220,15 @@
         }
         else
         {
-           
+
             navigationManager.NavigateTo("Account/Login");
         }
     }
 
-    
+
     private void ActualizarTotal(ChangeEventArgs e)
     {
-        
+
         bool esDelivery = (bool)(e.Value ?? false);
         Pedido.Delivery = esDelivery;
         CalcularTotal();
@@ -242,21 +244,22 @@
     {
         if (Pedido.ClienteId <= 0)
         {
-           
+            Console.WriteLine("Si fun");
+
             return;
         }
         if (!Pedido.Detalles.Any())
         {
-           
+            Console.WriteLine("Si ");
             return;
         }
 
-     
+
         if (MetodoPagoSeleccionado == "Transferencia")
         {
             Pedido.Estado = "Pendiente de Pago";
-            
-           
+
+
             Pedido.ReferenciaSitio += " [PAGO: TRANSFERENCIA]";
         }
         else
@@ -268,7 +271,7 @@
         CalcularTotal();
 
         var guardado = await pedidosService.Guardar(Pedido);
-
+        Console.WriteLine("Si funcionaaaaaaaaaaaaaa");
         if (guardado)
         {
             carritoService.LimpiarCarrito();

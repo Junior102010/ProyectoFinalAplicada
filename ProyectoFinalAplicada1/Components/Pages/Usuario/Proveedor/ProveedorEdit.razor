@@ -1,10 +1,13 @@
 ﻿@page "/Proveedor/Edit/{ProveedorId:int}"
+@using Microsoft.AspNetCore.Authorization
 @rendermode InteractiveServer
 
 
 @inject ProveedoresServices proveedoresService
 @inject NavigationManager navigationManager
 @inject PageTitleService PageTitleService
+
+@attribute [Authorize(Roles = "Administrador")]
 
 <PageTitle>Editar Proveedor</PageTitle>
 

@@ -66,6 +66,12 @@ public class PedidosServices(IDbContextFactory<Context> DbFactory)
 
         return await contexto.SaveChangesAsync() > 0;
     }
+
+    public async Task<bool> Eliminar(int id)
+    {
+        using var contexto = await DbFactory.CreateDbContextAsync();
+        return await contexto.Pedido.AsNoTracking().Where(p => p.PedidoId == id).ExecuteDeleteAsync() > 0;
+    }
     public async Task<bool> CambiarEstado(int pedidoId, string nuevoEstado)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();

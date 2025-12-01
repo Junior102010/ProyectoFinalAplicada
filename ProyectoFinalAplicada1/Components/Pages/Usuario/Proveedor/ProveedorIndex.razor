@@ -1,9 +1,12 @@
 ﻿@page "/Proveedor/Index"
+@using Microsoft.AspNetCore.Authorization
 @rendermode InteractiveServer
 
 @inject ProveedoresServices proveedoresService
 @inject NavigationManager navigationManager
 @inject PageTitleService PageTitleService
+
+@attribute [Authorize(Roles = "Administrador")]
 
 <PageTitle>Registro de Proveedores</PageTitle>
 
@@ -87,7 +90,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        PageTitleService.SetTitle("Registro de Proveedores");
+        PageTitleService.SetTitle("Proveedores");
         ListaProveedores = await proveedoresService.Listar(p => p.ProveedorId > 0);
     }
 

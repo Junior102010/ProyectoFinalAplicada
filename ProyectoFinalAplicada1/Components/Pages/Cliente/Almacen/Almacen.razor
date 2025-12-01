@@ -1,11 +1,14 @@
 ﻿@page "/Tienda"
+@using Microsoft.AspNetCore.Authorization
 
 @rendermode InteractiveServer
 
 @inject ProductosServices productosService
 @inject CarritoService carritoService
 @inject NavigationManager navigationManager
+@inject PageTitleService PageTitleService
 
+@attribute [Authorize(Roles = "Cliente")]
 
 <PageTitle>Almacén Virtual</PageTitle>
 
@@ -112,7 +115,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-       
+        PageTitleService.SetTitle("Tienda");
         ListaProductos = await productosService.Listar(p => p.Existencia > 0);
     }
 
