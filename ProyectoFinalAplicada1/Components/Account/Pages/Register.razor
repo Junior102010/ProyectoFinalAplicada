@@ -16,84 +16,127 @@
 @inject NavigationManager NavigationManager
 @inject IdentityRedirectManager RedirectManager
 
-<PageTitle>Register</PageTitle>
+<PageTitle>Registro de Cliente</PageTitle>
 
-<h1>Register</h1>
+@* Contenedor con el fondo de imagen (Romero) *@
+<div class="login-container">
+    <div class="login-overlay"></div>
 
-<div class="row">
-    <div class="col-lg-6">
+    @* --- TARJETA ESTILO GLASS (Igual que el Index) --- *@
+    <div class="card card-glass rounded-4 shadow-lg animate__animated animate__fadeInUp"
+         style="max-width: 850px; max-height: 90vh; display: flex; flex-direction: column; width: 95%;">
+
+        @* --- HEADER FIJO --- *@
+        <div class="card-header bg-transparent border-bottom border-secondary border-opacity-10 text-center pb-2 pt-3">
+            <img src="/imagenes/Logo.png" alt="Logo" style="max-height: 60px;" class="mb-2" />
+            <h4 class="fw-bold text-dark m-0">Crear Cuenta</h4>
+            <small class="text-muted">Únete para realizar tus pedidos</small>
+        </div>
+
         <StatusMessage Message="@Message" />
-        <EditForm Model="Input" method="post" OnValidSubmit="RegisterUser" FormName="register">
+
+        <EditForm Model="Input" method="post" OnValidSubmit="RegisterUser" FormName="register" style="display: flex; flex-direction: column; overflow: hidden; height: 100%;">
             <DataAnnotationsValidator />
-            <h3 class="mt-4">Información del Cliente</h3>
-            <hr />
-            <ValidationSummary class="text-danger" role="alert" />
-            <div class="form-floating mb-3">
-                <InputText @bind-Value="Input.Email" id="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
-                <label for="Input.Email">Email</label>
-                <ValidationMessage For="() => Input.Email" class="text-danger" />
-            </div>
-            <div class="form-floating mb-3">
-                <InputText type="password" @bind-Value="Input.Password" id="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
-                <label for="Input.Password">Password</label>
-                <ValidationMessage For="() => Input.Password" class="text-danger" />
-            </div>
-            <div class="form-floating mb-3">
-                <InputText type="password" @bind-Value="Input.ConfirmPassword" id="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
-                <label for="Input.ConfirmPassword">Confirm Password</label>
-                <ValidationMessage For="() => Input.ConfirmPassword" class="text-danger" />
+
+            @* --- BODY CON SCROLL (Para que quepa todo) --- *@
+            <div class="card-body register-scroll-area px-4">
+                <div class="row g-3">
+
+                    @* SECCIÓN: DATOS PERSONALES *@
+                    <div class="col-12 mt-2">
+                        <h6 class="text-success fw-bold border-bottom border-success border-opacity-25 pb-1">
+                            <i class="bi bi-person-lines-fill"></i> Datos Personales
+                        </h6>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold text-muted">Nombre</label>
+                        <InputText @bind-Value="Input.NombreCliente" class="form-control input-glass" placeholder="Ej: Juan" />
+                        <ValidationMessage For="() => Input.NombreCliente" class="text-danger small" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold text-muted">Apellido</label>
+                        <InputText @bind-Value="Input.ApellidoCliente" class="form-control input-glass" placeholder="Ej: Pérez" />
+                        <ValidationMessage For="() => Input.ApellidoCliente" class="text-danger small" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold text-muted">Teléfono</label>
+                        <InputText @bind-Value="Input.TelefonoCliente" class="form-control input-glass" placeholder="Ej: 809-555-5555" />
+                        <ValidationMessage For="() => Input.TelefonoCliente" class="text-danger small" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold text-muted">Correo Electrónico</label>
+                        <InputText @bind-Value="Input.Email" class="form-control input-glass" placeholder="nombre@correo.com" />
+                        <ValidationMessage For="() => Input.Email" class="text-danger small" />
+                    </div>
+
+                    @* SECCIÓN: DIRECCIÓN *@
+                    <div class="col-12 mt-4">
+                        <h6 class="text-success fw-bold border-bottom border-success border-opacity-25 pb-1">
+                            <i class="bi bi-geo-alt-fill"></i> Dirección de Entrega
+                        </h6>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold text-muted">Sector</label>
+                        <InputText @bind-Value="Input.Sector" class="form-control input-glass" placeholder="Ej: Centro Ciudad" />
+                        <ValidationMessage For="() => Input.Sector" class="text-danger small" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold text-muted">Calle</label>
+                        <InputText @bind-Value="Input.CalleCliente" class="form-control input-glass" placeholder="Ej: Calle Principal" />
+                        <ValidationMessage For="() => Input.CalleCliente" class="text-danger small" />
+                    </div>
+                    <div class="col-md-12">
+                        <label class="form-label small fw-bold text-muted">Número de Casa / Apto</label>
+                        <InputText @bind-Value="Input.ViviendaCliente" class="form-control input-glass" placeholder="Ej: Casa #12 o Apto 2B" />
+                        <ValidationMessage For="() => Input.ViviendaCliente" class="text-danger small" />
+                    </div>
+                    <div class="col-md-12">
+                        <label class="form-label small fw-bold text-muted">Referencia</label>
+                        <InputTextArea @bind-Value="Input.DescripcionCliente" class="form-control input-glass" placeholder="Ej: Casa azul frente al parque..." rows="2" />
+                        <ValidationMessage For="() => Input.DescripcionCliente" class="text-danger small" />
+                    </div>
+
+                    @* SECCIÓN: SEGURIDAD *@
+                    <div class="col-12 mt-4">
+                        <h6 class="text-success fw-bold border-bottom border-success border-opacity-25 pb-1">
+                            <i class="bi bi-shield-lock-fill"></i> Seguridad
+                        </h6>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold text-muted">Contraseña</label>
+                        <InputText type="password" @bind-Value="Input.Password" class="form-control input-glass" />
+                        <ValidationMessage For="() => Input.Password" class="text-danger small" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold text-muted">Confirmar Contraseña</label>
+                        <InputText type="password" @bind-Value="Input.ConfirmPassword" class="form-control input-glass" />
+                        <ValidationMessage For="() => Input.ConfirmPassword" class="text-danger small" />
+                    </div>
+
+                </div>
             </div>
 
-
-            
-
-            @* --- Client Fields --- *@
-            <div class="form-floating mb-3">
-                <InputText @bind-Value="Input.NombreCliente" id="Input.NombreCliente" class="form-control" placeholder="Nombre" />
-                <label for="Input.NombreCliente">Nombre</label>
-                <ValidationMessage For="() => Input.NombreCliente" class="text-danger" />
-            </div>
-            <div class="form-floating mb-3">
-                <InputText @bind-Value="Input.ApellidoCliente" id="Input.ApellidoCliente" class="form-control" placeholder="Apellido" />
-                <label for="Input.ApellidoCliente">Apellido</label>
-                <ValidationMessage For="() => Input.ApellidoCliente" class="text-danger" />
-            </div>
-            <div class="form-floating mb-3">
-                <InputText @bind-Value="Input.TelefonoCliente" id="Input.TelefonoCliente" class="form-control" placeholder="Teléfono" />
-                <label for="Input.TelefonoCliente">Teléfono</label>
-                <ValidationMessage For="() => Input.TelefonoCliente" class="text-danger" />
-            </div>
-            <div class="form-floating mb-3">
-                <InputText @bind-Value="Input.Sector" id="Input.Sector" class="form-control" placeholder="Sector" />
-                <label for="Input.Sector">Sector</label>
-                <ValidationMessage For="() => Input.Sector" class="text-danger" />
-            </div>
-            <div class="form-floating mb-3">
-                <InputText @bind-Value="Input.CalleCliente" id="Input.CalleCliente" class="form-control" placeholder="Calle" />
-                <label for="Input.CalleCliente">Calle</label>
-                <ValidationMessage For="() => Input.CalleCliente" class="text-danger" />
-            </div>
-            <div class="form-floating mb-3">
-                <InputText @bind-Value="Input.ViviendaCliente" id="Input.ViviendaCliente" class="form-control" placeholder="Vivienda/Número" />
-                <label for="Input.ViviendaCliente">Vivienda/Número</label>
-                <ValidationMessage For="() => Input.ViviendaCliente" class="text-danger" />
-            </div>
-            <div class="form-floating mb-3">
-                <InputTextArea @bind-Value="Input.DescripcionCliente" id="Input.DescripcionCliente" class="form-control" placeholder="Descripción adicional" style="height: 100px;" />
-                <label for="Input.DescripcionCliente">Descripción Adicional</label>
-                <ValidationMessage For="() => Input.DescripcionCliente" class="text-danger" />
+            @* --- FOOTER FIJO --- *@
+            <div class="card-footer bg-transparent border-top border-secondary border-opacity-10 pt-3 pb-3">
+                <div class="d-grid gap-2 mb-2 px-md-5">
+                    @* Botón con el estilo del Index (btn-gradiente) *@
+                    <button type="submit" class="btn btn-gradiente py-2 fs-5 shadow-sm">
+                        <i class="bi bi-person-check-fill me-2"></i> REGISTRARSE
+                    </button>
+                </div>
+                <div class="text-center">
+                    <span class="text-muted small">¿Ya tienes cuenta?</span>
+                    <a href="Account/Login" class="text-success fw-bold ms-1 text-decoration-none">
+                        Inicia Sesión aquí
+                    </a>
+                </div>
             </div>
 
-
-            <button type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
         </EditForm>
-    </div>
-    <div class="col-lg-4 col-lg-offset-2">
-        <section>
-            <h3>Use another service to register.</h3>
-            <hr />
-            <ExternalLoginPicker />
-        </section>
     </div>
 </div>
 
@@ -115,27 +158,21 @@
 
     public async Task RegisterUser(EditContext editContext)
     {
-        // 1. Crear el usuario de Identity (ApplicationUser)
         var user = CreateUser();
 
         await UserStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
         var emailStore = GetEmailStore();
         await emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
 
-        // Crear el usuario de Identity en la BD (La clave foránea del cliente apunta aquí)
         var result = await UserManager.CreateAsync(user, Input.Password);
 
         if (result.Succeeded)
         {
-            // 2. Obtener el ID del usuario recién creado
             var userId = await UserManager.GetUserIdAsync(user);
 
-            // --- INICIO DE LA LÓGICA DE CLIENTE ---
-
-            // 3. Crear el objeto Cliente y enlazarlo
             var newCliente = new ProyectoFinalAplicada.Models.Cliente
             {
-                UserId = userId, // 🔑 ENLACE CLAVE: El valor de esta FK ya debe existir en AspNetUsers
+                UserId = userId,
                 NombreCliente = Input.NombreCliente,
                 ApellidoCliente = Input.ApellidoCliente,
                 TelefonoCliente = Input.TelefonoCliente,
@@ -145,20 +182,13 @@
                 DescripcionCliente = Input.DescripcionCliente,
             };
 
-            // 4. Guardar el objeto Cliente en la BD (Aquí se dispara el DbContext.SaveChanges)
-            // Si UserManager.CreateAsync no había terminado la transacción,
-            // esto causaría el error. Ahora confiamos en que Identity terminó.
             DbContext.Cliente.Add(newCliente);
-            await DbContext.SaveChangesAsync(); // <-- Si falla aquí, la FK es el problema.
+            await DbContext.SaveChangesAsync();
 
-            // 5. Asignar el rol "Cliente" (Ahora se asigna después de que Cliente está guardado)
             await UserManager.AddToRoleAsync(user, "Cliente");
 
-            // --- FIN DE LA LÓGICA DE CLIENTE ---
+            Logger.LogInformation("User created a new account with password.");
 
-            Logger.LogInformation("User, Cliente record, and Role assigned successfully.");
-
-            // ... (Resto del código para confirmación de email y redirección) ...
             var code = await UserManager.GenerateEmailConfirmationTokenAsync(user);
             code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
             var callbackUrl = NavigationManager.GetUriWithQueryParameters(
@@ -178,12 +208,10 @@
                 await SignInManager.SignInAsync(user, isPersistent: false);
                 RedirectManager.RedirectTo(ReturnUrl);
             }
-
         }
         else
         {
             identityErrors = result.Errors;
-            return;
         }
     }
 
@@ -211,50 +239,39 @@
 
     private sealed class InputModel
     {
-        [Required]
+        [Required(ErrorMessage = "El correo es obligatorio")]
         [EmailAddress]
-        [Display(Name = "Email")]
         public string Email { get; set; } = "";
 
-        [Required]
-        [Display(Name = "Nombre")]
+        [Required(ErrorMessage = "El nombre es obligatorio")]
         public string NombreCliente { get; set; } = "";
 
-        [Required]
-        [Display(Name = "Apellido")]
+        [Required(ErrorMessage = "El apellido es obligatorio")]
         public string ApellidoCliente { get; set; } = "";
 
-        [Required]
-        [Display(Name = "Teléfono")]
+        [Required(ErrorMessage = "El teléfono es obligatorio")]
         public string TelefonoCliente { get; set; } = "";
 
-        [Required]
-        [Display(Name = "Sector")]
+        [Required(ErrorMessage = "El sector es obligatorio")]
         public string Sector { get; set; } = "";
 
-        [Required]
-        [Display(Name = "Calle")]
+        [Required(ErrorMessage = "La calle es obligatoria")]
         public string CalleCliente { get; set; } = "";
 
-        [Required]
-        [Display(Name = "Vivienda/Número")]
+        [Required(ErrorMessage = "El número de casa es obligatorio")]
         public string ViviendaCliente { get; set; } = "";
 
-        [Required]
-        [Display(Name = "Descripción Adicional")]
+        [Required(ErrorMessage = "La referencia es obligatoria")]
         public string DescripcionCliente { get; set; } = "";
 
-        [Required]
-        [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+        [Required(ErrorMessage = "La contraseña es obligatoria")]
+        [StringLength(100, ErrorMessage = "La {0} debe tener al menos {2} caracteres.", MinimumLength = 6)]
         [DataType(DataType.Password)]
-        [Display(Name = "Password")]
         public string Password { get; set; } = "";
 
         [DataType(DataType.Password)]
         [Display(Name = "Confirm password")]
-        [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+        [Compare("Password", ErrorMessage = "Las contraseñas no coinciden.")]
         public string ConfirmPassword { get; set; } = "";
-
-        
     }
 }
