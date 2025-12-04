@@ -18,125 +18,114 @@
 
 <PageTitle>Registro de Cliente</PageTitle>
 
-@* Contenedor con el fondo de imagen (Romero) *@
-<div class="login-container">
-    <div class="login-overlay"></div>
+<div class="d-flex align-items-center justify-content-center min-vh-100 py-5" style="background-color: #F4EAD6;">
 
-    @* --- TARJETA ESTILO GLASS (Igual que el Index) --- *@
-    <div class="card card-glass rounded-4 shadow-lg animate__animated animate__fadeInUp"
-         style="max-width: 850px; max-height: 90vh; display: flex; flex-direction: column; width: 95%;">
-
-        @* --- HEADER FIJO --- *@
-        <div class="card-header bg-transparent border-bottom border-secondary border-opacity-10 text-center pb-2 pt-3">
-            <img src="/imagenes/Logo.png" alt="Logo" style="max-height: 60px;" class="mb-2" />
-            <h4 class="fw-bold text-dark m-0">Crear Cuenta</h4>
-            <small class="text-muted">Únete para realizar tus pedidos</small>
-        </div>
+    <div class="col-md-10 col-lg-8 col-xl-7">
 
         <StatusMessage Message="@Message" />
 
-        <EditForm Model="Input" method="post" OnValidSubmit="RegisterUser" FormName="register" style="display: flex; flex-direction: column; overflow: hidden; height: 100%;">
-            <DataAnnotationsValidator />
+        <div class="card card-neo p-4 p-md-5 border-0 text-center">
 
-            @* --- BODY CON SCROLL (Para que quepa todo) --- *@
-            <div class="card-body register-scroll-area px-4">
-                <div class="row g-3">
-
-                    @* SECCIÓN: DATOS PERSONALES *@
-                    <div class="col-12 mt-2">
-                        <h6 class="text-success fw-bold border-bottom border-success border-opacity-25 pb-1">
-                            <i class="bi bi-person-lines-fill"></i> Datos Personales
-                        </h6>
-                    </div>
-
-                    <div class="col-md-6">
-                        <label class="form-label small fw-bold text-muted">Nombre</label>
-                        <InputText @bind-Value="Input.NombreCliente" class="form-control input-glass" placeholder="Ej: Juan" />
-                        <ValidationMessage For="() => Input.NombreCliente" class="text-danger small" />
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label small fw-bold text-muted">Apellido</label>
-                        <InputText @bind-Value="Input.ApellidoCliente" class="form-control input-glass" placeholder="Ej: Pérez" />
-                        <ValidationMessage For="() => Input.ApellidoCliente" class="text-danger small" />
-                    </div>
-
-                    <div class="col-md-6">
-                        <label class="form-label small fw-bold text-muted">Teléfono</label>
-                        <InputText @bind-Value="Input.TelefonoCliente" class="form-control input-glass" placeholder="Ej: 809-555-5555" />
-                        <ValidationMessage For="() => Input.TelefonoCliente" class="text-danger small" />
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label small fw-bold text-muted">Correo Electrónico</label>
-                        <InputText @bind-Value="Input.Email" class="form-control input-glass" placeholder="nombre@correo.com" />
-                        <ValidationMessage For="() => Input.Email" class="text-danger small" />
-                    </div>
-
-                    @* SECCIÓN: DIRECCIÓN *@
-                    <div class="col-12 mt-4">
-                        <h6 class="text-success fw-bold border-bottom border-success border-opacity-25 pb-1">
-                            <i class="bi bi-geo-alt-fill"></i> Dirección de Entrega
-                        </h6>
-                    </div>
-
-                    <div class="col-md-6">
-                        <label class="form-label small fw-bold text-muted">Sector</label>
-                        <InputText @bind-Value="Input.Sector" class="form-control input-glass" placeholder="Ej: Centro Ciudad" />
-                        <ValidationMessage For="() => Input.Sector" class="text-danger small" />
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label small fw-bold text-muted">Calle</label>
-                        <InputText @bind-Value="Input.CalleCliente" class="form-control input-glass" placeholder="Ej: Calle Principal" />
-                        <ValidationMessage For="() => Input.CalleCliente" class="text-danger small" />
-                    </div>
-                    <div class="col-md-12">
-                        <label class="form-label small fw-bold text-muted">Número de Casa / Apto</label>
-                        <InputText @bind-Value="Input.ViviendaCliente" class="form-control input-glass" placeholder="Ej: Casa #12 o Apto 2B" />
-                        <ValidationMessage For="() => Input.ViviendaCliente" class="text-danger small" />
-                    </div>
-                    <div class="col-md-12">
-                        <label class="form-label small fw-bold text-muted">Referencia</label>
-                        <InputTextArea @bind-Value="Input.DescripcionCliente" class="form-control input-glass" placeholder="Ej: Casa azul frente al parque..." rows="2" />
-                        <ValidationMessage For="() => Input.DescripcionCliente" class="text-danger small" />
-                    </div>
-
-                    @* SECCIÓN: SEGURIDAD *@
-                    <div class="col-12 mt-4">
-                        <h6 class="text-success fw-bold border-bottom border-success border-opacity-25 pb-1">
-                            <i class="bi bi-shield-lock-fill"></i> Seguridad
-                        </h6>
-                    </div>
-
-                    <div class="col-md-6">
-                        <label class="form-label small fw-bold text-muted">Contraseña</label>
-                        <InputText type="password" @bind-Value="Input.Password" class="form-control input-glass" />
-                        <ValidationMessage For="() => Input.Password" class="text-danger small" />
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label small fw-bold text-muted">Confirmar Contraseña</label>
-                        <InputText type="password" @bind-Value="Input.ConfirmPassword" class="form-control input-glass" />
-                        <ValidationMessage For="() => Input.ConfirmPassword" class="text-danger small" />
-                    </div>
-
-                </div>
+            <div class="neo-avatar-circle mb-4 mx-auto" style="width: 100px; height: 100px;">
+                <img src="/imagenes/Logo.png" alt="Logo" class="rounded-circle img-fluid" style="width: 100%; height: 100%; object-fit: cover;" />
             </div>
 
-            @* --- FOOTER FIJO --- *@
-            <div class="card-footer bg-transparent border-top border-secondary border-opacity-10 pt-3 pb-3">
-                <div class="d-grid gap-2 mb-2 px-md-5">
-                    @* Botón con el estilo del Index (btn-gradiente) *@
-                    <button type="submit" class="btn btn-gradiente py-2 fs-5 shadow-sm">
-                        <i class="bi bi-person-check-fill me-2"></i> REGISTRARSE
+            <h3 class="fw-bold mb-2" style="color: #3D5D35; letter-spacing: 1px;">CREAR CUENTA</h3>
+            <p class="text-muted small mb-4">Únete al club y realiza tus pedidos</p>
+
+            <EditForm Model="Input" method="post" OnValidSubmit="RegisterUser" FormName="register">
+                <DataAnnotationsValidator />
+
+                <div class="text-start px-2">
+
+                    <h5 class="fw-bold mt-4 mb-3 pb-2 border-bottom" style="color: #3D5D35; border-color: rgba(61,93,53,0.2) !important;">
+                        <i class="bi bi-person-lines-fill me-2"></i>DATOS PERSONALES
+                    </h5>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="ms-3 mb-1 text-muted small fw-bold">NOMBRE</label>
+                            <InputText @bind-Value="Input.NombreCliente" class="form-control neo-input" placeholder="Ej: Juan" />
+                            <ValidationMessage For="() => Input.NombreCliente" class="text-danger small ms-3" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="ms-3 mb-1 text-muted small fw-bold">APELLIDO</label>
+                            <InputText @bind-Value="Input.ApellidoCliente" class="form-control neo-input" placeholder="Ej: Pérez" />
+                            <ValidationMessage For="() => Input.ApellidoCliente" class="text-danger small ms-3" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="ms-3 mb-1 text-muted small fw-bold">TELÉFONO</label>
+                            <InputText @bind-Value="Input.TelefonoCliente" class="form-control neo-input" placeholder="809-000-0000" />
+                            <ValidationMessage For="() => Input.TelefonoCliente" class="text-danger small ms-3" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="ms-3 mb-1 text-muted small fw-bold">CORREO ELECTRÓNICO</label>
+                            <InputText @bind-Value="Input.Email" class="form-control neo-input" placeholder="nombre@correo.com" />
+                            <ValidationMessage For="() => Input.Email" class="text-danger small ms-3" />
+                        </div>
+                    </div>
+
+                    <h5 class="fw-bold mt-5 mb-3 pb-2 border-bottom" style="color: #3D5D35; border-color: rgba(61,93,53,0.2) !important;">
+                        <i class="bi bi-geo-alt-fill me-2"></i>DIRECCIÓN DE ENTREGA
+                    </h5>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="ms-3 mb-1 text-muted small fw-bold">SECTOR</label>
+                            <InputText @bind-Value="Input.Sector" class="form-control neo-input" placeholder="Ej: Centro" />
+                            <ValidationMessage For="() => Input.Sector" class="text-danger small ms-3" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="ms-3 mb-1 text-muted small fw-bold">CALLE</label>
+                            <InputText @bind-Value="Input.CalleCliente" class="form-control neo-input" placeholder="Ej: Calle Principal" />
+                            <ValidationMessage For="() => Input.CalleCliente" class="text-danger small ms-3" />
+                        </div>
+                        <div class="col-md-12">
+                            <label class="ms-3 mb-1 text-muted small fw-bold">NÚMERO DE CASA / APTO</label>
+                            <InputText @bind-Value="Input.ViviendaCliente" class="form-control neo-input" placeholder="Ej: Casa #12 o Apto 2B" />
+                            <ValidationMessage For="() => Input.ViviendaCliente" class="text-danger small ms-3" />
+                        </div>
+                        <div class="col-md-12">
+                            <label class="ms-3 mb-1 text-muted small fw-bold">REFERENCIA (Opcional)</label>
+                            <InputTextArea @bind-Value="Input.DescripcionCliente" class="form-control neo-input" rows="2" placeholder="Ej: Frente al parque, casa azul..." />
+                            <ValidationMessage For="() => Input.DescripcionCliente" class="text-danger small ms-3" />
+                        </div>
+                    </div>
+
+                    <h5 class="fw-bold mt-5 mb-3 pb-2 border-bottom" style="color: #3D5D35; border-color: rgba(61,93,53,0.2) !important;">
+                        <i class="bi bi-shield-lock-fill me-2"></i>SEGURIDAD
+                    </h5>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="ms-3 mb-1 text-muted small fw-bold">CONTRASEÑA</label>
+                            <InputText type="password" @bind-Value="Input.Password" class="form-control neo-input text-center" placeholder="••••••" />
+                            <ValidationMessage For="() => Input.Password" class="text-danger small ms-3" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="ms-3 mb-1 text-muted small fw-bold">CONFIRMAR CONTRASEÑA</label>
+                            <InputText type="password" @bind-Value="Input.ConfirmPassword" class="form-control neo-input text-center" placeholder="••••••" />
+                            <ValidationMessage For="() => Input.ConfirmPassword" class="text-danger small ms-3" />
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="mt-4">
+                    <button type="submit" class="profile_button w-100 py-3 fw-bold fs-5" style="background: #C15349; color: white;">
+                        <i class="bi bi-person-plus-fill me-2"></i> REGISTRARSE
                     </button>
                 </div>
-                <div class="text-center">
+
+                <div class="text-center mt-3">
                     <span class="text-muted small">¿Ya tienes cuenta?</span>
-                    <a href="Account/Login" class="text-success fw-bold ms-1 text-decoration-none">
+                    <a href="Account/Login" class="text-decoration-none fw-bold ms-1" style="color: #3D5D35;">
                         Inicia Sesión aquí
                     </a>
                 </div>
-            </div>
 
-        </EditForm>
+            </EditForm>
+        </div>
     </div>
 </div>
 
@@ -187,7 +176,7 @@
 
             await UserManager.AddToRoleAsync(user, "Cliente");
 
-            Logger.LogInformation("User created a new account with password.");
+            Logger.LogInformation("Usuario creado exitosamente.");
 
             var code = await UserManager.GenerateEmailConfirmationTokenAsync(user);
             code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
@@ -223,8 +212,7 @@
         }
         catch
         {
-            throw new InvalidOperationException($"Can't create an instance of '{nameof(ApplicationUser)}'. " +
-                $"Ensure that '{nameof(ApplicationUser)}' is not an abstract class and has a parameterless constructor.");
+            throw new InvalidOperationException($"No se puede crear una instancia de '{nameof(ApplicationUser)}'.");
         }
     }
 
@@ -232,7 +220,7 @@
     {
         if (!UserManager.SupportsUserEmail)
         {
-            throw new NotSupportedException("The default UI requires a user store with email support.");
+            throw new NotSupportedException("La UI por defecto requiere un almacén de usuarios con soporte para email.");
         }
         return (IUserEmailStore<ApplicationUser>)UserStore;
     }
@@ -270,7 +258,7 @@
         public string Password { get; set; } = "";
 
         [DataType(DataType.Password)]
-        [Display(Name = "Confirm password")]
+        [Display(Name = "Confirmar contraseña")]
         [Compare("Password", ErrorMessage = "Las contraseñas no coinciden.")]
         public string ConfirmPassword { get; set; } = "";
     }

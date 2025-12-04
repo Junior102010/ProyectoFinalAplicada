@@ -1,16 +1,19 @@
 ﻿@inherits LayoutComponentBase
-@layout ProyectoFinalAplicada1.Components.Layout.MainLayout
+@layout MainLayout
+@using ProyectoFinalAplicada1.Components.Account.Shared
 
-<h1>Manage your account</h1>
-
-<div>
-    <h2>Change your account settings</h2>
-    <hr />
+<div class="container py-4">
     <div class="row">
-        <div class="col-lg-3">
-            <ManageNavMenu />
+        
+        <div class="col-md-3 mb-4">
+            <div class="card card-glass border-0">
+                <div class="card-body p-2">
+                    <ManageNavMenu />
+                </div>
+            </div>
         </div>
-        <div class="col-lg-9">
+
+        <div class="col-md-9">
             @Body
         </div>
     </div>

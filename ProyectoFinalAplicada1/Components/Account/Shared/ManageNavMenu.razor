@@ -3,32 +3,43 @@
 
 @inject SignInManager<ApplicationUser> SignInManager
 
-<ul class="nav nav-pills flex-column">
-    <li class="nav-item">
-        <NavLink class="nav-link" href="Account/Manage" Match="NavLinkMatch.All">Profile</NavLink>
-    </li>
-    <li class="nav-item">
-        <NavLink class="nav-link" href="Account/Manage/Email">Email</NavLink>
-    </li>
-    <li class="nav-item">
-        <NavLink class="nav-link" href="Account/Manage/ChangePassword">Password</NavLink>
-    </li>
-    @if (hasExternalLogins)
-    {
+<div class="mi-menu-perfil p-3 rounded">
+    <ul class="nav nav-pills flex-column">
         <li class="nav-item">
-            <NavLink class="nav-link" href="Account/Manage/ExternalLogins">External logins</NavLink>
+            <NavLink class="nav-link" href="Account/Manage" Match="NavLinkMatch.All">
+                <span class="bi bi-person-nav-menu" aria-hidden="true"></span> Perfil
+            </NavLink>
         </li>
-    }
-    <li class="nav-item">
-        <NavLink class="nav-link" href="Account/Manage/TwoFactorAuthentication">Two-factor authentication</NavLink>
-    </li>
-    <li class="nav-item">
-        <NavLink class="nav-link" href="Account/Manage/Passkeys">Passkeys</NavLink>
-    </li>
-    <li class="nav-item">
-        <NavLink class="nav-link" href="Account/Manage/PersonalData">Personal data</NavLink>
-    </li>
-</ul>
+        <li class="nav-item">
+            <NavLink class="nav-link" href="Account/Manage/Email">
+                <span class="bi bi-person-badge-nav-menu" aria-hidden="true"></span> Email
+            </NavLink>
+        </li>
+        <li class="nav-item">
+            <NavLink class="nav-link" href="Account/Manage/ChangePassword">
+                <span class="bi bi-lock-nav-menu" aria-hidden="true"></span> Contraseña
+            </NavLink>
+        </li>
+        @if (hasExternalLogins)
+        {
+            <li class="nav-item">
+                <NavLink class="nav-link" href="Account/Manage/ExternalLogins">
+                    <span class="bi bi-arrow-bar-left-nav-menu" aria-hidden="true"></span> Logins Externos
+                </NavLink>
+            </li>
+        }
+        <li class="nav-item">
+            <NavLink class="nav-link" href="Account/Manage/TwoFactorAuthentication">
+                <span class="bi bi-lock-nav-menu" aria-hidden="true"></span> Autenticación 2FA
+            </NavLink>
+        </li>
+        <li class="nav-item">
+            <NavLink class="nav-link" href="Account/Manage/PersonalData">
+                <span class="bi bi-person-fill-nav-menu" aria-hidden="true"></span> Datos Personales
+            </NavLink>
+        </li>
+    </ul>
+</div>
 
 @code {
     private bool hasExternalLogins;

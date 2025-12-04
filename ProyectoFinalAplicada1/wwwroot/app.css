@@ -358,3 +358,139 @@ table {
         padding: 1.5rem; /* Menos relleno en pantallas chicas */
     }
 }
+
+/* --- NEUMORFISMO ESTILO POLLERA (Adaptado) --- */
+
+/* 1. La Tarjeta Principal */
+.card-neo {
+    border: none;
+    border-radius: 20px;
+    background: #F4EAD6; /* Tu color de fondo base */
+    /* Sombra externa para que flote */
+    box-shadow: 20px 20px 60px #d1c9b8, -20px -20px 60px #ffffff;
+}
+
+/* 2. Botones Redondos Pequeños (Redes sociales) */
+.neo-button {
+    width: 45px;
+    height: 45px;
+    outline: 0 !important;
+    cursor: pointer;
+    color: #3D5D35; /* Tu Verde Corporativo */
+    font-size: 18px;
+    border: none;
+    margin-right: 10px;
+    border-radius: 50%;
+    background: #F4EAD6;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    /* Efecto "Botón Salido" (Outset) */
+    box-shadow: 6px 6px 12px #d1c9b8, -6px -6px 12px #ffffff;
+}
+
+    /* Efecto al presionar (Se hunde) */
+    .neo-button:active, .neo-button:hover {
+        color: #C15349; /* Tu Rojo al tocar */
+        /* Efecto "Hundido" (Inset) */
+        box-shadow: inset 6px 6px 12px #d1c9b8, inset -6px -6px 12px #ffffff;
+    }
+
+/* 3. Inputs (Cajas de texto) */
+.neo-input {
+    background: #F4EAD6;
+    border: none;
+    border-radius: 50px;
+    padding: 15px 20px;
+    color: #555;
+    font-weight: 600;
+    /* Efecto "Hundido" permanente para inputs */
+    box-shadow: inset 6px 6px 12px #d1c9b8, inset -6px -6px 12px #ffffff;
+}
+
+    .neo-input:focus {
+        outline: none;
+        color: #3D5D35; /* Texto verde al escribir */
+        /* Sombra un poco más suave al enfocar */
+        box-shadow: inset 3px 3px 6px #d1c9b8, inset -3px -3px 6px #ffffff;
+    }
+
+/* 4. Botón Grande de Perfil (Guardar) */
+.profile_button {
+    color: #3D5D35; /* Texto Verde */
+    padding: 12px 30px;
+    border: none;
+    outline: 0 !important;
+    border-radius: 50px;
+    font-weight: bold;
+    font-size: 1.1rem;
+    background: #F4EAD6;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+    /* Sombra Externa (Flotando) */
+    box-shadow: 12px 12px 24px #d1c9b8, -12px -12px 24px #ffffff;
+}
+
+    .profile_button:hover {
+        color: #F4EAD6; /* Texto Beige */
+        background: #3D5D35; /* Fondo Verde */
+        /* Mantenemos la sombra pero ajustada */
+        box-shadow: 6px 6px 12px #2e4628, -6px -6px 12px #4c7442;
+    }
+
+    .profile_button:active {
+        transform: scale(0.98);
+    }
+
+/* 5. Avatar (Círculo de foto) */
+.neo-avatar-circle {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    padding: 5px;
+    background: #F4EAD6;
+    /* Borde neumórfico */
+    box-shadow: 8px 8px 16px #d1c9b8, -8px -8px 16px #ffffff;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Iconos de marcas específicos (Opcional si usas FontAwesome) */
+.fa-facebook {
+    color: #3b5998;
+}
+
+.fa-twitter {
+    color: #55acee;
+}
+
+.fa-instagram {
+    color: #C13584;
+}
+
+
+
+/* --- ESTILOS PARA EL MENÚ DE PERFIL (Igualando al NavMenu) --- */
+.mi-menu-perfil .nav-link.active {
+    /* Mismo fondo que el menú para lograr el efecto de relieve */
+    background-color: #D9B59A !important;
+    /* Texto Verde (Tu marca) */
+    color: #3D5D35 !important;
+    font-weight: 800;
+    /* MAGIA 3D: Sombra interna (Inset) que hace que parezca presionado */
+    box-shadow: inset 6px 6px 12px #b89982, inset -6px -6px 12px #fad1b2 !important;
+    /* Eliminamos bordes de color */
+    border: none;
+    border-radius: 12px; /* Redondeado suave */
+}
+
+    /* El icono también se pone verde al "hundirse" */
+    .mi-menu-perfil .nav-link.active .bi {
+        filter: none;
+        color: #3D5D35;
+    }
+

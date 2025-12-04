@@ -4,7 +4,6 @@
 @using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Identity
 @using ProyectoFinalAplicada1.Data
-@* ❌ Eliminar inyecciones no usadas en el HTML visible *@
 
 @inject UserManager<ApplicationUser> UserManager
 @inject SignInManager<ApplicationUser> SignInManager
@@ -15,75 +14,67 @@
 
 <PageTitle>Iniciar Sesión</PageTitle>
 
-@* Contenedor Principal: Usa una clase personalizada para el fondo y centrado *@
-<div class="login-page-background d-flex justify-content-center align-items-center">
+<div class="d-flex align-items-center justify-content-center min-vh-100" style="background-color: #F4EAD6;">
 
-    @* Contenedor del Formulario Centrado *@
-    <div class="login-form-container text-center">
-
-        @* Logo Centrado *@
-        <div class="logo-area mb-4 text-center" style="transform: translateX(-9px);">
-            <img src="/imagenes/Logo.png" alt="Pollera Los Dos Carnales" class="img-fluid" style="max-height: 180px;" />
-        </div>
+    <div class="col-md-9 col-lg-6 col-xl-5">
 
         <StatusMessage Message="@errorMessage" />
 
-        <EditForm EditContext="editContext" method="post" OnSubmit="LoginUser" FormName="login">
-            <DataAnnotationsValidator />
-            <ValidationSummary class="text-danger" role="alert" />
+        <div class="card card-neo p-4 border-0 text-center">
 
-            @* 🔑 Campo de Usuario (Email) - Sin label y con Input Estilizado *@
-            <div class="mb-4">
-                @* **Nota:** Usamos type="email" aunque la imagen solo dice "Usuario", esto mantiene la funcionalidad de Identity *@
-                <InputText @bind-Value="Input.Email"
-                           id="Input.Email"
-                           class="form-control login-input"
-                           autocomplete="username"
-                           aria-required="true"
-                           placeholder="Usuario" />
-                <ValidationMessage For="() => Input.Email" class="text-danger mt-1 small" />
+            <div class="neo-avatar-circle mb-4" style="width: 140px; height: 140px;">
+                <img src="/imagenes/Logo.png" alt="Pollera Logo" class="rounded-circle img-fluid" style="width: 100%; height: 100%; object-fit: cover;" />
             </div>
 
-            @* 🔑 Campo de Contraseña - Sin label y con Input Estilizado *@
-            <div class="mb-4 position-relative">
-                @* El input de la imagen tiene un icono de ojo (toggle password), lo simulamos con un input normal y estilo custom. *@
-                <InputText type="password"
-                           @bind-Value="Input.Password"
-                           id="Input.Password"
-                           class="form-control login-input"
-                           autocomplete="current-password"
-                           aria-required="true"
-                           placeholder="Contraseña" />
-                @* Ícono de ojo (simulado, necesitas CSS para posicionarlo) *@
-                <i class="bi bi-eye-fill password-toggle-icon"></i>
-                <ValidationMessage For="() => Input.Password" class="text-danger mt-1 small" />
-            </div>
+            <h3 class="fw-bold mb-4" style="color: #3D5D35; letter-spacing: 1px;">BIENVENIDO</h3>
 
-            @* Botón de Iniciar Sesión - Grande y con el estilo de la imagen *@
-            <div class="d-grid mt-3 col-7 mx-auto">
-                <button type="submit" class="btn btn-login-custom fw-bold">Iniciar sesión</button>
-            </div>
+            <EditForm EditContext="editContext" method="post" OnSubmit="LoginUser" FormName="login">
+                <DataAnnotationsValidator />
 
-            @* Enlace de Registro *@
-            <div class="mt-3 text-center small">
-                ¿No Tienes una Cuenta? <a href="@(NavigationManager.GetUriWithQueryParameters("Account/Register", new Dictionary<string, object?> { ["ReturnUrl"] = ReturnUrl }))" class="text-dark fw-bold text-decoration-none">Regístrate</a>!
-            </div>
+                <div class="text-start px-3">
+                    <div class="mb-4">
+                        <label class="ms-3 mb-1 text-muted small fw-bold" style="font-size: 0.75rem;">USUARIO / CORREO</label>
+                        <InputText @bind-Value="Input.Email"
+                                   id="Input.Email"
+                                   class="form-control neo-input text-center py-2"
+                                   autocomplete="username"
+                                   placeholder="usuario@ejemplo.com" />
+                        <ValidationMessage For="() => Input.Email" class="text-danger small ms-3 mt-1" />
+                    </div>
 
-            @* ❌ Elementos eliminados para simplificar y parecerse a la imagen:
-               - Recordarme (Input.RememberMe)
-               - Passkey
-               - Servicios Externos
-               - Olvidaste tu contraseña
-               - Reenviar confirmación de email
-            *@
+                    <div class="mb-5 position-relative">
+                        <label class="ms-3 mb-1 text-muted small fw-bold" style="font-size: 0.75rem;">CONTRASEÑA</label>
+                        <InputText type="password"
+                                   @bind-Value="Input.Password"
+                                   id="Input.Password"
+                                   class="form-control neo-input text-center py-2"
+                                   autocomplete="current-password"
+                                   placeholder="••••••" />
+                        <i class="bi bi-key-fill position-absolute text-muted" style="right: 20px; top: 38px; opacity: 0.5;"></i>
+                        <ValidationMessage For="() => Input.Password" class="text-danger small ms-3 mt-1" />
+                    </div>
+                </div>
 
-        </EditForm>
+                <button type="submit" class="profile_button w-100 py-2 fw-bold" style="background: #C15349; color: white;">
+                    INICIAR SESIÓN
+                </button>
+
+                <div class="mt-4 small">
+                    <span class="text-muted">¿No tienes cuenta?</span>
+                    <a href="@(NavigationManager.GetUriWithQueryParameters("Account/Register", new Dictionary<string, object?> { ["ReturnUrl"] = ReturnUrl }))"
+                       class="text-decoration-none fw-bold ms-1"
+                       style="color: #3D5D35;">
+                        Regístrate aquí
+                    </a>
+                </div>
+
+            </EditForm>
+        </div>
+
     </div>
 </div>
 
-
 @code {
-    // --- CÓDIGO C# (@code) SE MANTIENE EXACTAMENTE IGUAL ---
     private string? errorMessage;
     private EditContext editContext = default!;
 
@@ -99,19 +90,16 @@
     protected override async Task OnInitializedAsync()
     {
         Input ??= new();
-
         editContext = new EditContext(Input);
 
         if (HttpMethods.IsGet(HttpContext.Request.Method))
         {
-            // Clear the existing external cookie to ensure a clean login process
             await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
         }
     }
 
     public async Task LoginUser()
     {
-        // ... (Tu lógica de inicio de sesión) ...
         if (!editContext.Validate())
         {
             return;
@@ -121,8 +109,7 @@
 
         if (result.Succeeded)
         {
-            Logger.LogInformation("User logged in.");
-            // RedirectManager.RedirectTo(ReturnUrl);
+            Logger.LogInformation("Usuario logueado correctamente.");
             navigation.NavigateTo("/Bienvenida");
         }
         else if (result.RequiresTwoFactor)
@@ -133,28 +120,26 @@
         }
         else if (result.IsLockedOut)
         {
-            Logger.LogWarning("User account locked out.");
+            Logger.LogWarning("Cuenta bloqueada.");
             RedirectManager.RedirectTo("Account/Lockout");
         }
         else
         {
-            errorMessage = "Error: Intento de inicio de sesión inválido.";
+            errorMessage = "Error: Usuario o contraseña incorrectos.";
         }
     }
 
     private sealed class InputModel
     {
-        [Required(ErrorMessage = "El usuario es requerido.")]
-        [EmailAddress(ErrorMessage = "Formato de email incorrecto.")]
+        [Required(ErrorMessage = "El correo es obligatorio.")]
+        [EmailAddress(ErrorMessage = "Formato de correo inválido.")]
         public string Email { get; set; } = "";
 
-        [Required(ErrorMessage = "La contraseña es requerida.")]
+        [Required(ErrorMessage = "La contraseña es obligatoria.")]
         [DataType(DataType.Password)]
         public string Password { get; set; } = "";
 
         [Display(Name = "Recordarme")]
         public bool RememberMe { get; set; }
-
-        public PasskeyInputModel? Passkey { get; set; }
     }
 }
