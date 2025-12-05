@@ -24,4 +24,10 @@
     <Folder Include="wwwroot\TransferenciaUploads\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Data\Pollera.db">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
