@@ -1,13 +1,16 @@
-﻿using System.Linq.Expressions;
+﻿using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
 using ProyectoFinalAplicada.Models;
 using ProyectoFinalAplicada1.DAL;
+using System.Linq.Expressions;
+using Microsoft.AspNetCore.Components.Authorization;
 
 
 namespace ProyectoFinalAplicada.Services;
 
 public class ClientesServices(IDbContextFactory<Context> DbFactory)
 {
+    private readonly AuthenticationStateProvider _authenticationStateProvider;
     public async Task<bool> Existe(int id)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
@@ -82,10 +85,12 @@ public class ClientesServices(IDbContextFactory<Context> DbFactory)
             .AsNoTracking()
             .FirstOrDefaultAsync(c => c.TelefonoCliente == telefono);
     }
-    public async Task<Cliente?> BuscarPorCorreo(string correo)
+    public async Task<Cliente?> BuscarPorNombre(string nombre)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
         return await contexto.Cliente
-            .FirstOrDefaultAsync(c => c.NombreCliente == correo || c.DescripcionCliente.Contains(correo));
+            .FirstOrDefaultAsync(c => c.NombreCliente == nombre || c.DescripcionCliente.Contains(nombre));
     }
+
+    
 }

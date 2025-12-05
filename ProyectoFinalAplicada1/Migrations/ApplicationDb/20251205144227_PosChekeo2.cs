@@ -5,7 +5,7 @@
 namespace ProyectoFinalAplicada1.Migrations.ApplicationDb
 {
     /// <inheritdoc />
-    public partial class Usuarios3 : Migration
+    public partial class PosChekeo2 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

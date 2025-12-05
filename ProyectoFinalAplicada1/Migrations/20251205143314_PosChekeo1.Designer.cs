@@ -11,8 +11,8 @@ using ProyectoFinalAplicada1.DAL;
 namespace ProyectoFinalAplicada1.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20251130162555_Usuarios")]
-    partial class Usuarios
+    [Migration("20251205143314_PosChekeo1")]
+    partial class PosChekeo1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -73,8 +73,6 @@ namespace ProyectoFinalAplicada1.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("ClienteId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Cliente");
                 });
@@ -159,6 +157,33 @@ namespace ProyectoFinalAplicada1.Migrations
                     b.ToTable("Pedido");
                 });
 
+            modelBuilder.Entity("ProyectoFinalAplicada.Models.PedidoDetalle", b =>
+                {
+                    b.Property<int>("DetalleId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<double>("Cantidad")
+                        .HasColumnType("REAL");
+
+                    b.Property<double>("Importe")
+                        .HasColumnType("REAL");
+
+                    b.Property<int>("PedidoId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<double>("PrecioUnitario")
+                        .HasColumnType("REAL");
+
+                    b.Property<int>("ProductoId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("DetalleId");
+
+                    b.HasIndex("ProductoId");
+
+                    b.ToTable("PedidoDetalle");
+                });
+
             modelBuilder.Entity("ProyectoFinalAplicada.Models.Producto", b =>
                 {
                     b.Property<int>("ProductoId")
@@ -238,6 +263,26 @@ namespace ProyectoFinalAplicada1.Migrations
                     b.ToTable("Transferencia");
                 });
 
+            modelBuilder.Entity("ProyectoFinalAplicada.Models.TransferenciaImagen", b =>
+                {
+                    b.Property<int>("TransferenciaImagenId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("RutaImagen")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("TransferenciaId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("TransferenciaImagenId");
+
+                    b.HasIndex("TransferenciaId");
+
+                    b.ToTable("TransferenciaImagenes");
+                });
+
             modelBuilder.Entity("ProyectoFinalAplicada.Models.Usuario", b =>
                 {
                     b.Property<int>("UsuarioId")
@@ -261,133 +306,6 @@ namespace ProyectoFinalAplicada1.Migrations
                     b.ToTable("Usuario");
                 });
 
-            modelBuilder.Entity("ProyectoFinalAplicada1.Data.ApplicationUser", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("AccessFailedCount")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("ApellidoCliente")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("CalleCliente")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("DescripcionCliente")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Email")
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool>("EmailConfirmed")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<bool>("LockoutEnabled")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTimeOffset?>("LockoutEnd")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("NombreCliente")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("NormalizedEmail")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("NormalizedUserName")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("PasswordHash")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool>("PhoneNumberConfirmed")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Sector")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("SecurityStamp")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("TelefonoCliente")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool>("TwoFactorEnabled")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("UserName")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ViviendaCliente")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ApplicationUser");
-                });
-
-            modelBuilder.Entity("ProyectoFinalAplicada1.Models.PedidoDetalle", b =>
-                {
-                    b.Property<int>("DetalleId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<double>("Cantidad")
-                        .HasColumnType("REAL");
-
-                    b.Property<double>("Importe")
-                        .HasColumnType("REAL");
-
-                    b.Property<int>("PedidoId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<double>("PrecioUnitario")
-                        .HasColumnType("REAL");
-
-                    b.Property<int>("ProductoId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("DetalleId");
-
-                    b.HasIndex("ProductoId");
-
-                    b.ToTable("PedidoDetalle");
-                });
-
-            modelBuilder.Entity("ProyectoFinalAplicada1.Models.TransferenciaImagen", b =>
-                {
-                    b.Property<int>("TransferenciaImagenId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("RutaImagen")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("TransferenciaId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("TransferenciaImagenId");
-
-                    b.HasIndex("TransferenciaId");
-
-                    b.ToTable("TransferenciaImagenes");
-                });
-
             modelBuilder.Entity("ProyectoFinalAplicada.Models.Categoria", b =>
                 {
                     b.HasOne("ProyectoFinalAplicada.Models.Proveedor", null)
@@ -395,17 +313,6 @@ namespace ProyectoFinalAplicada1.Migrations
                         .HasForeignKey("CategoriaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("ProyectoFinalAplicada.Models.Cliente", b =>
-                {
-                    b.HasOne("ProyectoFinalAplicada1.Data.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("ProyectoFinalAplicada.Models.Entrada", b =>
@@ -447,22 +354,7 @@ namespace ProyectoFinalAplicada1.Migrations
                     b.Navigation("Cliente");
                 });
 
-            modelBuilder.Entity("ProyectoFinalAplicada.Models.Transferencia", b =>
-                {
-                    b.HasOne("ProyectoFinalAplicada.Models.Cliente", null)
-                        .WithMany("transferencia")
-                        .HasForeignKey("TransferenciaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ProyectoFinalAplicada1.Models.PedidoDetalle", null)
-                        .WithMany("transferencia")
-                        .HasForeignKey("TransferenciaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("ProyectoFinalAplicada1.Models.PedidoDetalle", b =>
+            modelBuilder.Entity("ProyectoFinalAplicada.Models.PedidoDetalle", b =>
                 {
                     b.HasOne("ProyectoFinalAplicada.Models.Pedido", null)
                         .WithMany("Detalles")
@@ -479,7 +371,22 @@ namespace ProyectoFinalAplicada1.Migrations
                     b.Navigation("Producto");
                 });
 
-            modelBuilder.Entity("ProyectoFinalAplicada1.Models.TransferenciaImagen", b =>
+            modelBuilder.Entity("ProyectoFinalAplicada.Models.Transferencia", b =>
+                {
+                    b.HasOne("ProyectoFinalAplicada.Models.Cliente", null)
+                        .WithMany("transferencia")
+                        .HasForeignKey("TransferenciaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ProyectoFinalAplicada.Models.PedidoDetalle", null)
+                        .WithMany("transferencia")
+                        .HasForeignKey("TransferenciaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ProyectoFinalAplicada.Models.TransferenciaImagen", b =>
                 {
                     b.HasOne("ProyectoFinalAplicada.Models.Transferencia", null)
                         .WithMany("Imagenes")
@@ -503,6 +410,11 @@ namespace ProyectoFinalAplicada1.Migrations
                     b.Navigation("Detalles");
                 });
 
+            modelBuilder.Entity("ProyectoFinalAplicada.Models.PedidoDetalle", b =>
+                {
+                    b.Navigation("transferencia");
+                });
+
             modelBuilder.Entity("ProyectoFinalAplicada.Models.Proveedor", b =>
                 {
                     b.Navigation("ProveedorDetalle");
@@ -511,11 +423,6 @@ namespace ProyectoFinalAplicada1.Migrations
             modelBuilder.Entity("ProyectoFinalAplicada.Models.Transferencia", b =>
                 {
                     b.Navigation("Imagenes");
-                });
-
-            modelBuilder.Entity("ProyectoFinalAplicada1.Models.PedidoDetalle", b =>
-                {
-                    b.Navigation("transferencia");
                 });
 #pragma warning restore 612, 618
         }

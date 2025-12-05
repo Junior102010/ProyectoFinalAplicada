@@ -35,7 +35,6 @@ public class Context : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        // Mapeo explícito de la relación Cliente.UserId -> AspNetUsers.Id
         modelBuilder.Entity<Cliente>()
             .HasOne<ApplicationUser>()
             .WithOne()
