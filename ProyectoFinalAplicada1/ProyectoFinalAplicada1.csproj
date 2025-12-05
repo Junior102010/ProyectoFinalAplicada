@@ -18,14 +18,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Data\Migrations\" />
+    <Folder Include="Migrations\" />
     <Folder Include="wwwroot\TransferenciaUploads\" />
     <Folder Include="wwwroot\TransferenciaUploads\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="Data\Pollera.db">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
 </Project>

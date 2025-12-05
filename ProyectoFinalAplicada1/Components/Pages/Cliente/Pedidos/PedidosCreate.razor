@@ -1,6 +1,9 @@
 ﻿@page "/PedidoCliente/Create"
 @using Microsoft.AspNetCore.Authorization
+@using Microsoft.EntityFrameworkCore
 @rendermode InteractiveServer
+@inject ProyectoFinalAplicada1.DAL.Context _context
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 @inject PedidosServices pedidosService
 @inject ClientesServices clientesService
@@ -50,11 +53,19 @@
                     </div>
 
                     <div class="col-md-12">
-                        <div class="form-check form-switch p-3 bg-warning bg-opacity-10 rounded border border-warning border-opacity-25">
-                            <InputCheckbox class="form-check-input" @bind-Value="Pedido.Delivery" id="chkDelivery" style="cursor: pointer;" @oninput="ActualizarTotal" />
-                            <label class="form-check-label fw-bold ms-2" for="chkDelivery">
+                        <div class="form-check form-switch p-3 bg-warning bg-opacity-10 rounded border border-warning border-opacity-25 col-5 d-flex align-items-center">
+    
+                            <label class="form-check-label fw-bold me-auto" for="chkDelivery">
                                 <i class="bi bi-bicycle"></i> Solicitar Delivery (+RD$ @CostoEnvio.ToString("N2"))
                             </label>
+
+                            <InputCheckbox 
+                                class="form-check-input ms-auto" 
+                                @bind-Value="Pedido.Delivery" 
+                                id="chkDelivery" 
+                                style="cursor: pointer;" 
+                                @oninput="ActualizarTotal" />
+
                         </div>
                     </div>
                 </div>
@@ -172,59 +183,96 @@
     public Pedido Pedido { get; set; } = new Pedido();
 
 
+    public int IdCliente { get; set; }
+
+
     public string MetodoPagoSeleccionado { get; set; } = "Efectivo";
 
     public string NombreClienteDisplay { get; set; } = "Cargando...";
     public string TelefonoClienteDisplay { get; set; } = "";
+
     public string Mensaje { get; set; } = string.Empty;
+
+    public Cliente cliente { get; set; } 
 
     private const double CostoEnvio = 150.00;
 
     protected override async Task OnInitializedAsync()
     {
-
+        IdCliente = await GetClienteIdAsync();
+        if (await clientesService.Buscar(IdCliente) != null)
+        {
+            cliente = await clientesService.Buscar(IdCliente);
+        }
         if (carritoService.Carrito.Any())
         {
             Pedido.Detalles = new List<PedidoDetalle>(carritoService.Carrito);
             CalcularTotal();
+
         }
 
         Pedido.FechaPedido = DateTime.Now;
 
+        
 
-        var authState = await authStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
+        // var authState = await authStateProvider.GetAuthenticationStateAsync();
+        // var user = authState.User;
 
-        if (user.Identity != null && user.Identity.IsAuthenticated)
-        {
-            var nombreUsuario = user.Identity.Name;
-            var clienteEncontrado = await clientesService.BuscarPorCorreo(nombreUsuario ?? "");
-
-            if (clienteEncontrado != null)
-            {
-                Pedido.ClienteId = clienteEncontrado.ClienteId;
-                NombreClienteDisplay = $"{clienteEncontrado.NombreCliente} {clienteEncontrado.ApellidoCliente}";
-                TelefonoClienteDisplay = clienteEncontrado.TelefonoCliente;
+        // if (user.Identity != null && user.Identity.IsAuthenticated)
+        // {
+        //     var nombreUsuario = user.Identity.Name;
 
 
-                if (string.IsNullOrEmpty(Pedido.ReferenciaSitio))
-                {
-                    Pedido.ReferenciaSitio = $"{clienteEncontrado.CalleCliente} #{clienteEncontrado.ViviendaCliente}, {clienteEncontrado.Sector} ({clienteEncontrado.DescripcionCliente})";
-                }
-            }
-            else
-            {
-                Mensaje = "No se encontraron datos del cliente asociado a este usuario.";
-                NombreClienteDisplay = "Cliente Desconocido";
-            }
-        }
-        else
-        {
+        //     var clienteEncontrado = await clientesService.BuscarPorNombre(nombreUsuario ?? "");
 
-            navigationManager.NavigateTo("Account/Login");
-        }
+        //     if (clienteEncontrado != null)
+        //     {
+        //         Pedido.ClienteId = clienteEncontrado.ClienteId;
+        //         NombreClienteDisplay = $"{clienteEncontrado.NombreCliente} {clienteEncontrado.ApellidoCliente}";
+        //         TelefonoClienteDisplay = clienteEncontrado.TelefonoCliente;
+
+
+        //         if (string.IsNullOrEmpty(Pedido.ReferenciaSitio))
+        //         {
+        //             Pedido.ReferenciaSitio = $"{clienteEncontrado.CalleCliente} #{clienteEncontrado.ViviendaCliente}, {clienteEncontrado.Sector} ({clienteEncontrado.DescripcionCliente})";
+        //         }
+        //     }
+        //     else
+        //     {
+        //         Mensaje = "No se encontraron datos del cliente asociado a este usuario.";
+        //         NombreClienteDisplay = "Cliente Desconocido";
+        //     }
+        // }
+        // else
+        // {
+
+        //     navigationManager.NavigateTo("Account/Login");
+        // }
+
+        NombreClienteDisplay = cliente.NombreCliente;
+        TelefonoClienteDisplay = cliente.TelefonoCliente;
+        Pedido.ReferenciaSitio = cliente.Sector + " - " + cliente.CalleCliente + " - " + cliente.ViviendaCliente + " - " + cliente.DescripcionCliente ;
+
     }
 
+    public async Task<int> GetClienteIdAsync()
+    {
+        // 1. Obtener el GUID (Identity User ID)
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var identityId = authState.User
+            .FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+        if (string.IsNullOrEmpty(identityId))
+        {
+            return 0; // Usuario no logueado o ID no encontrado
+        }
+
+        // 2. Consultar la base de datos para obtener el ClienteId
+        return await _context.Cliente
+            .Where(c => c.UserId == identityId)
+            .Select(c => c.ClienteId) // Selecciona solo el ClienteId
+            .FirstOrDefaultAsync();    // Devuelve el ID (o 0 si no se encuentra)
+    }
 
     private void ActualizarTotal(ChangeEventArgs e)
     {

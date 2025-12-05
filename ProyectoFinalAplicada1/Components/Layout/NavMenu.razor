@@ -4,7 +4,6 @@
 @inject PageTitleService PageTitleService
 
 @{
-    // Obtiene la URL relativa actual para usarla como ReturnUrl en el formulario de Logout.
     var currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
 }
 
@@ -119,7 +118,7 @@
 
     public void Volver()
     {
-        NavigationManager.NavigateTo("Account/Login");
+        NavigationManager.NavigateTo("/Account/Login");
         PageTitleService.SetTitle("Almacen");
  
     }

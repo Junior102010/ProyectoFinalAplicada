@@ -1,13 +1,48 @@
 ﻿@page "/Bienvenida"
 @inject PageTitleService PageTitleService
-
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager navigationManager
 
 @code {
+
 
     protected override async Task OnInitializedAsync()
     {
         PageTitleService.SetTitle("Bienvenido/a");
-        
+
+
+
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+
+        const string RolAdministrador = "Administrador";
+        const string RolCliente = "Cliente";
+
+
+        if (user.Identity.IsAuthenticated)
+        {
+            if (user.IsInRole(RolAdministrador))
+            {
+                navigationManager.NavigateTo("/Resumen");
+
+            }
+            // ⭐️ CONDICIÓN PARA CLIENTE ⭐️
+            else if (user.IsInRole(RolCliente))
+            {
+                navigationManager.NavigateTo("/Tienda");
+            }
+            
+            else
+            {
+                PageTitleService.SetTitle("Bienvenido/a");
+                Console.WriteLine("Usuario autenticado sin rol específico.");
+            }
+        }
+        else
+        {
+            PageTitleService.SetTitle("Por favor, Inicie Sesión");
+        }
     }
 
 }

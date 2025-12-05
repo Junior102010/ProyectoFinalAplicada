@@ -46,7 +46,7 @@
 
               
                 <div class="col-md-2 text-end">
-                    <a href="/Pedido/Create" class="btn btn-gradiente w-100">
+                    <a href= "/PedidoCliente/Create" class="btn btn-gradiente w-100">
                         <span class="bi bi-plus-square"></span> Nuevo
                     </a>
                 </div>
@@ -152,15 +152,17 @@
     public DateTime? FechaFin { get; set; }
     public int ClienteLogId { get; set; }
 
+    public int IdCliente { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
-
+        IdCliente = await GetClienteIdAsync();
         FechaInicio = DateTime.Now.AddDays(-30);
         FechaFin = DateTime.Now;
         await Buscar();
     }
 
-    // Función que realiza todo el proceso y devuelve el ClienteId
+    
     public async Task<int> GetClienteIdAsync()
     {
         // 1. Obtener el GUID (Identity User ID)
@@ -185,9 +187,7 @@
 
         var lista = await pedidosService.Listar(p => p.PedidoId > 0);
 
-        int id = await GetClienteIdAsync();
-
-        lista = lista.Where(p => p.ClienteId == id).ToList();
+        lista = lista.Where(p => p.ClienteId == IdCliente).ToList();
 
         
         if (FechaInicio.HasValue)
