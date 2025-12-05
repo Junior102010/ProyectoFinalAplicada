@@ -11,14 +11,20 @@ public class Transferencia
 
     [Required]
     public DateTime Fecha { get; set; } = DateTime.Now;
+
     [Required]
-    public string Origen { get; set; }
+    public string Origen { get; set; } = string.Empty;
+
     [Required]
-    public string Destino { get; set; }
+    public string Destino { get; set; } = string.Empty;
+
     [Required]
+    [Range(0.01, double.MaxValue, ErrorMessage = "El monto transferido debe ser mayor a 0.")]
     public double Monto { get; set; }
+
     [Required]
-    public string Observaciones { get; set; }
+    public string Observaciones { get; set; } = string.Empty;
+
 
     public ICollection<TransferenciaImagen> Imagenes { get; set; } = new List<TransferenciaImagen>();
     //[ForeignKey("UsuarioId")]
