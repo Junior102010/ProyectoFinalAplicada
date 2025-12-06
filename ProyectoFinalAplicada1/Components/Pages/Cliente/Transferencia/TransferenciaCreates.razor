@@ -2,6 +2,7 @@
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.EntityFrameworkCore
 
+@rendermode InteractiveServer
 @inject IWebHostEnvironment WebHostEnvironment
 @inject NavigationManager NavigationManager
 @inject TranferenciaServices TransferenciaService
@@ -12,9 +13,7 @@
 @attribute [Authorize(Roles = "Cliente")]
 
 <h3>Nueva Transferencia Bancaria</h3>
-<EditForm Model="@NuevaTransferencia" OnValidSubmit="@GuardarTransferenciaCompleta" formname="TransferenciaFormularioUnico">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
+
 
     <div class="card p-4 shadow">
 
@@ -29,7 +28,7 @@
                     <option value="BHD">BHD</option>
                     <option value="Qik - Banco digital">Qik - Banco digital</option>
                 </InputSelect>
-                <ValidationMessage For="@(() => NuevaTransferencia.Origen)" />
+                
             </div>
 
             <div class="col-6 mb-3">
@@ -41,7 +40,7 @@
                     <option value="BHD">BHD</option>
                     <option value="Qik - Banco digital">Qik - Banco digital</option>
                 </InputSelect>
-                <ValidationMessage For="@(() => NuevaTransferencia.Destino)" />
+                
             </div>
         </div>
 
@@ -55,9 +54,11 @@
                 <InputDate id="fecha" class="form-control" @bind-Value="NuevaTransferencia.Fecha" />
             </div>
         </div>
+
+
         <div class="col-6 mb-3">
             <label for="destino">Pedido a Pagar: <span class="text-danger">*</span></label>
-            <InputSelect id="destino" class="form-select" @bind-Value="NuevaTransferencia.Destino">
+            <InputSelect id="IdPedido" class="form-select" @bind-Value="IdPedido">
                 <option value="">-- Seleccione un Pedido a Pagar --</option>
                 @foreach(var p in ListaPedidos)
                 {
@@ -65,16 +66,15 @@
                 }
 
             </InputSelect>
-            <ValidationMessage For="@(() => NuevaTransferencia.Destino)" />
         </div>
+
+
 
         <div class="mb-3">
             <label for="observaciones">Observaciones <span class="text-danger">*</span></label>
             <InputTextArea id="observaciones" class="form-control" @bind-Value="NuevaTransferencia.Observaciones" />
         </div>
         <hr />
-
-
         <div class="card-body">
             <h4>📄 Adjuntar Comprobante(s)</h4>
             <div class="mb-3">
@@ -96,19 +96,20 @@
             <a href="/TransferenciaCliente/Index" class="btn btn-outline-secondary px-4">
                 <span class="bi bi-arrow-left"></span> Volver
             </a>
-            <button type="submit" class="btn btn-gradiente px-5" @onclick="GuardarTransferenciaCompleta">
+            <button type="button" class="btn btn-gradiente px-5" @onclick="GuardarTransferenciaCompleta">
                 <span class="bi bi-floppy"></span> Guardar
             </button>
         </div>
 
     </div>
-</EditForm>
+
 
 @code {
 
     public List<Pedido> ListaPedidos { get; set; } = new List<Pedido>();
     public Pedido pedido { get; set; } = new Pedido();
     public int IdCliente { get; set; }
+    public int IdPedido { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -119,19 +120,19 @@
 
     }
 
-    private Transferencia NuevaTransferencia { get; set; } = new Transferencia
+    private Transferencia NuevaTransferencia { get; set; } = new Transferencia
     {
-        
+
         Imagenes = new List<TransferenciaImagen>()
     };
     private List<IBrowserFile> selectedFiles = new List<IBrowserFile>();
     private string? errorMessage;
 
-  
-    private const long MaxFileSize = 1024 * 1024 * 5;
 
-    
-    private void HandleFileSelection(InputFileChangeEventArgs e)
+    private const long MaxFileSize = 1024 * 1024 * 5;
+
+
+    private void HandleFileSelection(InputFileChangeEventArgs e)
     {
         selectedFiles.Clear();
         errorMessage = null;
@@ -166,40 +167,50 @@
             .Select(c => c.ClienteId) // Selecciona solo el ClienteId
             .FirstOrDefaultAsync();    // Devuelve el ID (o 0 si no se encuentra)
     }
-    
-    private async Task GuardarTransferenciaCompleta()
+
+    private async Task GuardarTransferenciaCompleta()
     {
-        string uploadsPath = Path.Combine(WebHostEnvironment.WebRootPath, "TransferenciaUploads");
+        string uploadsPath = Path.Combine(WebHostEnvironment.WebRootPath, "TransferenciaUploads");
         Directory.CreateDirectory(uploadsPath);
-        foreach (var file in selectedFiles)
+        foreach (var file in selectedFiles)
         {
             string uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(file.Name);
             string fullServerPath = Path.Combine(uploadsPath, uniqueFileName);
 
-            
-            await using (var stream = new FileStream(fullServerPath, FileMode.Create))
+
+
+            await using (var stream = new FileStream(fullServerPath, FileMode.Create))
             {
-                
-                await file.OpenReadStream(MaxFileSize).CopyToAsync(stream);
+
+                await file.OpenReadStream(MaxFileSize).CopyToAsync(stream);
             }
 
-            
-            string relativeDbPath = $"/TransferenciaUploads/{uniqueFileName}";
+
+            string relativeDbPath = $"/TransferenciaUploads/{uniqueFileName}";
 
             var imagenRegistro = new TransferenciaImagen
             {
                 RutaImagen = relativeDbPath
             };
 
-            
-            NuevaTransferencia.Imagenes.Add(imagenRegistro);
-        }
 
-        
-        bool guardado = await TransferenciaService.Guardar(NuevaTransferencia);
+            NuevaTransferencia.Imagenes.Add(imagenRegistro);
+        }
+        NuevaTransferencia.PedidoId = IdPedido;
+
+        bool guardado = await TransferenciaService.Guardar(NuevaTransferencia);
 
         if (guardado)
         {
+            if (IdPedido != null)
+            {
+                pedido = await pedidosServices.Buscar(IdPedido);
+                pedido.MontoTotal = -NuevaTransferencia.Monto;
+                await pedidosServices.Guardar(pedido);
+
+                pedido = new Pedido();
+            }
+
             NavigationManager.NavigateTo("/transferencias");
         }
         else
