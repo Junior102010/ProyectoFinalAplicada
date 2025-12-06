@@ -1,9 +1,13 @@
 ﻿@page "/transferencias/crear"
 @using Microsoft.AspNetCore.Authorization
+@using Microsoft.EntityFrameworkCore
 
 @inject IWebHostEnvironment WebHostEnvironment
 @inject NavigationManager NavigationManager
 @inject TranferenciaServices TransferenciaService
+@inject PedidosServices pedidosServices
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject ProyectoFinalAplicada1.DAL.Context _context
 
 @attribute [Authorize(Roles = "Cliente")]
 
@@ -51,13 +55,26 @@
                 <InputDate id="fecha" class="form-control" @bind-Value="NuevaTransferencia.Fecha" />
             </div>
         </div>
+        <div class="col-6 mb-3">
+            <label for="destino">Pedido a Pagar: <span class="text-danger">*</span></label>
+            <InputSelect id="destino" class="form-select" @bind-Value="NuevaTransferencia.Destino">
+                <option value="">-- Seleccione un Pedido a Pagar --</option>
+                @foreach(var p in ListaPedidos)
+                {
+                    <option value="@p.PedidoId">ID: @p.PedidoId - Fecha: @p.FechaPedido --- Monto a Pagar: @p.MontoTotal</option>
+                }
+
+            </InputSelect>
+            <ValidationMessage For="@(() => NuevaTransferencia.Destino)" />
+        </div>
 
         <div class="mb-3">
             <label for="observaciones">Observaciones <span class="text-danger">*</span></label>
-            <InputText id="observaciones" class="form-control" @bind-Value="NuevaTransferencia.Observaciones" />
+            <InputTextArea id="observaciones" class="form-control" @bind-Value="NuevaTransferencia.Observaciones" />
         </div>
-
         <hr />
+
+
         <div class="card-body">
             <h4>📄 Adjuntar Comprobante(s)</h4>
             <div class="mb-3">
@@ -79,7 +96,7 @@
             <a href="/TransferenciaCliente/Index" class="btn btn-outline-secondary px-4">
                 <span class="bi bi-arrow-left"></span> Volver
             </a>
-            <button type="submit" class="btn btn-gradiente px-5">
+            <button type="submit" class="btn btn-gradiente px-5" @onclick="GuardarTransferenciaCompleta">
                 <span class="bi bi-floppy"></span> Guardar
             </button>
         </div>
@@ -88,7 +105,20 @@
 </EditForm>
 
 @code {
-  
+
+    public List<Pedido> ListaPedidos { get; set; } = new List<Pedido>();
+    public Pedido pedido { get; set; } = new Pedido();
+    public int IdCliente { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        IdCliente = await GetClienteIdAsync();
+        ListaPedidos = await pedidosServices.Listar(p => p.PedidoId > 0);
+        ListaPedidos = ListaPedidos.Where(p => p.ClienteId == IdCliente).ToList();
+
+    }
+
     private Transferencia NuevaTransferencia { get; set; } = new Transferencia
     {
         
@@ -118,6 +148,24 @@
         }
     }
 
+    public async Task<int> GetClienteIdAsync()
+    {
+        // 1. Obtener el GUID (Identity User ID)
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var identityId = authState.User
+            .FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+        if (string.IsNullOrEmpty(identityId))
+        {
+            return 0; // Usuario no logueado o ID no encontrado
+        }
+
+        // 2. Consultar la base de datos para obtener el ClienteId
+        return await _context.Cliente
+            .Where(c => c.UserId == identityId)
+            .Select(c => c.ClienteId) // Selecciona solo el ClienteId
+            .FirstOrDefaultAsync();    // Devuelve el ID (o 0 si no se encuentra)
+    }
     
     private async Task GuardarTransferenciaCompleta()
     {

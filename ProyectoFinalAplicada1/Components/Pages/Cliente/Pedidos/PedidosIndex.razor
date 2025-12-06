@@ -7,15 +7,12 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject ProyectoFinalAplicada1.DAL.Context _context
 @using Microsoft.EntityFrameworkCore
+@inject PageTitleService PageTitleService
 
 @attribute [Authorize(Roles = "Cliente")]
 
-<PageTitle>Gestión de Pedidos</PageTitle>
-
 <SectionContent SectionName="TituloPagina">
-    <div class="d-flex justify-content-center w-100">
-        <h3 class="m-0 fw-bold">Gestión de Pedidos</h3>
-    </div>
+   
 </SectionContent>
 
 <div class="container">
@@ -45,11 +42,11 @@
                 </div>
 
               
-                <div class="col-md-2 text-end">
+               @*  <div class="col-md-2 text-end">
                     <a href= "/PedidoCliente/Create" class="btn btn-gradiente w-100">
                         <span class="bi bi-plus-square"></span> Nuevo
                     </a>
-                </div>
+                </div> *@
             </div>
 
             <div class="table-responsive">
@@ -156,6 +153,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+        PageTitleService.SetTitle("Pedidos");
         IdCliente = await GetClienteIdAsync();
         FechaInicio = DateTime.Now.AddDays(-30);
         FechaFin = DateTime.Now;
