@@ -28,50 +28,97 @@ public class PedidosServices(IDbContextFactory<Context> DbFactory)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
         return await contexto.Pedido
-            .Include(p => p.Cliente)         
+            .Include(p => p.Cliente)
             .Include(p => p.Detalles)
             .Where(criterio)
             .AsNoTracking()
             .ToListAsync();
-
-    }
-
-    public async Task<bool> Insertar(Pedido producto)
-    {
-        await using var contexto = await DbFactory.CreateDbContextAsync();
-        contexto.Pedido.Add(producto);
-        return await contexto.SaveChangesAsync() > 0;
     }
 
     public async Task<bool> Guardar(Pedido pedido)
     {
         if (!await Existe(pedido.PedidoId))
-        {
-
             return await Insertar(pedido);
-        }
         else
-        {
             return await Modificar(pedido);
-        }
     }
 
-    public async Task<bool> Modificar(Pedido pedido)
+    private async Task<bool> Insertar(Pedido pedido)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
 
+        await AfectarExistencia(contexto, pedido.Detalles.ToArray(), false);
+
+        foreach (var detalle in pedido.Detalles)
+        {
+            detalle.Producto = null;
+        }
+
+        contexto.Pedido.Add(pedido);
+        return await contexto.SaveChangesAsync() > 0;
+    }
+
+    private async Task<bool> Modificar(Pedido pedido)
+    {
+        await using var contexto = await DbFactory.CreateDbContextAsync();
+
+        var pedidoOriginal = await contexto.Pedido
+            .Include(p => p.Detalles)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(p => p.PedidoId == pedido.PedidoId);
+
+        if (pedidoOriginal != null)
+        {
+            await AfectarExistencia(contexto, pedidoOriginal.Detalles.ToArray(), true);
+        }
+
+        await AfectarExistencia(contexto, pedido.Detalles.ToArray(), false);
+
+        foreach (var detalle in pedido.Detalles)
+        {
+            detalle.Producto = null;
+        }
 
         contexto.Update(pedido);
-
-
         return await contexto.SaveChangesAsync() > 0;
     }
 
     public async Task<bool> Eliminar(int id)
     {
-        using var contexto = await DbFactory.CreateDbContextAsync();
-        return await contexto.Pedido.AsNoTracking().Where(p => p.PedidoId == id).ExecuteDeleteAsync() > 0;
+        await using var contexto = await DbFactory.CreateDbContextAsync();
+
+        var pedido = await contexto.Pedido
+            .Include(p => p.Detalles)
+            .FirstOrDefaultAsync(p => p.PedidoId == id);
+
+        if (pedido != null)
+        {
+            await AfectarExistencia(contexto, pedido.Detalles.ToArray(), true);
+
+            contexto.Pedido.Remove(pedido);
+            return await contexto.SaveChangesAsync() > 0;
+        }
+        return false;
     }
+
+    private async Task AfectarExistencia(Context contexto, PedidoDetalle[] detalles, bool sumar)
+    {
+        foreach (var item in detalles)
+        {
+            var producto = await contexto.Producto.FindAsync(item.ProductoId);
+
+            if (producto != null)
+            {
+                if (sumar)
+                    producto.Existencia += (int)item.Cantidad;
+                else
+                    producto.Existencia -= (int)item.Cantidad;
+
+                contexto.SaveChangesAsync();
+            }
+        }
+    }
+
     public async Task<bool> CambiarEstado(int pedidoId, string nuevoEstado)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
@@ -83,6 +130,7 @@ public class PedidosServices(IDbContextFactory<Context> DbFactory)
         }
         return false;
     }
+
     public async Task<double> CalcularIngresosTotales()
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();

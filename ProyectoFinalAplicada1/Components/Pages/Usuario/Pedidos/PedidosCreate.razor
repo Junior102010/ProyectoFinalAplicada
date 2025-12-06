@@ -257,7 +257,6 @@
         Pedido.MontoTotal = Pedido.Detalles.Sum(d => d.Importe);
     }
 
-
     public async Task Guardar()
     {
         if (Pedido.ClienteId <= 0 || !Pedido.Detalles.Any())
@@ -266,21 +265,23 @@
             return;
         }
 
-
+        // El servicio ya se encarga de guardar el pedido Y restar la existencia.
         var guardado = await pedidosService.Guardar(Pedido);
 
         if (guardado)
         {
-            foreach (var producto in Pedido.Detalles)
+            // ELIMINAR O COMENTAR ESTE BLOQUE FOREACH ENTERO
+            /* foreach (var producto in Pedido.Detalles)
             {
                 if (producto.Producto != null)
                 {
                     var pro = await productosService.Buscar(producto.Producto.ProductoId);
                     pro.Existencia -= (int)producto.Cantidad;
-                    Console.WriteLine("aaaaaaaaa");
                     await productosService.Modificar(pro);
                 }
             }
+            */
+
             navigationManager.NavigateTo("/Pedido/Index");
         }
         else

@@ -195,7 +195,7 @@
 
     public Cliente cliente { get; set; } 
 
-    private const double CostoEnvio = 150.00;
+    private const double CostoEnvio = 15.00;
 
     protected override async Task OnInitializedAsync()
     {
@@ -251,7 +251,7 @@
 
         NombreClienteDisplay = cliente.NombreCliente;
         TelefonoClienteDisplay = cliente.TelefonoCliente;
-        Pedido.ReferenciaSitio = cliente.Sector + " - " + cliente.CalleCliente + " - " + cliente.ViviendaCliente + " - " + cliente.DescripcionCliente ;
+        Pedido.ReferenciaSitio = cliente.Sector + " / " + cliente.CalleCliente + " / " + cliente.ViviendaCliente + " / " + cliente.DescripcionCliente ;
 
     }
 

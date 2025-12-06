@@ -28,5 +28,5 @@ public class Pedido
 
     [ForeignKey("DetalleId")]
     public ICollection<PedidoDetalle> Detalles { get; set; } = new List<PedidoDetalle>();
-
+ 
 }
