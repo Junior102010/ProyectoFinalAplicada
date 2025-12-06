@@ -29,7 +29,7 @@
                 </div>
 
                 <div class="col-md-4">
-                    <label class="form-label text-muted small fw-bold mb-1">Buscar (Cliente o Estado)</label>
+                    <label class="form-label text-muted small fw-bold mb-1">Buscar (Cliente)</label>
                     <div class="input-group">
                         <input class="form-control input-glass" @bind="ValorFiltro" placeholder="Escribe nombre..." />
                         <button type="button" class="btn btn-outline-success bi bi-search" @onclick="Buscar"></button>
@@ -166,10 +166,7 @@
        
         if (!string.IsNullOrWhiteSpace(ValorFiltro))
         {
-            lista = lista.Where(p => 
-                (p.Cliente != null && (p.Cliente.NombreCliente.Contains(ValorFiltro, StringComparison.OrdinalIgnoreCase) || 
-                                       p.Cliente.ApellidoCliente.Contains(ValorFiltro, StringComparison.OrdinalIgnoreCase))) ||
-                p.Estado.Contains(ValorFiltro, StringComparison.OrdinalIgnoreCase)
+            lista = lista.Where(p => (p.Cliente.NombreCliente.Contains(ValorFiltro, StringComparison.OrdinalIgnoreCase) || p.Cliente.ApellidoCliente.Contains(ValorFiltro, StringComparison.OrdinalIgnoreCase))
             ).ToList();
         }
 

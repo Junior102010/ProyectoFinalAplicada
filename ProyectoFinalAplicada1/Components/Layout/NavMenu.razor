@@ -23,7 +23,7 @@
             <Authorized>
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="/Tienda" Match="NavLinkMatch.All">
-                        <span class="bi bi-inbox-fill" aria-hidden="true"></span> Tienda
+                        <span class="bi bi-shop" aria-hidden="true"></span> Tienda
                     </NavLink>
                 </div>
                 <div class="nav-item px-3">
@@ -41,6 +41,11 @@
 
         <AuthorizeView Roles="Administrador">
             <Authorized>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="/Resumen" Match="NavLinkMatch.All">
+                        <span class="bi bi-bar-chart-line" aria-hidden="true"></span> Resumen
+                    </NavLink>
+                </div>
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="/Almacen" Match="NavLinkMatch.All">
                         <span class="bi bi-inbox-fill" aria-hidden="true"></span> Almacen
@@ -102,8 +107,6 @@
 
 
 @code {
-
-    // El @code se mantiene para asegurar la reactividad y limpieza de eventos.
 
     protected override void OnInitialized()
     {

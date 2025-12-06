@@ -33,9 +33,9 @@
                 </div>
 
                 <div class="col-md-4">
-                    <label class="form-label text-muted small fw-bold mb-1">Buscar (Cliente o Estado)</label>
+                    <label class="form-label text-muted small fw-bold mb-1">Buscar (Estado)</label>
                     <div class="input-group">
-                        <input class="form-control input-glass" @bind="ValorFiltro" placeholder="Escribe nombre..." />
+                        <input class="form-control input-glass" @bind="ValorFiltro" placeholder="Escribe el Estado..." />
                         <button type="button" class="btn btn-outline-success bi bi-search" @onclick="Buscar"></button>
                         <button type="button" class="btn btn-outline-secondary bi bi-arrow-counterclockwise" @onclick="Restablecer" title="Limpiar"></button>
                     </div>
@@ -115,7 +115,7 @@
                                 </td>
 
                                 <td class="text-center">
-                                    <a href="/Pedido/Edit/@pedido.PedidoId" class="btn btn-sm btn-outline-success border-0 bi bi-eye fs-5" title="Ver Detalle"></a>
+                                    <a href="/PedidoCliente/Edit/@pedido.PedidoId" class="btn btn-sm btn-outline-info bi bi-info-circle-fill" title="Ver Detalle"></a>
                                 </td>
                             </tr>
                         }
@@ -197,7 +197,7 @@
         if (!string.IsNullOrWhiteSpace(ValorFiltro))
         {
             lista = lista.Where(p => 
-                (p.Cliente != null && (p.Cliente.NombreCliente.Contains(ValorFiltro, StringComparison.OrdinalIgnoreCase) || 
+                (p.Cliente != null && (p.Cliente.NombreCliente.Contains(ValorFiltro) || 
                                        p.Cliente.ApellidoCliente.Contains(ValorFiltro, StringComparison.OrdinalIgnoreCase))) ||
                 p.Estado.Contains(ValorFiltro, StringComparison.OrdinalIgnoreCase)
             ).ToList();
