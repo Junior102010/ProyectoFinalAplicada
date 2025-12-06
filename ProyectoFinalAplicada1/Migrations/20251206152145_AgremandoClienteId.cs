@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ProyectoFinalAplicada1.Migrations
 {
     /// <inheritdoc />
-    public partial class PosChekeo1 : Migration
+    public partial class AgremandoClienteId : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -205,17 +205,17 @@ namespace ProyectoFinalAplicada1.Migrations
                     Origen = table.Column<string>(type: "TEXT", nullable: false),
                     Destino = table.Column<string>(type: "TEXT", nullable: false),
                     Monto = table.Column<double>(type: "REAL", nullable: false),
-                    Observaciones = table.Column<string>(type: "TEXT", nullable: false)
+                    Observaciones = table.Column<string>(type: "TEXT", nullable: false),
+                    ClienteId = table.Column<int>(type: "INTEGER", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Transferencia", x => x.TransferenciaId);
                     table.ForeignKey(
-                        name: "FK_Transferencia_Cliente_TransferenciaId",
-                        column: x => x.TransferenciaId,
+                        name: "FK_Transferencia_Cliente_ClienteId",
+                        column: x => x.ClienteId,
                         principalTable: "Cliente",
-                        principalColumn: "ClienteId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "ClienteId");
                     table.ForeignKey(
                         name: "FK_Transferencia_PedidoDetalle_TransferenciaId",
                         column: x => x.TransferenciaId,
@@ -268,6 +268,11 @@ namespace ProyectoFinalAplicada1.Migrations
                 name: "IX_PedidoDetalle_ProductoId",
                 table: "PedidoDetalle",
                 column: "ProductoId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Transferencia_ClienteId",
+                table: "Transferencia",
+                column: "ClienteId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_TransferenciaImagenes_TransferenciaId",

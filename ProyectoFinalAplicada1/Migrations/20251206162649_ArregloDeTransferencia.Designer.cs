@@ -11,8 +11,8 @@ using ProyectoFinalAplicada1.DAL;
 namespace ProyectoFinalAplicada1.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20251206145805_AgremandoClienteId")]
-    partial class AgremandoClienteId
+    [Migration("20251206162649_ArregloDeTransferencia")]
+    partial class ArregloDeTransferencia
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -393,11 +393,13 @@ namespace ProyectoFinalAplicada1.Migrations
 
             modelBuilder.Entity("ProyectoFinalAplicada.Models.TransferenciaImagen", b =>
                 {
-                    b.HasOne("ProyectoFinalAplicada.Models.Transferencia", null)
+                    b.HasOne("ProyectoFinalAplicada.Models.Transferencia", "Transferencia")
                         .WithMany("Imagenes")
                         .HasForeignKey("TransferenciaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Transferencia");
                 });
 
             modelBuilder.Entity("ProyectoFinalAplicada.Models.Cliente", b =>

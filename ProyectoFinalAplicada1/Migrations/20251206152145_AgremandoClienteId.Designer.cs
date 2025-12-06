@@ -11,8 +11,8 @@ using ProyectoFinalAplicada1.DAL;
 namespace ProyectoFinalAplicada1.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20251206142326_SolucionError")]
-    partial class SolucionError
+    [Migration("20251206152145_AgremandoClienteId")]
+    partial class AgremandoClienteId
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -240,6 +240,9 @@ namespace ProyectoFinalAplicada1.Migrations
                     b.Property<int>("TransferenciaId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int?>("ClienteId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Destino")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -259,6 +262,8 @@ namespace ProyectoFinalAplicada1.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("TransferenciaId");
+
+                    b.HasIndex("ClienteId");
 
                     b.ToTable("Transferencia");
                 });
@@ -373,17 +378,17 @@ namespace ProyectoFinalAplicada1.Migrations
 
             modelBuilder.Entity("ProyectoFinalAplicada.Models.Transferencia", b =>
                 {
-                    b.HasOne("ProyectoFinalAplicada.Models.Cliente", null)
+                    b.HasOne("ProyectoFinalAplicada.Models.Cliente", "Cliente")
                         .WithMany("transferencia")
-                        .HasForeignKey("TransferenciaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ClienteId");
 
                     b.HasOne("ProyectoFinalAplicada.Models.PedidoDetalle", null)
                         .WithMany("transferencia")
                         .HasForeignKey("TransferenciaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Cliente");
                 });
 
             modelBuilder.Entity("ProyectoFinalAplicada.Models.TransferenciaImagen", b =>

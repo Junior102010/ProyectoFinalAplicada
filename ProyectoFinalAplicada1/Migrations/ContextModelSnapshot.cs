@@ -390,11 +390,13 @@ namespace ProyectoFinalAplicada1.Migrations
 
             modelBuilder.Entity("ProyectoFinalAplicada.Models.TransferenciaImagen", b =>
                 {
-                    b.HasOne("ProyectoFinalAplicada.Models.Transferencia", null)
+                    b.HasOne("ProyectoFinalAplicada.Models.Transferencia", "Transferencia")
                         .WithMany("Imagenes")
                         .HasForeignKey("TransferenciaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Transferencia");
                 });
 
             modelBuilder.Entity("ProyectoFinalAplicada.Models.Cliente", b =>

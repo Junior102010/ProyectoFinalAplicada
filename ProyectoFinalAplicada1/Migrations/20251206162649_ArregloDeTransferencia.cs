@@ -5,7 +5,7 @@
 namespace ProyectoFinalAplicada1.Migrations
 {
     /// <inheritdoc />
-    public partial class SolucionTransferencia : Migration
+    public partial class ArregloDeTransferencia : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
