@@ -31,8 +31,41 @@ public class TranferenciaServices(IDbContextFactory<Context> DbFactory)
     public async Task<bool> Insertar(Transferencia transferencia)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
-        contexto.Transferencia.Add(transferencia);
-        return await contexto.SaveChangesAsync() > 0;
+
+        // Creamos la nueva entidad LIMPIA
+        var nuevaTransferencia = new Transferencia
+        {
+            Fecha = transferencia.Fecha,
+            Origen = transferencia.Origen,
+            Destino = transferencia.Destino,
+            Monto = transferencia.Monto,
+            Observaciones = transferencia.Observaciones,
+
+            // IMPORTANTE: Tomamos el ID que nos mandó la Vista (que ya lo buscó por Login)
+            ClienteId = transferencia.ClienteId,
+
+            // Desconectamos el objeto Cliente para que EF no se confunda
+            Cliente = null,
+
+            // Las imágenes se agregan manualmente abajo o se inicializan vacías
+            Imagenes = new List<TransferenciaImagen>()
+        };
+
+        contexto.Transferencia.Add(nuevaTransferencia);
+        var guardado = await contexto.SaveChangesAsync() > 0;
+
+        // Si había imágenes en el objeto original, las guardamos ahora que tenemos ID
+        if (guardado && transferencia.Imagenes != null && transferencia.Imagenes.Any())
+        {
+            foreach (var img in transferencia.Imagenes)
+            {
+                img.TransferenciaId = nuevaTransferencia.TransferenciaId;
+                contexto.TransferenciaImagenes.Add(img);
+            }
+            await contexto.SaveChangesAsync();
+        }
+
+        return guardado;
     }
 
     public async Task<bool> Guardar(Transferencia transferencia) 

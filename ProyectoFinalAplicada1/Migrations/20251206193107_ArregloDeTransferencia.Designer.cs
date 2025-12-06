@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProyectoFinalAplicada1.DAL;
 
@@ -10,9 +11,11 @@ using ProyectoFinalAplicada1.DAL;
 namespace ProyectoFinalAplicada1.Migrations
 {
     [DbContext(typeof(Context))]
-    partial class ContextModelSnapshot : ModelSnapshot
+    [Migration("20251206193107_ArregloDeTransferencia")]
+    partial class ArregloDeTransferencia
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.0");
@@ -237,9 +240,6 @@ namespace ProyectoFinalAplicada1.Migrations
                     b.Property<int>("TransferenciaId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("ClienteId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("Destino")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -258,14 +258,10 @@ namespace ProyectoFinalAplicada1.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("PedidoId")
+                    b.Property<int>("PedidoId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("TransferenciaId");
-
-                    b.HasIndex("ClienteId");
-
-                    b.HasIndex("PedidoId");
 
                     b.ToTable("Transferencia");
                 });
@@ -380,23 +376,17 @@ namespace ProyectoFinalAplicada1.Migrations
 
             modelBuilder.Entity("ProyectoFinalAplicada.Models.Transferencia", b =>
                 {
-                    b.HasOne("ProyectoFinalAplicada.Models.Cliente", "Cliente")
+                    b.HasOne("ProyectoFinalAplicada.Models.Cliente", null)
                         .WithMany("transferencia")
-                        .HasForeignKey("ClienteId");
-
-                    b.HasOne("ProyectoFinalAplicada.Models.Pedido", "Pedido")
-                        .WithMany()
-                        .HasForeignKey("PedidoId");
+                        .HasForeignKey("TransferenciaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("ProyectoFinalAplicada.Models.PedidoDetalle", null)
                         .WithMany("transferencia")
                         .HasForeignKey("TransferenciaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Cliente");
-
-                    b.Navigation("Pedido");
                 });
 
             modelBuilder.Entity("ProyectoFinalAplicada.Models.TransferenciaImagen", b =>

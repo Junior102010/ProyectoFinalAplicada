@@ -22,7 +22,4 @@ public class PedidoDetalle
     [Required]
     public double Importe { get; set; }
 
-
-    [ForeignKey("TransferenciaId")]
-    public ICollection<Transferencia> transferencia { get; set; } = new List<Transferencia>();
 }
