@@ -7,6 +7,7 @@
 @using Microsoft.AspNetCore.WebUtilities
 @using ProyectoFinalAplicada1.Data
 @inject ProyectoFinalAplicada1.DAL.Context DbContext
+@inject PageTitleService PageTitleService
 
 @inject UserManager<ApplicationUser> UserManager
 @inject IUserStore<ApplicationUser> UserStore
@@ -16,6 +17,8 @@
 @inject NavigationManager NavigationManager
 @inject IdentityRedirectManager RedirectManager
 
+@rendermode InteractiveServer
+
 <PageTitle>Registro de Cliente</PageTitle>
 
 <div class="d-flex align-items-center justify-content-center min-vh-100 py-5" style="background-color: #F4EAD6;">
@@ -24,20 +27,21 @@
 
         <StatusMessage Message="@Message" />
 
-        <div class="card card-neo p-4 p-md-5 border-0 text-center">
+        <div class="card card-neo p-4 p-md-5 border-0 text-center shadow-lg">
 
             <div class="neo-avatar-circle mb-4 mx-auto" style="width: 100px; height: 100px;">
-                <img src="/imagenes/Logo.png" alt="Logo" class="rounded-circle img-fluid" style="width: 100%; height: 100%; object-fit: cover;" />
+                <img src="/imagenes/Logo.png" alt="Logo" class="rounded-circle img-fluid shadow-sm" style="width: 100%; height: 100%; object-fit: cover;" />
             </div>
 
             <h3 class="fw-bold mb-2" style="color: #3D5D35; letter-spacing: 1px;">CREAR CUENTA</h3>
-            <p class="text-muted small mb-4">Únete al club y realiza tus pedidos</p>
+            <p class="text-muted small mb-4">Únete al club y realiza tus pedidos (Exclusivo El Factor)</p>
 
             <EditForm Model="Input" method="post" OnValidSubmit="RegisterUser" FormName="register">
                 <DataAnnotationsValidator />
 
                 <div class="text-start px-2">
 
+                    @* --- DATOS PERSONALES --- *@
                     <h5 class="fw-bold mt-4 mb-3 pb-2 border-bottom" style="color: #3D5D35; border-color: rgba(61,93,53,0.2) !important;">
                         <i class="bi bi-person-lines-fill me-2"></i>DATOS PERSONALES
                     </h5>
@@ -65,33 +69,92 @@
                         </div>
                     </div>
 
+                    @* --- DIRECCIÓN DE ENTREGA --- *@
                     <h5 class="fw-bold mt-5 mb-3 pb-2 border-bottom" style="color: #3D5D35; border-color: rgba(61,93,53,0.2) !important;">
                         <i class="bi bi-geo-alt-fill me-2"></i>DIRECCIÓN DE ENTREGA
                     </h5>
 
                     <div class="row g-3">
+
+                        @* 1. MUNICIPIO *@
+                        <div class="col-md-6">
+                            <label class="ms-3 mb-1 text-muted small fw-bold">MUNICIPIO (M.T.S.)</label>
+
+                            <div class="position-relative">
+                                @* Sin clases extrañas, solo neo-input para mantener el estilo base *@
+                                <InputSelect @bind-Value="SelectedMunicipio"
+                                             @bind-Value:after="ValidarMunicipio"
+                                             class="form-select neo-input"
+                                             style="cursor: pointer; -webkit-appearance: none; appearance: none;">
+                                    <option value="" selected disabled>Seleccione Municipio...</option>
+                                    @foreach (var m in ListaMunicipios)
+                                    {
+                                        <option value="@m">@m</option>
+                                    }
+                                </InputSelect>
+
+                                @* Icono Chevron *@
+                                <i class="bi bi-chevron-down position-absolute top-50 end-0 translate-middle-y me-3"
+                                   style="color: #3D5D35; pointer-events: none;"></i>
+                            </div>
+
+                            @if (!string.IsNullOrEmpty(ErrorMunicipio))
+                            {
+                                <div class="alert alert-danger mt-2 py-1 px-2 small shadow-sm">
+                                    <i class="bi bi-x-circle-fill"></i> @ErrorMunicipio
+                                </div>
+                            }
+                        </div>
+
+                        @* 2. SECTOR *@
                         <div class="col-md-6">
                             <label class="ms-3 mb-1 text-muted small fw-bold">SECTOR</label>
-                            <InputText @bind-Value="Input.Sector" class="form-control neo-input" placeholder="Ej: Centro" />
+
+                            @if (SectoresDisponibles.Any())
+                            {
+                                @* MODO ACTIVO: Lista desplegable *@
+                                <div class="position-relative">
+                                    <InputSelect @bind-Value="Input.Sector"
+                                                 class="form-select neo-input"
+                                                 style="-webkit-appearance: none; appearance: none; cursor: pointer;">
+                                        <option value="" selected disabled>Seleccione su Sector</option>
+                                        @foreach (var s in SectoresDisponibles)
+                                        {
+                                            <option value="@s">@s</option>
+                                        }
+                                    </InputSelect>
+
+                                    <i class="bi bi-chevron-down position-absolute top-50 end-0 translate-middle-y me-3"
+                                       style="color: #3D5D35; pointer-events: none;"></i>
+                                </div>
+                            }
+                            else
+                            {
+                                @* MODO INACTIVO: Input deshabilitado simple *@
+                                <input type="text" class="form-control neo-input bg-light" disabled
+                                       placeholder="Seleccione Municipio..." />
+                            }
                             <ValidationMessage For="() => Input.Sector" class="text-danger small ms-3" />
                         </div>
+
                         <div class="col-md-6">
                             <label class="ms-3 mb-1 text-muted small fw-bold">CALLE</label>
                             <InputText @bind-Value="Input.CalleCliente" class="form-control neo-input" placeholder="Ej: Calle Principal" />
                             <ValidationMessage For="() => Input.CalleCliente" class="text-danger small ms-3" />
                         </div>
-                        <div class="col-md-12">
-                            <label class="ms-3 mb-1 text-muted small fw-bold">NÚMERO DE CASA / APTO</label>
-                            <InputText @bind-Value="Input.ViviendaCliente" class="form-control neo-input" placeholder="Ej: Casa #12 o Apto 2B" />
+                        <div class="col-md-6">
+                            <label class="ms-3 mb-1 text-muted small fw-bold">NÚMERO / APTO</label>
+                            <InputText @bind-Value="Input.ViviendaCliente" class="form-control neo-input" placeholder="Ej: #12" />
                             <ValidationMessage For="() => Input.ViviendaCliente" class="text-danger small ms-3" />
                         </div>
                         <div class="col-md-12">
-                            <label class="ms-3 mb-1 text-muted small fw-bold">REFERENCIA (Opcional)</label>
-                            <InputTextArea @bind-Value="Input.DescripcionCliente" class="form-control neo-input" rows="2" placeholder="Ej: Frente al parque, casa azul..." />
+                            <label class="ms-3 mb-1 text-muted small fw-bold">REFERENCIA</label>
+                            <InputTextArea @bind-Value="Input.DescripcionCliente" class="form-control neo-input" rows="2" placeholder="Ej: Casa azul, frente al parque..." />
                             <ValidationMessage For="() => Input.DescripcionCliente" class="text-danger small ms-3" />
                         </div>
                     </div>
 
+                    @* --- SEGURIDAD --- *@
                     <h5 class="fw-bold mt-5 mb-3 pb-2 border-bottom" style="color: #3D5D35; border-color: rgba(61,93,53,0.2) !important;">
                         <i class="bi bi-shield-lock-fill me-2"></i>SEGURIDAD
                     </h5>
@@ -112,7 +175,9 @@
                 </div>
 
                 <div class="mt-4">
-                    <button type="submit" class="profile_button w-100 py-3 fw-bold fs-5" style="background: #C15349; color: white;">
+                    <button type="submit" class="profile_button w-100 py-3 fw-bold fs-5 shadow-sm"
+                            style="background: #C15349; color: white;"
+                            disabled="@(!EsMunicipioValido)">
                         <i class="bi bi-person-plus-fill me-2"></i> REGISTRARSE
                     </button>
                 </div>
@@ -123,6 +188,8 @@
                         Inicia Sesión aquí
                     </a>
                 </div>
+
+                <div style="height: 300px;"></div>
 
             </EditForm>
         </div>
@@ -140,13 +207,57 @@
 
     private string? Message => identityErrors is null ? null : $"Error: {string.Join(", ", identityErrors.Select(error => error.Description))}";
 
+    // Lógica
+    private string SelectedMunicipio { get; set; } = "";
+    private string ErrorMunicipio { get; set; } = "";
+    private bool EsMunicipioValido { get; set; } = false;
+    private List<string> SectoresDisponibles { get; set; } = new();
+
+    private List<string> ListaMunicipios = new()
+    {
+        "El Factor",
+        "Nagua",
+        "Cabrera",
+        "Río San Juan"
+    };
+
+    private List<string> SectoresElFactor = new()
+    {
+        "Centro del Pueblo", "Pueblo Nuevo", "El Barro", "Los Pajones",
+        "Los Indios", "Telanza", "San José"
+    };
+
     protected override void OnInitialized()
     {
+        PageTitleService.SetTitle("Registrar Cuenta");
         Input ??= new();
+    }
+
+    private void ValidarMunicipio()
+    {
+        if (SelectedMunicipio == "El Factor")
+        {
+            EsMunicipioValido = true;
+            ErrorMunicipio = "";
+            SectoresDisponibles = SectoresElFactor;
+        }
+        else
+        {
+            EsMunicipioValido = false;
+            ErrorMunicipio = $"Lo sentimos, no hay servicio en {SelectedMunicipio} por el momento.";
+            SectoresDisponibles = new();
+            Input.Sector = "";
+        }
     }
 
     public async Task RegisterUser(EditContext editContext)
     {
+        if (SelectedMunicipio != "El Factor")
+        {
+            identityErrors = new List<IdentityError> { new IdentityError { Description = "Municipio no válido." } };
+            return;
+        }
+
         var user = CreateUser();
 
         await UserStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
@@ -165,7 +276,7 @@
                 NombreCliente = Input.NombreCliente,
                 ApellidoCliente = Input.ApellidoCliente,
                 TelefonoCliente = Input.TelefonoCliente,
-                Sector = Input.Sector,
+                Sector = $"{Input.Sector} (El Factor)",
                 CalleCliente = Input.CalleCliente,
                 ViviendaCliente = Input.ViviendaCliente,
                 DescripcionCliente = Input.DescripcionCliente,
@@ -188,9 +299,7 @@
 
             if (UserManager.Options.SignIn.RequireConfirmedAccount)
             {
-                RedirectManager.RedirectTo(
-                    "Account/RegisterConfirmation",
-                    new() { ["email"] = Input.Email, ["returnUrl"] = ReturnUrl });
+                RedirectManager.RedirectTo("Account/RegisterConfirmation", new() { ["email"] = Input.Email, ["returnUrl"] = ReturnUrl });
             }
             else
             {

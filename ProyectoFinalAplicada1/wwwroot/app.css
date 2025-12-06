@@ -312,14 +312,6 @@ table {
 
 
 
-
-
-
-
-/* ========================================= */
-/* ESTILOS PARA EL SCROLL DEL REGISTRO       */
-/* ========================================= */
-
 /* Hacemos que el cuerpo de la tarjeta tenga límite de altura */
 .register-scroll-area {
     max-height: 55vh; /* Ocupa máximo el 55% de la altura de la pantalla */
@@ -493,4 +485,5 @@ table {
         filter: none;
         color: #3D5D35;
     }
+
 
