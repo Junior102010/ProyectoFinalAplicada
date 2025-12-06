@@ -25,6 +25,9 @@ public class Transferencia
     [Required]
     public string Observaciones { get; set; } = string.Empty;
 
+    [Required]
+    [ForeignKey("PedidoId")]
+    public int PedidoId { get; set; }
 
     public ICollection<TransferenciaImagen> Imagenes { get; set; } = new List<TransferenciaImagen>();
     //[ForeignKey("UsuarioId")]
