@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ProyectoFinalAplicada1.Migrations
 {
     /// <inheritdoc />
-    public partial class AgremandoClienteId : Migration
+    public partial class ArregloDeTransferencia : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -230,8 +230,8 @@ namespace ProyectoFinalAplicada1.Migrations
                 {
                     TransferenciaImagenId = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    TransferenciaId = table.Column<int>(type: "INTEGER", nullable: false),
-                    RutaImagen = table.Column<string>(type: "TEXT", nullable: false)
+                    RutaImagen = table.Column<string>(type: "TEXT", nullable: false),
+                    TransferenciaId = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {

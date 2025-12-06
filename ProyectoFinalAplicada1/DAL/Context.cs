@@ -41,5 +41,20 @@ public class Context : DbContext
             .HasForeignKey<Cliente>(c => c.UserId)
             .IsRequired();
         modelBuilder.Ignore<ApplicationUser>();
+
+        modelBuilder.Entity<Transferencia>(b =>
+        {
+            b.HasKey(t => t.TransferenciaId);
+            b.HasMany(t => t.Imagenes)
+             .WithOne(i => i.Transferencia)
+             .HasForeignKey(i => i.TransferenciaId)
+             .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<TransferenciaImagen>(b =>
+        {
+            b.HasKey(i => i.TransferenciaImagenId); // <-- asegurarse que esta sea la PK
+            b.Property(i => i.RutaImagen).IsRequired();
+        });
     }
 }

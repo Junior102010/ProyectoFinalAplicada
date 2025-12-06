@@ -1,0 +1,130 @@
+﻿@page "/Transferencia/Edit/{TransferenciaId:int}"
+
+@rendermode InteractiveServer
+@inject TranferenciaServices transferenciaServices
+@inject NavigationManager navigationManager
+@inject IWebHostEnvironment WebHostEnvironment
+
+<PageTitle>Completar Transferencia</PageTitle>
+
+<EditForm Model="Transferencia" OnValidSubmit="Modificar">
+    <DataAnnotationsValidator />
+
+    <div class="container">
+        <div class="card shadow-lg">
+            <div class="card-header text-center">
+                <h5 class="card-title">Editar / Subir Comprobante</h5>
+            </div>
+
+            <div class="card-body">
+                @* Información Informativa (Read Only si quieres) *@
+                <div class="row mb-3">
+                    <div class="col-6">
+                        <label class="form-label">Origen</label>
+                        <InputText class="form-control" @bind-Value="Transferencia.Origen" disabled />
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">Monto</label>
+                        <InputNumber class="form-control" @bind-Value="Transferencia.Monto" />
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label"><strong>Observaciones</strong></label>
+                    <InputTextArea class="form-control" @bind-Value="Transferencia.Observaciones" />
+                </div>
+
+                @* --- SECCIÓN DE IMAGEN (Solo visible aquí) --- *@
+                <div class="mb-3 border p-3 rounded">
+                    <label class="form-label fw-bold">Comprobante de Pago (Imagen)</label>
+
+                    <InputFile OnChange="SubirImagen" class="form-control mb-2" accept=".png, .jpg, .jpeg" />
+
+                    @if (Transferencia.Imagenes.Any())
+                    {
+                        <div class="d-flex flex-wrap gap-2 mt-2">
+                            @foreach (var img in Transferencia.Imagenes)
+                            {
+                                <div class="card p-1">
+                                    <img src="@img.RutaImagen" class="img-fluid rounded" style="max-height: 100px;" />
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="card-footer text-center mt-2">
+                <a href="/Transferencia/Index" class="btn btn-secondary">Volver</a>
+                <button type="submit" class="btn btn-success bi bi-check-lg"> Finalizar</button>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+<div class="text-center text-danger mt-2">
+    @Mensaje
+</div>
+
+@code {
+    [Parameter]
+    public int TransferenciaId { get; set; }
+
+    public Transferencia Transferencia { get; set; } = new Transferencia();
+    public string Mensaje { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Transferencia = await transferenciaServices.Buscar(TransferenciaId);
+    }
+
+    private async Task SubirImagen(InputFileChangeEventArgs e)
+    {
+        var archivo = e.File;
+        if (archivo != null)
+        {
+            try
+            {
+                // 1. Guardar archivo físico
+                var nombreArchivo = Guid.NewGuid().ToString() + Path.GetExtension(archivo.Name);
+                var rutaCarpeta = Path.Combine(WebHostEnvironment.WebRootPath, "imagenes", "transferencias");
+
+                if (!Directory.Exists(rutaCarpeta)) Directory.CreateDirectory(rutaCarpeta);
+
+                var rutaCompleta = Path.Combine(rutaCarpeta, nombreArchivo);
+
+                await using (var stream = new FileStream(rutaCompleta, FileMode.Create))
+                {
+                    await archivo.OpenReadStream(maxAllowedSize: 5 * 1024 * 1024).CopyToAsync(stream);
+                }
+
+                // 2. Agregar al modelo (se guardará al dar click en Finalizar)
+                var nuevaImagen = new TransferenciaImagen
+                {
+                    RutaImagen = $"/imagenes/transferencias/{nombreArchivo}",
+                    TransferenciaId = Transferencia.TransferenciaId
+                };
+
+                Transferencia.Imagenes.Add(nuevaImagen);
+            }
+            catch (Exception ex)
+            {
+                Mensaje = $"Error al subir imagen: {ex.Message}";
+            }
+        }
+    }
+
+    public async Task Modificar()
+    {
+        var modificado = await transferenciaServices.Guardar(Transferencia);
+
+        if (modificado)
+        {
+            navigationManager.NavigateTo("/Transferencia/Index");
+        }
+        else
+        {
+            Mensaje = "No se ha podido modificar correctamente";
+        }
+    }
+}

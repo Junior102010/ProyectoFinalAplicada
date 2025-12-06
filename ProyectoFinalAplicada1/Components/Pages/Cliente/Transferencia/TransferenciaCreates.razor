@@ -1,162 +1,147 @@
-﻿@page "/transferencias/crear"
-@using Microsoft.AspNetCore.Authorization
+﻿@page "/Transferencia/Create"
 
-@inject IWebHostEnvironment WebHostEnvironment
-@inject NavigationManager NavigationManager
-@inject TranferenciaServices TransferenciaService
+@using System.Security.Claims
+@using Microsoft.EntityFrameworkCore
 
-@attribute [Authorize(Roles = "Cliente")]
+@rendermode InteractiveServer
+@inject TranferenciaServices transferenciaServices
+@inject NavigationManager navigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject ProyectoFinalAplicada1.DAL.Context _context
 
-<h3>Nueva Transferencia Bancaria</h3>
-<EditForm Model="@NuevaTransferencia" OnValidSubmit="@GuardarTransferenciaCompleta" formname="TransferenciaFormularioUnico">
+<PageTitle>Crear Transferencia</PageTitle>
+
+<EditForm Model="Transferencia" OnValidSubmit="Guardar">
     <DataAnnotationsValidator />
-    <ValidationSummary />
 
-    <div class="card p-4 shadow">
-
-        <div class="row">
-
-            <div class="col-6 mb-3">
-                <label for="origen">Cuenta/Banco Origen <span class="text-danger">*</span></label>
-                <InputSelect id="origen" class="form-select" @bind-Value="NuevaTransferencia.Origen">
-                    <option value="">-- Seleccione un Banco --</option>
-                    <option value="Banreservas">Banreservas</option>
-                    <option value="Popular">Popular</option>
-                    <option value="BHD">BHD</option>
-                    <option value="Qik - Banco digital">Qik - Banco digital</option>
-                </InputSelect>
-                <ValidationMessage For="@(() => NuevaTransferencia.Origen)" />
+    <div class="container">
+        <div class="card shadow-lg">
+            <div class="card-header text-center">
+                <h5 class="card-title">Nueva Transferencia</h5>
             </div>
 
-            <div class="col-6 mb-3">
-                <label for="destino">Cuenta/Banco Destino <span class="text-danger">*</span></label>
-                <InputSelect id="destino" class="form-select" @bind-Value="NuevaTransferencia.Destino">
-                    <option value="">-- Seleccione un Banco --</option>
-                    <option value="Banreservas">Banreservas</option>
-                    <option value="Popular">Popular</option>
-                    <option value="BHD">BHD</option>
-                    <option value="Qik - Banco digital">Qik - Banco digital</option>
-                </InputSelect>
-                <ValidationMessage For="@(() => NuevaTransferencia.Destino)" />
+            <div class="card-body">
+                @* Origen *@
+                <div class="mb-3">
+                    <label class="form-label"><strong>Banco de Origen</strong></label>
+                    <InputSelect class="form-select" @bind-Value="Transferencia.Origen">
+                        <option value="" selected disabled>-- Seleccione --</option>
+                        <option value="Banreservas">Banreservas</option>
+                        <option value="Popular">Popular</option>
+                        <option value="BHD">BHD</option>
+                        <option value="Qik">Qik - Banco digital</option>
+                    </InputSelect>
+                    <ValidationMessage For="(() => Transferencia.Origen)" />
+                </div>
+
+                @* Destino *@
+                <div class="mb-3">
+                    <label class="form-label"><strong>Banco de Destino</strong></label>
+                    <InputSelect class="form-select" @bind-Value="Transferencia.Destino">
+                        <option value="" selected disabled>-- Seleccione --</option>
+                        <option value="Banreservas">Banreservas</option>
+                        <option value="Popular">Popular</option>
+                        <option value="BHD">BHD</option>
+                        <option value="Qik">Qik - Banco digital</option>
+                    </InputSelect>
+                    <ValidationMessage For="(() => Transferencia.Destino)" />
+                </div>
+
+                @* Monto *@
+                <div class="mb-3">
+                    <label class="form-label"><strong>Monto</strong></label>
+                    <InputNumber class="form-control" @bind-Value="Transferencia.Monto" />
+                    <ValidationMessage For="(() => Transferencia.Monto)" />
+                </div>
+
+                @* Observaciones *@
+                <div class="mb-3">
+                    <label class="form-label"><strong>Observaciones</strong></label>
+                    <InputTextArea class="form-control" @bind-Value="Transferencia.Observaciones" />
+                    <ValidationMessage For="(() => Transferencia.Observaciones)" />
+                </div>
+
+                <div class="alert alert-secondary text-center">
+                    <small>Nota: Podrá adjuntar la imagen del comprobante en el siguiente paso.</small>
+                </div>
+            </div>
+
+            <div class="card-footer text-center mt-2">
+                <a href="/Transferencia/Index" class="btn btn-secondary">
+                    <span class="bi bi-arrow-left"></span> Volver
+                </a>
+                <button type="submit" class="btn btn-primary bi bi-floppy"> Guardar</button>
             </div>
         </div>
-
-        <div class="row">
-            <div class="col-6 mb-3">
-                <label for="monto">Monto Transferido <span class="text-danger">*</span></label>
-                <InputNumber id="monto" class="form-control" @bind-Value="NuevaTransferencia.Monto" />
-            </div>
-            <div class="col-6 mb-3">
-                <label for="fecha">Fecha de la Transferencia <span class="text-danger">*</span></label>
-                <InputDate id="fecha" class="form-control" @bind-Value="NuevaTransferencia.Fecha" />
-            </div>
-        </div>
-
-        <div class="mb-3">
-            <label for="observaciones">Observaciones <span class="text-danger">*</span></label>
-            <InputText id="observaciones" class="form-control" @bind-Value="NuevaTransferencia.Observaciones" />
-        </div>
-
-        <hr />
-        <div class="card-body">
-            <h4>📄 Adjuntar Comprobante(s)</h4>
-            <div class="mb-3">
-                <label>Seleccionar Imagen(es) (Máx @(MaxFileSize / 1024 / 1024)MB por archivo)</label>
-                <InputFile OnChange="@HandleFileSelection" multiple />
-
-                @if (selectedFiles.Count > 0)
-                {
-                    <p class="mt-2 text-success">**@selectedFiles.Count archivo(s) seleccionado(s) listo(s) para subir.**</p>
-                }
-                @if (!string.IsNullOrEmpty(errorMessage))
-                {
-                    <div class="alert alert-danger mt-2">@errorMessage</div>
-                }
-            </div>
-        </div>
-
-        <div class="card-footer bg-transparent border-top-0 d-flex justify-content-between align-items-center mt-2 pt-0 pb-3 px-4">
-            <a href="/TransferenciaCliente/Index" class="btn btn-outline-secondary px-4">
-                <span class="bi bi-arrow-left"></span> Volver
-            </a>
-            <button type="submit" class="btn btn-gradiente px-5">
-                <span class="bi bi-floppy"></span> Guardar
-            </button>
-        </div>
-
     </div>
 </EditForm>
 
+<div class="text-center text-danger mt-2">
+    @Mensaje
+</div>
+
 @code {
-  
-    private Transferencia NuevaTransferencia { get; set; } = new Transferencia
+    public Transferencia Transferencia { get; set; } = new Transferencia();
+    public string Mensaje { get; set; } = string.Empty;
+    private string UserId { get; set; } = string.Empty;
+    public int IdCliente { get; set; }
+
+    protected override async Task OnInitializedAsync()
     {
-        
-        Imagenes = new List<TransferenciaImagen>()
-    };
-    private List<IBrowserFile> selectedFiles = new List<IBrowserFile>();
-    private string? errorMessage;
+        // 1. OBTENEMOS EL USUARIO LOGUEADO
+        IdCliente = await GetClienteIdAsync();
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
 
-  
-    private const long MaxFileSize = 1024 * 1024 * 5;
-
-    
-    private void HandleFileSelection(InputFileChangeEventArgs e)
-    {
-        selectedFiles.Clear();
-        errorMessage = null;
-
-        foreach (var file in e.GetMultipleFiles())
+        if (user.Identity != null && user.Identity.IsAuthenticated)
         {
-            if (file.Size > MaxFileSize)
-            {
-                errorMessage = $"El archivo '{file.Name}' excede el límite de 5MB.";
-                selectedFiles.Clear();
-                return;
-            }
-            selectedFiles.Add(file);
-        }
-    }
-
-    
-    private async Task GuardarTransferenciaCompleta()
-    {
-        string uploadsPath = Path.Combine(WebHostEnvironment.WebRootPath, "TransferenciaUploads");
-        Directory.CreateDirectory(uploadsPath);
-        foreach (var file in selectedFiles)
-        {
-            string uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(file.Name);
-            string fullServerPath = Path.Combine(uploadsPath, uniqueFileName);
-
-            
-            await using (var stream = new FileStream(fullServerPath, FileMode.Create))
-            {
-                
-                await file.OpenReadStream(MaxFileSize).CopyToAsync(stream);
-            }
-
-            
-            string relativeDbPath = $"/TransferenciaUploads/{uniqueFileName}";
-
-            var imagenRegistro = new TransferenciaImagen
-            {
-                RutaImagen = relativeDbPath
-            };
-
-            
-            NuevaTransferencia.Imagenes.Add(imagenRegistro);
-        }
-
-        
-        bool guardado = await TransferenciaService.Guardar(NuevaTransferencia);
-
-        if (guardado)
-        {
-            NavigationManager.NavigateTo("/transferencias");
+            // Buscamos el ID del usuario (Claim "sub" o NameIdentifier)
+            UserId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value ?? "";
         }
         else
         {
-            errorMessage = "Error al guardar los datos en la base de datos. Los archivos físicos pudieron haberse guardado.";
+            Mensaje = "Error: Usuario no autenticado.";
+        }
+    }
+    public async Task<int> GetClienteIdAsync()
+    {
+        // 1. Obtener el GUID (Identity User ID)
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var identityId = authState.User
+            .FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+        if (string.IsNullOrEmpty(identityId))
+        {
+            return 0; // Usuario no logueado o ID no encontrado
+        }
+
+        // 2. Consultar la base de datos para obtener el ClienteId
+        return await _context.Cliente
+            .Where(c => c.UserId == identityId)
+            .Select(c => c.ClienteId) // Selecciona solo el ClienteId
+            .FirstOrDefaultAsync();    // Devuelve el ID (o 0 si no se encuentra)
+    }
+
+    public async Task Guardar()
+    {
+        if (string.IsNullOrEmpty(UserId))
+        {
+            Mensaje = "No se puede guardar: No se identificó al usuario.";
+            return;
+        }
+
+        // 2. LLAMAMOS AL NUEVO MÉTODO PASANDO EL USERID
+        var guardado = await transferenciaServices.Guardar(Transferencia, IdCliente);
+
+        if (guardado)
+        {
+            // Redirigir a Edit para subir la foto
+            navigationManager.NavigateTo($"/Transferencia/Edit/{Transferencia.TransferenciaId}");
+        }
+        else
+        {
+            Mensaje = "No se pudo guardar. Asegúrese de tener un Perfil de Cliente registrado.";
         }
     }
 }

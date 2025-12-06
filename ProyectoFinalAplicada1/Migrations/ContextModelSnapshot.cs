@@ -265,26 +265,6 @@ namespace ProyectoFinalAplicada1.Migrations
                     b.ToTable("Transferencia");
                 });
 
-            modelBuilder.Entity("ProyectoFinalAplicada.Models.TransferenciaImagen", b =>
-                {
-                    b.Property<int>("TransferenciaImagenId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("RutaImagen")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("TransferenciaId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("TransferenciaImagenId");
-
-                    b.HasIndex("TransferenciaId");
-
-                    b.ToTable("TransferenciaImagenes");
-                });
-
             modelBuilder.Entity("ProyectoFinalAplicada.Models.Usuario", b =>
                 {
                     b.Property<int>("UsuarioId")
@@ -306,6 +286,26 @@ namespace ProyectoFinalAplicada1.Migrations
                     b.HasKey("UsuarioId");
 
                     b.ToTable("Usuario");
+                });
+
+            modelBuilder.Entity("TransferenciaImagen", b =>
+                {
+                    b.Property<int>("TransferenciaImagenId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("RutaImagen")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("TransferenciaId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("TransferenciaImagenId");
+
+                    b.HasIndex("TransferenciaId");
+
+                    b.ToTable("TransferenciaImagenes");
                 });
 
             modelBuilder.Entity("ProyectoFinalAplicada.Models.Categoria", b =>
@@ -388,7 +388,7 @@ namespace ProyectoFinalAplicada1.Migrations
                     b.Navigation("Cliente");
                 });
 
-            modelBuilder.Entity("ProyectoFinalAplicada.Models.TransferenciaImagen", b =>
+            modelBuilder.Entity("TransferenciaImagen", b =>
                 {
                     b.HasOne("ProyectoFinalAplicada.Models.Transferencia", "Transferencia")
                         .WithMany("Imagenes")
