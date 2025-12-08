@@ -15,14 +15,14 @@
 <div class="container-fluid mt-4">
     <div class="row">
 
-        
+        @* -- COLUMNA IZQUIERDA: PRODUCTOS (Sin cambios) -- *@
         <div class="col-lg-8">
             <div class="row">
                 @foreach (var prod in ListaProductos)
                 {
                     <div class="col-md-4 col-sm-6 mb-4">
                         <div class="card card-glass h-100 border-0 shadow-sm product-card">
-                           
+                            
                             <div class="text-center p-3 bg-light rounded-top position-relative" style="height: 160px;">
                                 <img src="/imagenes/Logo.png" class="img-fluid" style="max-height: 100%; object-fit: contain; opacity: 0.8;" />
                             </div>
@@ -48,61 +48,86 @@
             </div>
         </div>
 
-        
+        @* -- COLUMNA DERECHA: CARRITO COLAPSABLE -- *@
         <div class="col-lg-4">
-            <div class="card card-glass sticky-top shadow-lg" style="top: 20px; max-height: 90vh; overflow-y: auto;">
-                <div class="card-header bg-transparent fw-bold text-success border-bottom border-success border-opacity-25">
-                    <i class="bi bi-basket-fill"></i> Tu Canasta
+            <div class="card card-glass sticky-top shadow-lg" style="top: 20px; transition: all 0.3s ease;">
+                
+                @* CABECERA: Ahora tiene el botón para minimizar/maximizar *@
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center border-bottom border-success border-opacity-25">
+                    <div class="fw-bold text-success">
+                        <i class="bi bi-basket-fill"></i> Tu Canasta (@carritoService.Carrito.Sum(x => x.Cantidad))
+                    </div>
+                    @* Botón Toggle *@
+                    <button class="btn btn-sm btn-outline-success border-0" @onclick="ToggleCarrito">
+                        @if (carritoExpandido)
+                        {
+                            <i class="bi bi-dash-lg"></i> <small>Minimizar</small>
+                        }
+                        else
+                        {
+                            <i class="bi bi-plus-lg"></i> <small>Ver Detalles</small>
+                        }
+                    </button>
                 </div>
-                <div class="card-body">
-                    @if (carritoService.Carrito.Any())
-                    {
-                        <ul class="list-group list-group-flush mb-3">
-                            @foreach (var item in carritoService.Carrito)
-                            {
-                                <li class="list-group-item bg-transparent px-0 border-bottom border-secondary border-opacity-10">
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <span class="fw-bold text-dark">@item.Producto?.NombreProducto</span>
-                                        <span class="text-success fw-bold">@item.Importe.ToString("C0")</span>
-                                    </div>
 
-                                    
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div class="btn-group btn-group-sm shadow-sm" role="group">
-                                            <button type="button" class="btn btn-light border" @onclick="() => DisminuirCantidad(item)">
-                                                <i class="bi bi-dash"></i>
-                                            </button>
-                                            <span class="btn btn-light border-top border-bottom disabled text-dark fw-bold" style="width: 40px; background-color: #fff;">
-                                                @item.Cantidad
-                                            </span>
-                                            <button type="button" class="btn btn-light border" @onclick="() => AumentarCantidad(item)">
-                                                <i class="bi bi-plus"></i>
-                                            </button>
+                @* CUERPO: Se oculta si 'carritoExpandido' es false *@
+                @if (carritoExpandido)
+                {
+                    <div class="card-body" style="max-height: 60vh; overflow-y: auto;">
+                        @if (carritoService.Carrito.Any())
+                        {
+                            <ul class="list-group list-group-flush mb-3">
+                                @foreach (var item in carritoService.Carrito)
+                                {
+                                    <li class="list-group-item bg-transparent px-0 border-bottom border-secondary border-opacity-10">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="fw-bold text-dark">@item.Producto?.NombreProducto</span>
+                                            <span class="text-success fw-bold">@item.Importe.ToString("C0")</span>
                                         </div>
 
-                                        <button class="btn btn-sm btn-outline-danger border-0" @onclick="() => EliminarItem(item)" title="Eliminar">
-                                            <i class="bi bi-trash-fill"></i>
-                                        </button>
-                                    </div>
-                                </li>
-                            }
-                        </ul>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div class="btn-group btn-group-sm shadow-sm" role="group">
+                                                <button type="button" class="btn btn-light border" @onclick="() => DisminuirCantidad(item)">
+                                                    <i class="bi bi-dash"></i>
+                                                </button>
+                                                <span class="btn btn-light border-top border-bottom disabled text-dark fw-bold" style="width: 40px; background-color: #fff;">
+                                                    @item.Cantidad
+                                                </span>
+                                                <button type="button" class="btn btn-light border" @onclick="() => AumentarCantidad(item)">
+                                                    <i class="bi bi-plus"></i>
+                                                </button>
+                                            </div>
 
-                        <div class="d-flex justify-content-between border-top border-success border-opacity-25 pt-3 mb-3">
-                            <h4 class="text-muted">Total:</h4>
-                            <h4 class="text-success fw-bold">@carritoService.ObtenerTotal().ToString("C2")</h4>
-                        </div>
+                                            <button class="btn btn-sm btn-outline-danger border-0" @onclick="() => EliminarItem(item)" title="Eliminar">
+                                                <i class="bi bi-trash-fill"></i>
+                                            </button>
+                                        </div>
+                                    </li>
+                                }
+                            </ul>
+                        }
+                        else
+                        {
+                            <div class="text-center text-muted py-4">
+                                <i class="bi bi-cart-x fs-1 opacity-50"></i>
+                                <p class="mt-2 mb-0">Tu carrito está vacío.</p>
+                            </div>
+                        }
+                    </div>
+                }
 
+                @* FOOTER: SIEMPRE VISIBLE (Total y Botón Pagar) *@
+                <div class="card-footer bg-transparent border-top border-success border-opacity-25 pt-3">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="text-muted m-0">Total:</h5>
+                        <h4 class="text-success fw-bold m-0">@carritoService.ObtenerTotal().ToString("C2")</h4>
+                    </div>
+
+                    @if (carritoService.Carrito.Any())
+                    {
                         <button class="btn btn-gradiente w-100 py-2 fs-5 shadow" @onclick="IrAPagar">
                             Procesar Pedido <i class="bi bi-arrow-right-circle-fill ms-1"></i>
                         </button>
-                    }
-                    else
-                    {
-                        <div class="text-center text-muted py-5">
-                            <i class="bi bi-cart-x fs-1 opacity-50"></i>
-                            <p class="mt-2">Tu carrito está vacío.</p>
-                        </div>
                     }
                 </div>
             </div>
@@ -112,6 +137,9 @@
 
 @code {
     public List<Producto> ListaProductos { get; set; } = new List<Producto>();
+    
+    // VARIABLE NUEVA: Controla si se ven los items o solo el resumen
+    private bool carritoExpandido = true;
 
     protected override async Task OnInitializedAsync()
     {
@@ -119,9 +147,14 @@
         ListaProductos = await productosService.Listar(p => p.Existencia > 0);
     }
 
+ 
+    private void ToggleCarrito()
+    {
+        carritoExpandido = !carritoExpandido;
+    }
+
     private void AgregarAlCarrito(Producto prod)
     {
-       
         var itemExistente = carritoService.Carrito.FirstOrDefault(p => p.ProductoId == prod.ProductoId);
 
         if (itemExistente != null)
@@ -140,8 +173,10 @@
                 Importe = prod.Precio
             };
             carritoService.AgregarItem(item);
+            
+            
+            if (!carritoExpandido) carritoExpandido = true;
         }
-       
     }
 
     private void AumentarCantidad(PedidoDetalle item)
@@ -159,7 +194,6 @@
         }
         else
         {
-            
             EliminarItem(item);
         }
     }
@@ -167,7 +201,6 @@
     private void EliminarItem(PedidoDetalle item)
     {
         carritoService.Carrito.Remove(item);
-       
     }
 
     private void IrAPagar()

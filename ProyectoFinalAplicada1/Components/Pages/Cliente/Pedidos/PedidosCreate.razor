@@ -182,103 +182,59 @@
     [SupplyParameterFromForm]
     public Pedido Pedido { get; set; } = new Pedido();
 
-
     public int IdCliente { get; set; }
-
-
     public string MetodoPagoSeleccionado { get; set; } = "Efectivo";
-
     public string NombreClienteDisplay { get; set; } = "Cargando...";
     public string TelefonoClienteDisplay { get; set; } = "";
-
     public string Mensaje { get; set; } = string.Empty;
-
-    public Cliente cliente { get; set; } 
-
     private const double CostoEnvio = 15.00;
 
     protected override async Task OnInitializedAsync()
     {
         IdCliente = await GetClienteIdAsync();
-        if (await clientesService.Buscar(IdCliente) != null)
+
+        if (IdCliente > 0)
         {
-            cliente = await clientesService.Buscar(IdCliente);
+            var cliente = await clientesService.Buscar(IdCliente);
+            if (cliente != null)
+            {
+                NombreClienteDisplay = $"{cliente.NombreCliente} {cliente.ApellidoCliente}";
+                TelefonoClienteDisplay = cliente.TelefonoCliente;
+               
+                if (string.IsNullOrEmpty(Pedido.ReferenciaSitio))
+                {
+                    Pedido.ReferenciaSitio = $"{cliente.Sector}, {cliente.CalleCliente} #{cliente.ViviendaCliente}";
+                }
+            }
         }
+
+        
         if (carritoService.Carrito.Any())
         {
-            Pedido.Detalles = new List<PedidoDetalle>(carritoService.Carrito);
+            
+            Pedido.Detalles = carritoService.Carrito.ToList();
             CalcularTotal();
-
         }
 
         Pedido.FechaPedido = DateTime.Now;
-
-        
-
-        // var authState = await authStateProvider.GetAuthenticationStateAsync();
-        // var user = authState.User;
-
-        // if (user.Identity != null && user.Identity.IsAuthenticated)
-        // {
-        //     var nombreUsuario = user.Identity.Name;
-
-
-        //     var clienteEncontrado = await clientesService.BuscarPorNombre(nombreUsuario ?? "");
-
-        //     if (clienteEncontrado != null)
-        //     {
-        //         Pedido.ClienteId = clienteEncontrado.ClienteId;
-        //         NombreClienteDisplay = $"{clienteEncontrado.NombreCliente} {clienteEncontrado.ApellidoCliente}";
-        //         TelefonoClienteDisplay = clienteEncontrado.TelefonoCliente;
-
-
-        //         if (string.IsNullOrEmpty(Pedido.ReferenciaSitio))
-        //         {
-        //             Pedido.ReferenciaSitio = $"{clienteEncontrado.CalleCliente} #{clienteEncontrado.ViviendaCliente}, {clienteEncontrado.Sector} ({clienteEncontrado.DescripcionCliente})";
-        //         }
-        //     }
-        //     else
-        //     {
-        //         Mensaje = "No se encontraron datos del cliente asociado a este usuario.";
-        //         NombreClienteDisplay = "Cliente Desconocido";
-        //     }
-        // }
-        // else
-        // {
-
-        //     navigationManager.NavigateTo("Account/Login");
-        // }
-
-        NombreClienteDisplay = cliente.NombreCliente;
-        TelefonoClienteDisplay = cliente.TelefonoCliente;
-        Pedido.ReferenciaSitio = cliente.Sector + " / " + cliente.CalleCliente + " / " + cliente.ViviendaCliente + " / " + cliente.DescripcionCliente ;
-
     }
 
     public async Task<int> GetClienteIdAsync()
     {
-        // 1. Obtener el GUID (Identity User ID)
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        var identityId = authState.User
-            .FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        var identityId = authState.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
-        if (string.IsNullOrEmpty(identityId))
-        {
-            return 0; // Usuario no logueado o ID no encontrado
-        }
+        if (string.IsNullOrEmpty(identityId)) return 0;
 
-        // 2. Consultar la base de datos para obtener el ClienteId
         return await _context.Cliente
             .Where(c => c.UserId == identityId)
-            .Select(c => c.ClienteId) // Selecciona solo el ClienteId
-            .FirstOrDefaultAsync();    // Devuelve el ID (o 0 si no se encuentra)
+            .Select(c => c.ClienteId)
+            .FirstOrDefaultAsync();
     }
 
     private void ActualizarTotal(ChangeEventArgs e)
     {
-
-        bool esDelivery = (bool)(e.Value ?? false);
-        Pedido.Delivery = esDelivery;
+        Pedido.Delivery = (bool)(e.Value ?? false);
         CalcularTotal();
     }
 
@@ -290,42 +246,56 @@
 
     public async Task Guardar()
     {
-        if (Pedido.ClienteId <= 0)
+      
+        if (IdCliente <= 0)
         {
-            Console.WriteLine("Si fun");
-
+            Mensaje = "Error: No se ha identificado su cuenta de cliente. Por favor contacte soporte.";
             return;
         }
+
         if (!Pedido.Detalles.Any())
         {
-            Console.WriteLine("Si ");
+            Mensaje = "El carrito está vacío.";
             return;
         }
 
+       
+        Pedido.ClienteId = IdCliente;
+        Pedido.Cliente = null; 
 
+        
         if (MetodoPagoSeleccionado == "Transferencia")
         {
             Pedido.Estado = "Pendiente de Pago";
-
-
             Pedido.ReferenciaSitio += " [PAGO: TRANSFERENCIA]";
         }
         else
         {
-            Pedido.Estado = "Pendiente"; 
+            Pedido.Estado = "Pendiente";
             Pedido.ReferenciaSitio += " [PAGO: EFECTIVO]";
         }
 
         CalcularTotal();
 
+    
+        foreach (var detalle in Pedido.Detalles)
+        {
+            detalle.PedidoId = 0; 
+            detalle.DetalleId = 0; 
+            detalle.Producto = null; 
+        }
+
+      
         var guardado = await pedidosService.Guardar(Pedido);
-        Console.WriteLine("Si funcionaaaaaaaaaaaaaa");
+
         if (guardado)
         {
             carritoService.LimpiarCarrito();
-            await Task.Delay(2000);
-            navigationManager.NavigateTo("/"); 
+            navigationManager.NavigateTo("/PedidoCliente/Index");
         }
-       
+        else
+        {
+            Mensaje = "No se pudo realizar el pedido. Intente nuevamente.";
+        }
     }
 }

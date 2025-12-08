@@ -30,14 +30,14 @@
                         <label class="form-label text-muted small fw-bold mb-1">Categoría</label>
                         <InputSelect class="form-select input-glass" @bind-Value="Producto.Categoria">
                             <option value="" selected disabled>Seleccione...</option>
-                            <option value="Granos">Granos</option>
-                            <option value="Víveres">Víveres</option>
-                            <option value="Lácteos">Lácteos</option>
                             <option value="Carnes">Carnes</option>
-                            <option value="Embutidos">Embutidos</option>
-                            <option value="Limpieza">Limpieza</option>
-                            <option value="Bebidas">Bebidas</option>
-                            <option value="Otros">Otros</option>
+                            <option value="Granos">Granos</option>
+                            <option value="Verduras">Verduras</option>
+                            <option value="Vegetales">Vegetales</option>
+                            <option value="Ensaladas">Ensaladas</option>
+                            <option value="Frutas">Frutas</option>
+                            <option value="Sazones">Sazones</option>
+                            <option value="Víveres">Víveres</option>
                         </InputSelect>
                         <ValidationMessage For="(() => Producto.Categoria)" />
                     </div>
