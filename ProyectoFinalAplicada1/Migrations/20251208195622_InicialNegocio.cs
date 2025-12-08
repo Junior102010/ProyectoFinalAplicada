@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ProyectoFinalAplicada1.Migrations
 {
     /// <inheritdoc />
-    public partial class PosChekeo1 : Migration
+    public partial class InicialNegocio : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -145,7 +145,8 @@ namespace ProyectoFinalAplicada1.Migrations
                 name: "PedidoDetalle",
                 columns: table => new
                 {
-                    DetalleId = table.Column<int>(type: "INTEGER", nullable: false),
+                    DetalleId = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
                     PedidoId = table.Column<int>(type: "INTEGER", nullable: false),
                     ProductoId = table.Column<int>(type: "INTEGER", nullable: false),
                     Cantidad = table.Column<double>(type: "REAL", nullable: false),
@@ -156,8 +157,8 @@ namespace ProyectoFinalAplicada1.Migrations
                 {
                     table.PrimaryKey("PK_PedidoDetalle", x => x.DetalleId);
                     table.ForeignKey(
-                        name: "FK_PedidoDetalle_Pedido_DetalleId",
-                        column: x => x.DetalleId,
+                        name: "FK_PedidoDetalle_Pedido_PedidoId",
+                        column: x => x.PedidoId,
                         principalTable: "Pedido",
                         principalColumn: "PedidoId",
                         onDelete: ReferentialAction.Cascade);
@@ -167,6 +168,35 @@ namespace ProyectoFinalAplicada1.Migrations
                         principalTable: "Producto",
                         principalColumn: "ProductoId",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Transferencia",
+                columns: table => new
+                {
+                    TransferenciaId = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Fecha = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Origen = table.Column<string>(type: "TEXT", nullable: false),
+                    Destino = table.Column<string>(type: "TEXT", nullable: false),
+                    Monto = table.Column<double>(type: "REAL", nullable: false),
+                    Observaciones = table.Column<string>(type: "TEXT", nullable: false),
+                    ClienteId = table.Column<int>(type: "INTEGER", nullable: true),
+                    PedidoId = table.Column<int>(type: "INTEGER", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Transferencia", x => x.TransferenciaId);
+                    table.ForeignKey(
+                        name: "FK_Transferencia_Cliente_ClienteId",
+                        column: x => x.ClienteId,
+                        principalTable: "Cliente",
+                        principalColumn: "ClienteId");
+                    table.ForeignKey(
+                        name: "FK_Transferencia_Pedido_PedidoId",
+                        column: x => x.PedidoId,
+                        principalTable: "Pedido",
+                        principalColumn: "PedidoId");
                 });
 
             migrationBuilder.CreateTable(
@@ -193,34 +223,6 @@ namespace ProyectoFinalAplicada1.Migrations
                         column: x => x.ProductoId,
                         principalTable: "Producto",
                         principalColumn: "ProductoId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Transferencia",
-                columns: table => new
-                {
-                    TransferenciaId = table.Column<int>(type: "INTEGER", nullable: false),
-                    Fecha = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Origen = table.Column<string>(type: "TEXT", nullable: false),
-                    Destino = table.Column<string>(type: "TEXT", nullable: false),
-                    Monto = table.Column<double>(type: "REAL", nullable: false),
-                    Observaciones = table.Column<string>(type: "TEXT", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Transferencia", x => x.TransferenciaId);
-                    table.ForeignKey(
-                        name: "FK_Transferencia_Cliente_TransferenciaId",
-                        column: x => x.TransferenciaId,
-                        principalTable: "Cliente",
-                        principalColumn: "ClienteId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Transferencia_PedidoDetalle_TransferenciaId",
-                        column: x => x.TransferenciaId,
-                        principalTable: "PedidoDetalle",
-                        principalColumn: "DetalleId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -265,9 +267,24 @@ namespace ProyectoFinalAplicada1.Migrations
                 column: "ClienteId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_PedidoDetalle_PedidoId",
+                table: "PedidoDetalle",
+                column: "PedidoId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_PedidoDetalle_ProductoId",
                 table: "PedidoDetalle",
                 column: "ProductoId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Transferencia_ClienteId",
+                table: "Transferencia",
+                column: "ClienteId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Transferencia_PedidoId",
+                table: "Transferencia",
+                column: "PedidoId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_TransferenciaImagenes_TransferenciaId",
@@ -285,6 +302,9 @@ namespace ProyectoFinalAplicada1.Migrations
                 name: "EntradaDetalles");
 
             migrationBuilder.DropTable(
+                name: "PedidoDetalle");
+
+            migrationBuilder.DropTable(
                 name: "TransferenciaImagenes");
 
             migrationBuilder.DropTable(
@@ -294,19 +314,16 @@ namespace ProyectoFinalAplicada1.Migrations
                 name: "Entrada");
 
             migrationBuilder.DropTable(
+                name: "Producto");
+
+            migrationBuilder.DropTable(
                 name: "Transferencia");
 
             migrationBuilder.DropTable(
                 name: "Proveedor");
 
             migrationBuilder.DropTable(
-                name: "PedidoDetalle");
-
-            migrationBuilder.DropTable(
                 name: "Pedido");
-
-            migrationBuilder.DropTable(
-                name: "Producto");
 
             migrationBuilder.DropTable(
                 name: "Cliente");
