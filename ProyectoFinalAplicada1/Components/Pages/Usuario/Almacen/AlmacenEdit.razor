@@ -43,9 +43,9 @@
                     </div>
                 </div>
 
-                @* --- FILA 2: COSTOS Y PRECIOS --- *@
+            
                 <div class="row mb-3">
-                    @* Costo *@
+                    
                     <div class="col-md-4">
                         <label class="form-label text-muted small fw-bold mb-1">Costo (Compra)</label>
                         <div class="input-group">
@@ -65,7 +65,7 @@
                         <ValidationMessage For="(() => Producto.Precio)" />
                     </div>
 
-                    @* Visualizador de Ganancia (Calculado) *@
+                   
                     <div class="col-md-4 d-flex flex-column justify-content-end pb-2">
                         <span class="small text-muted">Margen estimado:</span>
                         <h5 class="m-0 @(ObtenerColorGanancia())">
@@ -76,7 +76,7 @@
 
                 <hr class="border-secondary opacity-25" />
 
-                @* --- FILA 3: AJUSTE DE INVENTARIO --- *@
+                
                 <div class="row mb-3 align-items-end">
                     
                     <div class="col-md-4">
@@ -92,7 +92,7 @@
                         </InputSelect>
                     </div>
 
-                    @* EXISTENCIA EDITABLE *@
+                   
                     <div class="col-md-4">
                         <label class="form-label text-muted small fw-bold mb-1">Existencia Actual</label>
                         <InputNumber class="form-control input-glass fw-bold" style="color: #3D5D35;" @bind-Value="Producto.Existencia" />
@@ -110,13 +110,13 @@
                 }
             </div>
 
-            @* --- FOOTER --- *@
+         
             <div class="card-footer bg-transparent border-top-0 d-flex justify-content-between align-items-center mt-2 pt-0 pb-3 px-4">
                 <a href="/Almacen" class="btn btn-outline-secondary px-4">
                     <span class="bi bi-arrow-left"></span> Volver
                 </a>
                 
-                @* Botón Guardar Cambios *@
+                
                 <button type="submit" class="btn btn-gradiente px-5">
                     <span class="bi bi-pencil-square"></span> Guardar Cambios
                 </button>
@@ -171,7 +171,7 @@
 
         if (modificado)
         {
-            navigationManager.NavigateTo("/Producto/Index");
+            navigationManager.NavigateTo("/Almacen");
         }
         else
         {

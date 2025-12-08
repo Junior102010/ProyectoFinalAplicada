@@ -142,7 +142,7 @@
                     </div>
                 }
 
-                @* FOOTER: SIEMPRE VISIBLE (Total y Botón Pagar) *@
+                
                 <div class="card-footer bg-transparent border-top border-success border-opacity-25 pt-3">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5 class="text-muted m-0">Total:</h5>
@@ -164,7 +164,7 @@
 @code {
     public List<Producto> ListaProductos { get; set; } = new List<Producto>();
 
-    // VARIABLE NUEVA: Controla si se ven los items o solo el resumen
+    
     private bool carritoExpandido = true;
     public string ValorFiltro { get; set; } = string.Empty;
     public string Filtro { get; set; } = string.Empty;
@@ -175,7 +175,6 @@
         ListaProductos = await productosService.Listar(p => p.Existencia > 0);
 
     }
-
 
     private async Task Buscar()
     {
