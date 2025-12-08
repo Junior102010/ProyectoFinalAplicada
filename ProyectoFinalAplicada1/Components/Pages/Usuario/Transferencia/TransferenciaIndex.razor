@@ -43,14 +43,9 @@
                     </div>
                 </div>
 
-                <div class="col-md-2 text-end">
-                    <a href="/transferencias/crear" class="btn btn-gradiente w-100">
-                        <span class="bi bi-plus-square"></span> Nueva
-                    </a>
-                </div>
+                
             </div>
 
-            @* --- Tabla de Datos --- *@
             <div class="table-responsive">
                 <table class="table table-hover bg-transparent align-middle">
                     <thead class="text-black" style="background-color: rgba(0,0,0,0.03); border-bottom: 2px solid rgba(0,0,0,0.1);">
@@ -90,8 +85,8 @@
                                 </td>
 
                                 <td class="text-center">
-                                    <a href="/transferencia/edit/@transferencia.TransferenciaId" class="btn btn-sm btn-outline-success border-0 bi bi-eye fs-5" title="Ver Detalle"></a>
-                                    @* Aquí puedes agregar el botón de eliminar *@
+                                    <a href="/transferencia/ver/@transferencia.TransferenciaId" class="btn btn-sm btn-outline-success border-0 bi bi-eye fs-5" title="Ver Detalle"></a>
+                                 
                                 </td>
                             </tr>
                         }
@@ -109,7 +104,6 @@
             </div>
         </div>
         
-        @* --- Pie de Página --- *@
         <div class="card-footer bg-transparent border-top-0 d-flex justify-content-between text-muted mt-2 pt-0 pb-3 px-4">
             <small class="fw-bold">Cantidad de Transferencias: @ListaTransferencias.Count()</small>
             <small class="fw-bold fs-6">Monto Total: <span style="color: #3D5D35;">@ListaTransferencias.Sum(t => t.Monto).ToString("C2")</span></small>

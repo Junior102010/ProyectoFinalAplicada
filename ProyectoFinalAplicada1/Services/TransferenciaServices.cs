@@ -18,21 +18,22 @@ public class TranferenciaServices(IDbContextFactory<Context> DbFactory)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
 
-        return await contexto.Transferencia.FirstOrDefaultAsync(c => c.TransferenciaId  == id);
+        return await contexto.Transferencia
+            .Include(t => t.Imagenes) 
+            .FirstOrDefaultAsync(c => c.TransferenciaId == id);
     }
 
     public async Task<List<Transferencia>> Listar(Expression<Func<Transferencia, bool>> criterio)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
-        return await contexto.Transferencia.Where(criterio).AsNoTracking().ToListAsync();
 
+        return await contexto.Transferencia.Include(t => t.Imagenes) .Where(criterio).AsNoTracking().ToListAsync();
     }
 
     public async Task<bool> Insertar(Transferencia transferencia)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
 
-        // Creamos la nueva entidad LIMPIA
         var nuevaTransferencia = new Transferencia
         {
             Fecha = transferencia.Fecha,
@@ -41,13 +42,10 @@ public class TranferenciaServices(IDbContextFactory<Context> DbFactory)
             Monto = transferencia.Monto,
             Observaciones = transferencia.Observaciones,
 
-            // IMPORTANTE: Tomamos el ID que nos mandó la Vista (que ya lo buscó por Login)
             ClienteId = transferencia.ClienteId,
 
-            // Desconectamos el objeto Cliente para que EF no se confunda
             Cliente = null,
 
-            // Las imágenes se agregan manualmente abajo o se inicializan vacías
             Imagenes = new List<TransferenciaImagen>()
         };
 

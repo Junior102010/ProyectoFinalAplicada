@@ -27,7 +27,7 @@
             <DataAnnotationsValidator />
 
             <div class="row">
-                @* Bancos *@
+                
                 <div class="col-md-6 mb-3">
                     <label class="form-label fw-bold">Cuenta/Banco Origen <span class="text-danger">*</span></label>
                     <InputSelect class="form-select" @bind-Value="NuevaTransferencia.Origen">
@@ -52,7 +52,6 @@
                     <ValidationMessage For="(() => NuevaTransferencia.Destino)" />
                 </div>
 
-                @* Monto y Fecha *@
                 <div class="col-md-6 mb-3">
                     <label class="form-label fw-bold">Monto Transferido <span class="text-danger">*</span></label>
                     <InputNumber class="form-control" @bind-Value="NuevaTransferencia.Monto" />
@@ -63,7 +62,6 @@
                     <InputDate class="form-control" @bind-Value="NuevaTransferencia.Fecha" />
                 </div>
 
-                @* Selección de Pedido (Opcional) *@
                 <div class="col-md-12 mb-3">
                     <label class="form-label fw-bold">Asociar a Pedido (Opcional):</label>
                     <InputSelect class="form-select" @bind-Value="IdPedido">
@@ -76,7 +74,6 @@
                     <small class="text-muted">Si selecciona un pedido, se actualizará su estado a "En Proceso" tras la verificación.</small>
                 </div>
 
-                @* Observaciones *@
                 <div class="col-md-12 mb-3">
                     <label class="form-label fw-bold">Observaciones</label>
                     <InputTextArea class="form-control" @bind-Value="NuevaTransferencia.Observaciones" placeholder="Ej: Pago factura #123" />
@@ -86,7 +83,6 @@
 
             <hr />
 
-            @* Carga de Imágenes *@
             <div class="mb-4">
                 <h5 class="fw-bold"><i class="bi bi-paperclip"></i> Comprobante</h5>
                 <div class="p-3 border rounded bg-light">
@@ -106,9 +102,8 @@
                 </div>
             </div>
 
-            @* Botones *@
             <div class="d-flex justify-content-between">
-                <a href="/PedidoCliente/Index" class="btn btn-outline-secondary px-4">
+                <a href="/TransferenciaCliente/Index" class="btn btn-outline-secondary px-4">
                     <i class="bi bi-arrow-left"></i> Volver
                 </a>
                 <button type="submit" class="btn btn-primary px-5 shadow">
@@ -124,7 +119,7 @@
     public List<Pedido> ListaPedidos { get; set; } = new List<Pedido>();
 
     public int IdCliente { get; set; }
-    public int IdPedido { get; set; } // Variable temporal para el select
+    public int IdPedido { get; set; } 
 
     private List<IBrowserFile> selectedFiles = new List<IBrowserFile>();
     private string? errorMessage;
@@ -132,12 +127,10 @@
 
     protected override async Task OnInitializedAsync()
     {
-        // 1. OBTENER ID DEL CLIENTE LOGUEADO (Igual que en Pedidos)
         IdCliente = await GetClienteIdAsync();
 
         if (IdCliente > 0)
         {
-            // 2. Cargar solo los pedidos de ESTE cliente
             ListaPedidos = await pedidosServices.Listar(p => p.ClienteId == IdCliente && (p.Estado == "Pendiente" || p.Estado == "Pendiente de Pago"));
         }
         else
@@ -182,11 +175,9 @@
             return;
         }
 
-        // 1. PROCESAR IMÁGENES FÍSICAS
         string uploadsPath = Path.Combine(WebHostEnvironment.WebRootPath, "TransferenciaUploads");
         if (!Directory.Exists(uploadsPath)) Directory.CreateDirectory(uploadsPath);
 
-        // Limpiamos la lista previa para no duplicar si le dan guardar 2 veces
         NuevaTransferencia.Imagenes = new List<TransferenciaImagen>();
 
         foreach (var file in selectedFiles)
@@ -201,7 +192,7 @@
                     await file.OpenReadStream(MaxFileSize).CopyToAsync(stream);
                 }
 
-                // Ruta relativa para la BD
+           
                 NuevaTransferencia.Imagenes.Add(new TransferenciaImagen { RutaImagen = $"/TransferenciaUploads/{uniqueFileName}" });
             }
             catch (Exception ex)
@@ -211,37 +202,32 @@
             }
         }
 
-        // 2. ASIGNAR DATOS CLAVE
-        NuevaTransferencia.ClienteId = IdCliente; // <--- AQUÍ ESTÁ LA MAGIA
 
-        // (Opcional) Si seleccionó un pedido, guardamos la referencia en observaciones si no hay campo PedidoId en Transferencia
+        NuevaTransferencia.ClienteId = IdCliente;
+
+        
         if (IdPedido > 0)
         {
             NuevaTransferencia.Observaciones += $" [Pago Pedido #{IdPedido}]";
         }
 
-        // 3. GUARDAR EN BD
-        // Usamos el método simple Guardar(modelo) porque ya llenamos el ClienteId manualmente arriba
         bool guardado = await TransferenciaService.Guardar(NuevaTransferencia);
 
         if (guardado)
         {
-            // 4. ACTUALIZAR ESTADO DEL PEDIDO (Si aplica)
             if (IdPedido > 0)
             {
                 var pedido = await pedidosServices.Buscar(IdPedido);
                 if (pedido != null)
                 {
-                    // Cambiamos el estado para indicar que ya pagó/envió comprobante
+                    
                     pedido.Estado = "En Proceso";
-                    // OJO: No restamos el monto total porque eso alteraría la factura.
-                    // Lo correcto es cambiar el estado.
-
+                    
                     await pedidosServices.Guardar(pedido);
                 }
             }
 
-            NavigationManager.NavigateTo("/PedidoCliente/Index"); // Volver a mis pedidos
+            NavigationManager.NavigateTo("/TransferenciaCliente/Index");
         }
         else
         {
