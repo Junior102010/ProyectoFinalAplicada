@@ -91,7 +91,7 @@ public class PedidosServices(IDbContextFactory<Context> DbFactory)
         return await contexto.SaveChangesAsync() > 0;
     }
 
-    private async Task AfectarExistencia(Context contexto, List<PedidoDetalle> detalles, bool sumar)
+    private static async Task AfectarExistencia(Context contexto, List<PedidoDetalle> detalles, bool sumar)
     {
         foreach (var item in detalles)
         {

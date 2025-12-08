@@ -2,6 +2,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using ProyectoFinalAplicada1.Data; // ⬅️ Asegúrate de que este using sea correcto
 
+namespace ProyectoFinalAplicada1;
+
 public static class SeedData
 {
     public static async Task InitializeAsync(IServiceProvider serviceProvider)
@@ -58,8 +60,7 @@ public static class SeedData
                 // 🚨 CÓDIGO DE MANEJO DE ERRORES: Muestra la causa exacta del fallo 🚨
                 var errors = string.Join(", ", result.Errors.Select(e => e.Description));
 
-                // Lanza una excepción para que el fallo se registre en la consola/logs.
-                throw new Exception($"El seeding del Admin falló: {errors}. Verifique los requisitos de contraseña o los campos [Required] de ApplicationUser.");
+                throw new InvalidOperationException($"El seeding del Admin falló: {errors} Verifique los requisitos...");
             }
         }
     }

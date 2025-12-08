@@ -35,6 +35,5 @@ public class Transferencia
     public Pedido? Pedido { get; set; }
 
     public ICollection<TransferenciaImagen> Imagenes { get; set; } = new List<TransferenciaImagen>();
-    //[ForeignKey("UsuarioId")]
-    //public Usuario? Usuario { get; set; }
+  
 }

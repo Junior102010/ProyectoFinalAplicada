@@ -64,59 +64,53 @@ h1:focus {
     color: #e50000;
 }
 
-/* ---------------------------------- */
-/* ESTILOS ESPECÍFICOS PARA LA PÁGINA DE LOGIN (POLLERA) */
-/* ---------------------------------- */
-
-/* Fondo general de la página de login (color beige claro de la imagen) */
 .login-page-background {
-    background-color: #F4EAD6; /* Un beige suave */
+    background-color: #F4EAD6; 
     min-height: 100vh;
     width: 100%;
-    /* Asegúrate de que los dibujos de fondo (pollos, cuchillo, etc.) se gestionen con CSS adicional si son parte del diseño.
-       Si el logo ya contiene los pollos centrales, solo necesitarías los dibujos de las esquinas como imágenes de fondo. */
+    
 }
 
-/* Contenedor del formulario (ajustar el ancho) */
+
 .login-form-container {
-    max-width: 400px; /* Ancho máximo para que se vea centrado y no ocupe todo */
+    max-width: 400px; 
     width: 90%;
 }
 
-/* Estilo para los inputs de "Usuario" y "Contraseña" */
+
 .login-input {
-    height: 55px; /* Altura que le da un aspecto grande */
-    border-radius: 50px; /* Bordes totalmente redondos (Pill shape) */
-    border: 1px solid #ccc; /* Borde sutil */
+    height: 55px;
+    border-radius: 50px; 
+    border: 1px solid #ccc;
     padding-left: 20px;
     padding-right: 20px;
     font-size: 1.1em;
-    box-shadow: none !important; /* Quitar cualquier sombra por defecto de Bootstrap */
-    background-color: white; /* Asegurar fondo blanco */
+    box-shadow: none !important; 
+    background-color: white; 
 }
 
     .login-input:focus {
-        border-color: #e04e4e; /* Puedes cambiar el color del foco a un tono rojizo */
+        border-color: #e04e4e; 
     }
 
-/* Estilo para el botón "Iniciar sesión" */
+
 .btn-login-custom {
-    background-color: #e04e4e; /* Un rojo pollo (o el color del botón en la imagen) */
+    background-color: #e04e4e; 
     color: white;
     border: none;
     height: 50px;
-    border-radius: 10px; /* Un poco redondeado, pero no totalmente como los inputs */
+    border-radius: 10px; 
     font-size: 1.2em;
     padding: 10px 40px;
     transition: background-color 0.3s;
 }
 
     .btn-login-custom:hover {
-        background-color: #c74545; /* Un tono más oscuro al pasar el ratón */
+        background-color: #c74545; 
         color: white;
     }
 
-/* Estilo para el ícono de ojo de contraseña (si quieres que se vea como en la imagen) */
+
 .password-toggle-icon {
     position: absolute;
     right: 20px;
@@ -150,7 +144,7 @@ h1:focus {
     text-align: start;
 }
 
-/* --- Estilos Personalizados para Aplicada --- */
+
 
 .card-glass {
     background-color: rgba(255, 255, 255, 0.65);
@@ -177,42 +171,41 @@ h1:focus {
         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
 
-/* Modificación del estilo del botón de Login */
+
 .btn-login-custom {
-    /* Gradiente lineal de arriba hacia abajo, usando los colores de la imagen */
+    
     background: linear-gradient(to bottom, #8B3A36 0%, #C15349 100%);
-    /* Eliminar el borde y la sombra por defecto de Bootstrap */
+    
     border: none;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Sombra para darle relieve */
-    /* Propiedades de forma y texto */
-    color: white; /* Color de texto blanco */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    color: white; 
     font-size: 1.2em;
     font-weight: bold;
-    height: 55px; /* Una altura cómoda */
-    line-height: 1; /* Ajustar la altura de línea */
-    border-radius: 50px; /* Bordes totalmente redondeados (tipo pastilla) */
-    padding: 10px 40px; /* Ajuste interno */
-    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.4); /* Sombra de texto blanca/clara */
+    height: 55px;
+    line-height: 1; 
+    border-radius: 50px; 
+    padding: 10px 40px;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.4); 
     transition: all 0.2s ease-in-out;
 }
 
-    /* Efecto al pasar el ratón (Hover) */
+   
     .btn-login-custom:hover {
-        /* Invertir el gradiente o hacerlo ligeramente más oscuro */
+        
         background: linear-gradient(to bottom, #C15349 0%, #8B3A36 100%);
-        box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3); /* Sombra más pronunciada */
-        transform: translateY(-2px); /* Un pequeño levantamiento */
-        color: white; /* Mantener el color blanco del texto */
+        box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3);
+        transform: translateY(-2px); 
+        color: white; 
     }
 
-    /* Efecto al presionar (Active/Focus) */
+    
     .btn-login-custom:active,
     .btn-login-custom:focus {
-        /* Hacer el botón más oscuro al presionarlo */
+        
         background: #8B3A36;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         transform: translateY(0);
-        outline: none; /* Eliminar el contorno de foco de Bootstrap */
+        outline: none; 
     }
 .input-glass {
     background-color: rgba(255, 255, 255, 0.7) !important;
@@ -225,7 +218,6 @@ h1:focus {
         border-color: #3D5D35;
     }
 
-/*Estilo de la pagina*/
 table.table thead tr th,
 .table thead tr th,
 table thead tr > th {
@@ -262,9 +254,6 @@ table {
     }
 
 
-/* --- ESTILOS PARA EL DASHBOARD (Adaptado a tu diseño) --- */
-
-/* Borde de color a la izquierda (Como SB Admin) */
 .border-left-primary {
     border-left: 0.25rem solid #4e73df !important;
 }
@@ -272,7 +261,7 @@ table {
 .border-left-success {
     border-left: 0.25rem solid #3D5D35 !important;
 }
-/* Tu verde */
+
 .border-left-info {
     border-left: 0.25rem solid #36b9cc !important;
 }
@@ -285,7 +274,7 @@ table {
     border-left: 0.25rem solid #e74a3b !important;
 }
 
-/* Texto pequeño de título */
+
 .text-xs {
     font-size: .7rem;
     font-weight: 700;
@@ -294,34 +283,28 @@ table {
     margin-bottom: 0.25rem;
 }
 
-/* El icono grande gris a la derecha */
 .icon-dashboard {
     color: #dddfeb;
     font-size: 2.5rem;
     opacity: 0.6;
 }
 
-/* Ajuste para que tus cards Glass se comporten bien en el dashboard */
 .card-dashboard {
     transition: transform 0.2s;
 }
 
     .card-dashboard:hover {
-        transform: translateY(-3px); /* Pequeño efecto al pasar el mouse */
+        transform: translateY(-3px);
     }
 
-
-
-/* Hacemos que el cuerpo de la tarjeta tenga límite de altura */
 .register-scroll-area {
-    max-height: 55vh; /* Ocupa máximo el 55% de la altura de la pantalla */
-    overflow-y: auto; /* Activa el scroll vertical si se pasa */
+    max-height: 55vh;
+    overflow-y: auto;
     overflow-x: hidden;
-    padding-right: 10px; /* Espacio para que el scroll no tape el texto */
+    padding-right: 10px;
     margin-bottom: 15px;
 }
 
-    /* --- Personalizar la barra de scroll (Para que sea verde y fina) --- */
     .register-scroll-area::-webkit-scrollbar {
         width: 8px;
     }
@@ -332,43 +315,37 @@ table {
     }
 
     .register-scroll-area::-webkit-scrollbar-thumb {
-        background: #a5d6a7; /* Un verde suave */
+        background: #a5d6a7;
         border-radius: 10px;
     }
 
         .register-scroll-area::-webkit-scrollbar-thumb:hover {
-            background: #3D5D35; /* Verde oscuro al pasar el mouse */
+            background: #3D5D35;
         }
 
-/* Ajuste para pantallas muy pequeñas (celulares) */
 @media (max-height: 700px) {
     .register-scroll-area {
         max-height: 45vh;
     }
 
     .login-card {
-        padding: 1.5rem; /* Menos relleno en pantallas chicas */
+        padding: 1.5rem;
     }
 }
 
-/* --- NEUMORFISMO ESTILO POLLERA (Adaptado) --- */
-
-/* 1. La Tarjeta Principal */
 .card-neo {
     border: none;
     border-radius: 20px;
-    background: #F4EAD6; /* Tu color de fondo base */
-    /* Sombra externa para que flote */
+    background: #F4EAD6;
     box-shadow: 20px 20px 60px #d1c9b8, -20px -20px 60px #ffffff;
 }
 
-/* 2. Botones Redondos Pequeños (Redes sociales) */
 .neo-button {
     width: 45px;
     height: 45px;
     outline: 0 !important;
     cursor: pointer;
-    color: #3D5D35; /* Tu Verde Corporativo */
+    color: #3D5D35;
     font-size: 18px;
     border: none;
     margin-right: 10px;
@@ -379,18 +356,14 @@ table {
     align-items: center;
     justify-content: center;
     transition: all 0.2s ease;
-    /* Efecto "Botón Salido" (Outset) */
     box-shadow: 6px 6px 12px #d1c9b8, -6px -6px 12px #ffffff;
 }
 
-    /* Efecto al presionar (Se hunde) */
     .neo-button:active, .neo-button:hover {
-        color: #C15349; /* Tu Rojo al tocar */
-        /* Efecto "Hundido" (Inset) */
+        color: #C15349;
         box-shadow: inset 6px 6px 12px #d1c9b8, inset -6px -6px 12px #ffffff;
     }
 
-/* 3. Inputs (Cajas de texto) */
 .neo-input {
     background: #F4EAD6;
     border: none;
@@ -398,20 +371,17 @@ table {
     padding: 15px 20px;
     color: #555;
     font-weight: 600;
-    /* Efecto "Hundido" permanente para inputs */
     box-shadow: inset 6px 6px 12px #d1c9b8, inset -6px -6px 12px #ffffff;
 }
 
     .neo-input:focus {
         outline: none;
-        color: #3D5D35; /* Texto verde al escribir */
-        /* Sombra un poco más suave al enfocar */
+        color: #3D5D35;
         box-shadow: inset 3px 3px 6px #d1c9b8, inset -3px -3px 6px #ffffff;
     }
 
-/* 4. Botón Grande de Perfil (Guardar) */
 .profile_button {
-    color: #3D5D35; /* Texto Verde */
+    color: #3D5D35;
     padding: 12px 30px;
     border: none;
     outline: 0 !important;
@@ -421,14 +391,12 @@ table {
     background: #F4EAD6;
     letter-spacing: 1px;
     transition: all 0.3s ease;
-    /* Sombra Externa (Flotando) */
     box-shadow: 12px 12px 24px #d1c9b8, -12px -12px 24px #ffffff;
 }
 
     .profile_button:hover {
-        color: #F4EAD6; /* Texto Beige */
-        background: #3D5D35; /* Fondo Verde */
-        /* Mantenemos la sombra pero ajustada */
+        color: #F4EAD6;
+        background: #3D5D35;
         box-shadow: 6px 6px 12px #2e4628, -6px -6px 12px #4c7442;
     }
 
@@ -436,14 +404,12 @@ table {
         transform: scale(0.98);
     }
 
-/* 5. Avatar (Círculo de foto) */
 .neo-avatar-circle {
     width: 120px;
     height: 120px;
     border-radius: 50%;
     padding: 5px;
     background: #F4EAD6;
-    /* Borde neumórfico */
     box-shadow: 8px 8px 16px #d1c9b8, -8px -8px 16px #ffffff;
     margin: 0 auto;
     display: flex;
@@ -451,7 +417,6 @@ table {
     justify-content: center;
 }
 
-/* Iconos de marcas específicos (Opcional si usas FontAwesome) */
 .fa-facebook {
     color: #3b5998;
 }
@@ -464,32 +429,24 @@ table {
     color: #C13584;
 }
 
-/* --- ESTILOS PARA EL MENÚ DE PERFIL (Igualando al NavMenu) --- */
 .mi-menu-perfil .nav-link.active {
-    /* Mismo fondo que el menú para lograr el efecto de relieve */
     background-color: #D9B59A !important;
-    /* Texto Verde (Tu marca) */
     color: #3D5D35 !important;
     font-weight: 800;
-    /* MAGIA 3D: Sombra interna (Inset) que hace que parezca presionado */
     box-shadow: inset 6px 6px 12px #b89982, inset -6px -6px 12px #fad1b2 !important;
-    /* Eliminamos bordes de color */
     border: none;
-    border-radius: 12px; /* Redondeado suave */
+    border-radius: 12px;
 }
 
-    /* El icono también se pone verde al "hundirse" */
     .mi-menu-perfil .nav-link.active .bi {
         filter: none;
         color: #3D5D35;
     }
 
-
-/* --- ESTILOS TIENDA: BOTÓN FLOTANTE --- */
 .btn-flotante {
     position: fixed;
-    top: 85px; /* Ubicación superior (debajo del header) */
-    right: 30px; /* Margen derecho */
+    top: 85px;
+    right: 30px;
     z-index: 1000;
     border-radius: 50px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.2);
@@ -497,10 +454,8 @@ table {
     font-size: 1rem;
     transition: all 0.3s ease;
     border: none;
-    /* Gradiente Verde Pollera */
     background: linear-gradient(90deg, #3D5D35 0%, #639658 100%);
     color: white;
-    /* Animación de entrada */
     animation: fadeInBtn 0.5s ease-out;
 }
 
@@ -522,28 +477,23 @@ table {
     }
 }
 
-/* ======================================================= */
-/* ESTILOS MODAL CARRITO (ANIMACIÓN SLIDE DOWN)            */
-/* ======================================================= */
-
 .modal-carrito-backdrop {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* Fondo oscuro */
+    background-color: rgba(0, 0, 0, 0.5);
     z-index: 1050;
     display: flex;
     justify-content: center;
-    align-items: flex-start; /* Alineamos arriba */
-    padding-top: 100px; /* Espacio desde el techo */
-
+    align-items: flex-start;
+    padding-top: 100px;
     backdrop-filter: blur(3px);
 }
 
 .modal-carrito-content {
-    background: #F4EAD6; /* Beige marca */
+    background: #F4EAD6;
     border-radius: 15px;
     width: 95%;
     max-width: 500px;
@@ -552,7 +502,6 @@ table {
     flex-direction: column;
     box-shadow: 0 15px 40px rgba(0,0,0,0.3);
     border: 1px solid rgba(255,255,255,0.6);
-    /* Animación de caída */
     animation: slideDown 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
@@ -562,7 +511,6 @@ table {
     flex-grow: 1;
 }
 
-    /* Scrollbar verde para el modal */
     .modal-body-scroll::-webkit-scrollbar {
         width: 6px;
     }

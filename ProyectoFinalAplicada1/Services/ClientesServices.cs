@@ -40,10 +40,7 @@ public class ClientesServices(IDbContextFactory<Context> DbFactory)
             var existeTelefono = await contexto.Cliente
                 .AnyAsync(c => c.TelefonoCliente == cliente.TelefonoCliente);
 
-            if (existeTelefono)
-            {
-
-            }
+            
         }
 
         if (!await Existe(cliente.ClienteId))
