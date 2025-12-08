@@ -47,54 +47,39 @@ public class PedidosServices(IDbContextFactory<Context> DbFactory)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
 
-       
-        var detallesParaGuardar = pedido.Detalles.ToList();
-        pedido.Detalles = new List<PedidoDetalle>();
-
         contexto.Pedido.Add(pedido);
         var guardado = await contexto.SaveChangesAsync() > 0;
 
-     
         if (!guardado) return false;
 
-        foreach (var item in detallesParaGuardar)
+        if (pedido.Estado == "Entregado")
         {
-            
-            var producto = await contexto.Producto.FindAsync(item.ProductoId);
-            if (producto != null)
-            {
-                producto.Existencia -= (int)item.Cantidad;
-              
-            }
-
-           
-            item.DetalleId = 0; 
-            item.PedidoId = pedido.PedidoId; 
-            item.Producto = null; 
-
-          
-            contexto.Set<PedidoDetalle>().Add(item);
+            await AfectarExistencia(contexto, pedido.Detalles.ToList(), false); 
         }
 
-        
-        return await contexto.SaveChangesAsync() > 0;
+        return true;
     }
 
     private async Task<bool> Modificar(Pedido pedido)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
 
+     
         var pedidoOriginal = await contexto.Pedido
             .Include(p => p.Detalles)
             .AsNoTracking()
             .FirstOrDefaultAsync(p => p.PedidoId == pedido.PedidoId);
 
-        if (pedidoOriginal != null)
+
+        if (pedidoOriginal != null && pedidoOriginal.Estado == "Entregado")
         {
-            await AfectarExistencia(contexto, pedidoOriginal.Detalles.ToArray(), true);
+            await AfectarExistencia(contexto, pedidoOriginal.Detalles.ToList(), true);
         }
 
-        await AfectarExistencia(contexto, pedido.Detalles.ToArray(), false);
+        if (pedido.Estado == "Entregado")
+        {
+            await AfectarExistencia(contexto, pedido.Detalles.ToList(), false);
+        }
 
         foreach (var detalle in pedido.Detalles)
         {
@@ -102,7 +87,26 @@ public class PedidosServices(IDbContextFactory<Context> DbFactory)
         }
 
         contexto.Update(pedido);
+
         return await contexto.SaveChangesAsync() > 0;
+    }
+
+    private async Task AfectarExistencia(Context contexto, List<PedidoDetalle> detalles, bool sumar)
+    {
+        foreach (var item in detalles)
+        {
+
+            var producto = await contexto.Producto.FindAsync(item.ProductoId);
+
+            if (producto != null)
+            {
+                if (sumar)
+                    producto.Existencia += (int)item.Cantidad;
+                else
+                    producto.Existencia -= (int)item.Cantidad;
+
+            }
+        }
     }
 
     public async Task<bool> Eliminar(int id)
@@ -115,30 +119,17 @@ public class PedidosServices(IDbContextFactory<Context> DbFactory)
 
         if (pedido != null)
         {
-            await AfectarExistencia(contexto, pedido.Detalles.ToArray(), true);
+          
+            if (pedido.Estado == "Entregado")
+            {
+                
+                await AfectarExistencia(contexto, pedido.Detalles.ToList(), true);
+            }
 
             contexto.Pedido.Remove(pedido);
             return await contexto.SaveChangesAsync() > 0;
         }
         return false;
-    }
-
-    private async Task AfectarExistencia(Context contexto, PedidoDetalle[] detalles, bool sumar)
-    {
-        foreach (var item in detalles)
-        {
-            var producto = await contexto.Producto.FindAsync(item.ProductoId);
-
-            if (producto != null)
-            {
-                if (sumar)
-                    producto.Existencia += (int)item.Cantidad;
-                else
-                    producto.Existencia -= (int)item.Cantidad;
-
-                contexto.SaveChangesAsync();
-            }
-        }
     }
 
     public async Task<bool> CambiarEstado(int pedidoId, string nuevoEstado)
@@ -160,6 +151,8 @@ public class PedidosServices(IDbContextFactory<Context> DbFactory)
             .Where(p => p.Estado == "Entregado")
             .SumAsync(p => p.MontoTotal);
     }
+
+   
 
     public async Task<int> ContarPedidosPendientes()
     {

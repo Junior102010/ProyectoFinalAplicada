@@ -68,4 +68,21 @@ public class ProductosServices(IDbContextFactory<Context> DbFactory)
             .ToListAsync();
     }
 
+    //private async Task AfectarExistencia(Context contexto, EntradaDetalle[] detalles, bool sumar)
+    //{
+    //    foreach (var item in detalles)
+    //    {
+    //        var producto = await contexto.Producto.FindAsync(item.ProductoId);
+    //        if (producto != null)
+    //        {
+    //            if (sumar)
+    //                producto.Existencia += item.Cantidad;
+    //            else
+    //                producto.Existencia -= item.Cantidad;
+
+    //            contexto.Producto.Update(producto);
+    //        }
+    //    }
+    //}
+
 }

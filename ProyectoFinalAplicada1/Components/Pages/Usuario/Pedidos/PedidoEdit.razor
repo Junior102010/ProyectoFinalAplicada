@@ -2,6 +2,7 @@
 @using Microsoft.AspNetCore.Authorization
 @rendermode InteractiveServer
 
+@inject ProductosServices productosServices
 @inject PedidosServices pedidosService
 @inject NavigationManager navigationManager
 @inject PageTitleService PageTitleService
@@ -107,13 +108,13 @@
 
     [SupplyParameterFromForm]
     public Pedido Pedido { get; set; } = new Pedido();
-    
+
     public string Mensaje { get; set; } = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
         PageTitleService.SetTitle("Editar Pedido");
-        if (Pedido.PedidoId == 0)
+        if (PedidoId > 0 && Pedido.PedidoId == 0) // Pequeña corrección para asegurar carga
         {
             var encontrado = await pedidosService.Buscar(PedidoId);
             if (encontrado != null)
@@ -129,7 +130,9 @@
 
     public async Task Guardar()
     {
-      
+        // ELIMINADO: Todo el bloque if(Pedido.Estado == "Entregado") {...}
+        // La lógica de inventario ahora la hace pedidosService.Guardar automáticamente.
+
         var guardado = await pedidosService.Guardar(Pedido);
 
         if (guardado)
@@ -142,17 +145,16 @@
         }
     }
 
-
     public async Task Eliminar()
     {
         var ok = await pedidosService.Eliminar(PedidoId);
         if (ok)
             navigationManager.NavigateTo("/Pedido/Index");
     }
-    //Comentarios para los cambios
-   
+
     private string ObtenerEstiloEstado(string estado)
     {
+        // ... (Tu código de estilos sigue igual)
         return estado switch
         {
             "Pendiente" => "border-color: #ffc107; color: #856404; background-color: #fff3cd;",
