@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProyectoFinalAplicada1.DAL;
 
@@ -10,9 +11,11 @@ using ProyectoFinalAplicada1.DAL;
 namespace ProyectoFinalAplicada1.Migrations
 {
     [DbContext(typeof(Context))]
-    partial class ContextModelSnapshot : ModelSnapshot
+    [Migration("20251207182456_ArregloDePedidoCliente")]
+    partial class ArregloDePedidoCliente
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.0");
@@ -157,7 +160,6 @@ namespace ProyectoFinalAplicada1.Migrations
             modelBuilder.Entity("ProyectoFinalAplicada.Models.PedidoDetalle", b =>
                 {
                     b.Property<int>("DetalleId")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
                     b.Property<double>("Cantidad")
@@ -176,8 +178,6 @@ namespace ProyectoFinalAplicada1.Migrations
                         .HasColumnType("INTEGER");
 
                     b.HasKey("DetalleId");
-
-                    b.HasIndex("PedidoId");
 
                     b.HasIndex("ProductoId");
 
@@ -369,7 +369,7 @@ namespace ProyectoFinalAplicada1.Migrations
                 {
                     b.HasOne("ProyectoFinalAplicada.Models.Pedido", null)
                         .WithMany("Detalles")
-                        .HasForeignKey("PedidoId")
+                        .HasForeignKey("DetalleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

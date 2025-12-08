@@ -23,15 +23,12 @@
             <small class="text-muted">Revisa tus datos, método de pago y productos.</small>
         </div>
 
-        @* CAMBIO 1: Usamos OnSubmit en lugar de OnValidSubmit *@
-        <EditForm Model="Pedido" OnSubmit="Guardar" FormName="ConfirmarPedidoCliente">
+        <EditForm Model="Pedido" OnValidSubmit="Guardar" FormName="ConfirmarPedidoCliente">
             <DataAnnotationsValidator />
-
-            @* CAMBIO 2: Agregamos esto para ver errores ocultos *@
-            <ValidationSummary class="alert alert-danger m-3" />
 
             <div class="card-body">
 
+               
                 <div class="row mb-4">
                     <div class="col-md-12">
                         <h6 class="fw-bold text-muted mb-3 border-bottom pb-2">
@@ -57,22 +54,23 @@
 
                     <div class="col-md-12">
                         <div class="form-check form-switch p-3 bg-warning bg-opacity-10 rounded border border-warning border-opacity-25 col-5 d-flex align-items-center">
-
+    
                             <label class="form-check-label fw-bold me-auto" for="chkDelivery">
                                 <i class="bi bi-bicycle"></i> Solicitar Delivery (+RD$ @CostoEnvio.ToString("N2"))
                             </label>
 
-                            <InputCheckbox class="form-check-input ms-auto"
-                                           @bind-Value="Pedido.Delivery"
-                                           id="chkDelivery"
-                                           style="cursor: pointer;"
-                                           @oninput="ActualizarTotal" />
+                            <InputCheckbox 
+                                class="form-check-input ms-auto" 
+                                @bind-Value="Pedido.Delivery" 
+                                id="chkDelivery" 
+                                style="cursor: pointer;" 
+                                @oninput="ActualizarTotal" />
 
                         </div>
                     </div>
                 </div>
 
-
+               
                 <div class="row mb-4">
                     <div class="col-md-12">
                         <h6 class="fw-bold text-muted mb-3 border-bottom pb-2">
@@ -111,7 +109,7 @@
                     </div>
                 </div>
 
-
+                
                 <h6 class="fw-bold text-muted mb-3 border-bottom pb-2 mt-4">
                     <i class="bi bi-cart3"></i> Resumen de Productos
                 </h6>
@@ -167,7 +165,7 @@
                 }
             </div>
 
-
+           
             <div class="card-footer bg-transparent border-top-0 d-flex justify-content-between align-items-center mt-2 pt-0 pb-3 px-4">
                 <a href="/PedidoCliente/Index" class="btn btn-outline-secondary px-4">
                     <i class="bi bi-arrow-left"></i> Volver
@@ -189,38 +187,32 @@
     public string NombreClienteDisplay { get; set; } = "Cargando...";
     public string TelefonoClienteDisplay { get; set; } = "";
     public string Mensaje { get; set; } = string.Empty;
-    public Cliente cliente { get; set; }
     private const double CostoEnvio = 15.00;
 
     protected override async Task OnInitializedAsync()
     {
         IdCliente = await GetClienteIdAsync();
 
-        // Asignamos el ID al pedido
-        Pedido.ClienteId = IdCliente;
-
         if (IdCliente > 0)
         {
-            cliente = await clientesService.Buscar(IdCliente);
+            var cliente = await clientesService.Buscar(IdCliente);
             if (cliente != null)
             {
-                NombreClienteDisplay = cliente.NombreCliente;
+                NombreClienteDisplay = $"{cliente.NombreCliente} {cliente.ApellidoCliente}";
                 TelefonoClienteDisplay = cliente.TelefonoCliente;
-                // Solo llenamos referencia si el usuario no ha escrito nada (útil para recargas)
+               
                 if (string.IsNullOrEmpty(Pedido.ReferenciaSitio))
                 {
-                    Pedido.ReferenciaSitio = cliente.Sector + " / " + cliente.CalleCliente + " / " + cliente.ViviendaCliente + " / " + cliente.DescripcionCliente;
+                    Pedido.ReferenciaSitio = $"{cliente.Sector}, {cliente.CalleCliente} #{cliente.ViviendaCliente}";
                 }
             }
         }
-        else
-        {
-            Mensaje = "Error: No se pudo identificar al cliente. Por favor cierre sesión e intente de nuevo.";
-        }
 
+        
         if (carritoService.Carrito.Any())
         {
-            Pedido.Detalles = new List<PedidoDetalle>(carritoService.Carrito);
+            
+            Pedido.Detalles = carritoService.Carrito.ToList();
             CalcularTotal();
         }
 
@@ -242,8 +234,7 @@
 
     private void ActualizarTotal(ChangeEventArgs e)
     {
-        bool esDelivery = (bool)(e.Value ?? false);
-        Pedido.Delivery = esDelivery;
+        Pedido.Delivery = (bool)(e.Value ?? false);
         CalcularTotal();
     }
 
@@ -253,22 +244,12 @@
         Pedido.MontoTotal = subtotal + (Pedido.Delivery ? CostoEnvio : 0);
     }
 
-    // Recibimos el EditContext para validar manualmente
-    public async Task Guardar(EditContext editContext)
+    public async Task Guardar()
     {
-        // 1. Validamos manualmente
-        if (!editContext.Validate())
+      
+        if (IdCliente <= 0)
         {
-            Mensaje = "Hay campos incorrectos en el formulario. Revise los mensajes de error.";
-            Console.WriteLine("El formulario NO es válido. No se guardará.");
-            return;
-        }
-
-        // 2. Verificaciones extra
-        if (Pedido.ClienteId <= 0)
-        {
-            Mensaje = "Error crítico: No hay Cliente ID asignado.";
-            Console.WriteLine("Error: ClienteId es 0 o menor.");
+            Mensaje = "Error: No se ha identificado su cuenta de cliente. Por favor contacte soporte.";
             return;
         }
 
@@ -278,7 +259,11 @@
             return;
         }
 
-        // 3. Lógica de guardado
+       
+        Pedido.ClienteId = IdCliente;
+        Pedido.Cliente = null; 
+
+        
         if (MetodoPagoSeleccionado == "Transferencia")
         {
             Pedido.Estado = "Pendiente de Pago";
@@ -292,21 +277,25 @@
 
         CalcularTotal();
 
-        Console.WriteLine($"Intentando guardar pedido para Cliente ID: {Pedido.ClienteId} con Total: {Pedido.MontoTotal}");
+    
+        foreach (var detalle in Pedido.Detalles)
+        {
+            detalle.PedidoId = 0; 
+            detalle.DetalleId = 0; 
+            detalle.Producto = null; 
+        }
 
+      
         var guardado = await pedidosService.Guardar(Pedido);
 
         if (guardado)
         {
-            Console.WriteLine("¡Guardado Exitoso!");
             carritoService.LimpiarCarrito();
-            await Task.Delay(1000); // Pequeña pausa
-            navigationManager.NavigateTo("/");
+            navigationManager.NavigateTo("/PedidoCliente/Index");
         }
         else
         {
-            Mensaje = "Ocurrió un error al intentar guardar en la base de datos.";
-            Console.WriteLine("El servicio Guardar retornó false.");
+            Mensaje = "No se pudo realizar el pedido. Intente nuevamente.";
         }
     }
 }

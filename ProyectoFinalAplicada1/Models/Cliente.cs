@@ -37,6 +37,6 @@ public class Cliente
     [Required]
     public string DescripcionCliente { get; set; }
 
-    [ForeignKey("TransferenciaId")]
+   
     public ICollection<Transferencia> transferencia { get; set; } = new List<Transferencia>();
 }

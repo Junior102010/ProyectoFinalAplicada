@@ -13,8 +13,6 @@ public class Pedido
     public DateTime FechaPedido { get; set; } = DateTime.Now;
     [Required]
     public int ClienteId { get; set; }
-    [Required]
-
     [ForeignKey("ClienteId")]
     public Cliente? Cliente { get; set; }
     [Required]
@@ -26,7 +24,6 @@ public class Pedido
     [Required]
     public string? ReferenciaSitio { get; set; }
 
-    [ForeignKey("DetalleId")]
     public ICollection<PedidoDetalle> Detalles { get; set; } = new List<PedidoDetalle>();
  
 }

@@ -11,6 +11,8 @@
 @inject NavigationManager NavigationManager
 @inject IdentityRedirectManager RedirectManager
 @inject NavigationManager navigation
+@inject PageTitleService PageTitleService
+
 
 <PageTitle>Iniciar Sesión</PageTitle>
 
@@ -89,6 +91,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+        PageTitleService.SetTitle("Inicio de Sesion");
         Input ??= new();
         editContext = new EditContext(Input);
 

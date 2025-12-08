@@ -47,14 +47,36 @@ public class PedidosServices(IDbContextFactory<Context> DbFactory)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
 
-        await AfectarExistencia(contexto, pedido.Detalles.ToArray(), false);
-
-        foreach (var detalle in pedido.Detalles)
-        {
-            detalle.Producto = null;
-        }
+       
+        var detallesParaGuardar = pedido.Detalles.ToList();
+        pedido.Detalles = new List<PedidoDetalle>();
 
         contexto.Pedido.Add(pedido);
+        var guardado = await contexto.SaveChangesAsync() > 0;
+
+     
+        if (!guardado) return false;
+
+        foreach (var item in detallesParaGuardar)
+        {
+            
+            var producto = await contexto.Producto.FindAsync(item.ProductoId);
+            if (producto != null)
+            {
+                producto.Existencia -= (int)item.Cantidad;
+              
+            }
+
+           
+            item.DetalleId = 0; 
+            item.PedidoId = pedido.PedidoId; 
+            item.Producto = null; 
+
+          
+            contexto.Set<PedidoDetalle>().Add(item);
+        }
+
+        
         return await contexto.SaveChangesAsync() > 0;
     }
 

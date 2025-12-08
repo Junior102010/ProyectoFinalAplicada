@@ -1,6 +1,8 @@
 ﻿@page "/transferencias/crear"
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.EntityFrameworkCore
+@using ProyectoFinalAplicada.Models
+@using ProyectoFinalAplicada.Services
 
 @rendermode InteractiveServer
 @inject IWebHostEnvironment WebHostEnvironment
@@ -12,210 +14,238 @@
 
 @attribute [Authorize(Roles = "Cliente")]
 
-<h3>Nueva Transferencia Bancaria</h3>
+<PageTitle>Registrar Transferencia</PageTitle>
 
+<div class="container mt-4">
+    <div class="card card-glass rounded-4 p-4 shadow-lg">
+        <div class="card-header bg-transparent border-bottom-0">
+            <h3 class="fw-bold text-primary"><i class="bi bi-bank"></i> Nueva Transferencia Bancaria</h3>
+            <p class="text-muted">Registre su pago y adjunte el comprobante.</p>
+        </div>
 
-    <div class="card p-4 shadow">
+        <EditForm Model="NuevaTransferencia" OnValidSubmit="GuardarTransferenciaCompleta">
+            <DataAnnotationsValidator />
 
-        <div class="row">
+            <div class="row">
+                @* Bancos *@
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Cuenta/Banco Origen <span class="text-danger">*</span></label>
+                    <InputSelect class="form-select" @bind-Value="NuevaTransferencia.Origen">
+                        <option value="">-- Seleccione --</option>
+                        <option value="Banreservas">Banreservas</option>
+                        <option value="Popular">Popular</option>
+                        <option value="BHD">BHD</option>
+                        <option value="Qik">Qik - Banco digital</option>
+                    </InputSelect>
+                    <ValidationMessage For="(() => NuevaTransferencia.Origen)" />
+                </div>
 
-            <div class="col-6 mb-3">
-                <label for="origen">Cuenta/Banco Origen <span class="text-danger">*</span></label>
-                <InputSelect id="origen" class="form-select" @bind-Value="NuevaTransferencia.Origen">
-                    <option value="">-- Seleccione un Banco --</option>
-                    <option value="Banreservas">Banreservas</option>
-                    <option value="Popular">Popular</option>
-                    <option value="BHD">BHD</option>
-                    <option value="Qik - Banco digital">Qik - Banco digital</option>
-                </InputSelect>
-                
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Cuenta/Banco Destino <span class="text-danger">*</span></label>
+                    <InputSelect class="form-select" @bind-Value="NuevaTransferencia.Destino">
+                        <option value="">-- Seleccione --</option>
+                        <option value="Banreservas">Banreservas</option>
+                        <option value="Popular">Popular</option>
+                        <option value="BHD">BHD</option>
+                        <option value="Qik">Qik - Banco digital</option>
+                    </InputSelect>
+                    <ValidationMessage For="(() => NuevaTransferencia.Destino)" />
+                </div>
+
+                @* Monto y Fecha *@
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Monto Transferido <span class="text-danger">*</span></label>
+                    <InputNumber class="form-control" @bind-Value="NuevaTransferencia.Monto" />
+                    <ValidationMessage For="(() => NuevaTransferencia.Monto)" />
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Fecha <span class="text-danger">*</span></label>
+                    <InputDate class="form-control" @bind-Value="NuevaTransferencia.Fecha" />
+                </div>
+
+                @* Selección de Pedido (Opcional) *@
+                <div class="col-md-12 mb-3">
+                    <label class="form-label fw-bold">Asociar a Pedido (Opcional):</label>
+                    <InputSelect class="form-select" @bind-Value="IdPedido">
+                        <option value="0">-- Ninguno / Pago General --</option>
+                        @foreach (var p in ListaPedidos)
+                        {
+                            <option value="@p.PedidoId">Pedido #@p.PedidoId - @p.FechaPedido.ToShortDateString() - Monto: @p.MontoTotal.ToString("C2")</option>
+                        }
+                    </InputSelect>
+                    <small class="text-muted">Si selecciona un pedido, se actualizará su estado a "En Proceso" tras la verificación.</small>
+                </div>
+
+                @* Observaciones *@
+                <div class="col-md-12 mb-3">
+                    <label class="form-label fw-bold">Observaciones</label>
+                    <InputTextArea class="form-control" @bind-Value="NuevaTransferencia.Observaciones" placeholder="Ej: Pago factura #123" />
+                    <ValidationMessage For="(() => NuevaTransferencia.Observaciones)" />
+                </div>
             </div>
 
-            <div class="col-6 mb-3">
-                <label for="destino">Cuenta/Banco Destino <span class="text-danger">*</span></label>
-                <InputSelect id="destino" class="form-select" @bind-Value="NuevaTransferencia.Destino">
-                    <option value="">-- Seleccione un Banco --</option>
-                    <option value="Banreservas">Banreservas</option>
-                    <option value="Popular">Popular</option>
-                    <option value="BHD">BHD</option>
-                    <option value="Qik - Banco digital">Qik - Banco digital</option>
-                </InputSelect>
-                
+            <hr />
+
+            @* Carga de Imágenes *@
+            <div class="mb-4">
+                <h5 class="fw-bold"><i class="bi bi-paperclip"></i> Comprobante</h5>
+                <div class="p-3 border rounded bg-light">
+                    <label class="form-label">Seleccionar Imagen (Máx 5MB)</label>
+                    <InputFile OnChange="@HandleFileSelection" class="form-control" multiple accept=".jpg,.jpeg,.png" />
+
+                    @if (selectedFiles.Count > 0)
+                    {
+                        <div class="mt-2 text-success fw-bold">
+                            <i class="bi bi-check-circle"></i> @selectedFiles.Count archivo(s) listo(s) para subir.
+                        </div>
+                    }
+                    @if (!string.IsNullOrEmpty(errorMessage))
+                    {
+                        <div class="alert alert-danger mt-2">@errorMessage</div>
+                    }
+                </div>
             </div>
-        </div>
 
-        <div class="row">
-            <div class="col-6 mb-3">
-                <label for="monto">Monto Transferido <span class="text-danger">*</span></label>
-                <InputNumber id="monto" class="form-control" @bind-Value="NuevaTransferencia.Monto" />
+            @* Botones *@
+            <div class="d-flex justify-content-between">
+                <a href="/PedidoCliente/Index" class="btn btn-outline-secondary px-4">
+                    <i class="bi bi-arrow-left"></i> Volver
+                </a>
+                <button type="submit" class="btn btn-primary px-5 shadow">
+                    <i class="bi bi-floppy"></i> Guardar Transferencia
+                </button>
             </div>
-            <div class="col-6 mb-3">
-                <label for="fecha">Fecha de la Transferencia <span class="text-danger">*</span></label>
-                <InputDate id="fecha" class="form-control" @bind-Value="NuevaTransferencia.Fecha" />
-            </div>
-        </div>
-
-
-        <div class="col-6 mb-3">
-            <label for="destino">Pedido a Pagar: <span class="text-danger">*</span></label>
-            <InputSelect id="IdPedido" class="form-select" @bind-Value="IdPedido">
-                <option value="">-- Seleccione un Pedido a Pagar --</option>
-                @foreach(var p in ListaPedidos)
-                {
-                    <option value="@p.PedidoId">ID: @p.PedidoId - Fecha: @p.FechaPedido --- Monto a Pagar: @p.MontoTotal</option>
-                }
-
-            </InputSelect>
-        </div>
-
-
-
-        <div class="mb-3">
-            <label for="observaciones">Observaciones <span class="text-danger">*</span></label>
-            <InputTextArea id="observaciones" class="form-control" @bind-Value="NuevaTransferencia.Observaciones" />
-        </div>
-        <hr />
-        <div class="card-body">
-            <h4>📄 Adjuntar Comprobante(s)</h4>
-            <div class="mb-3">
-                <label>Seleccionar Imagen(es) (Máx @(MaxFileSize / 1024 / 1024)MB por archivo)</label>
-                <InputFile OnChange="@HandleFileSelection" multiple />
-
-                @if (selectedFiles.Count > 0)
-                {
-                    <p class="mt-2 text-success">**@selectedFiles.Count archivo(s) seleccionado(s) listo(s) para subir.**</p>
-                }
-                @if (!string.IsNullOrEmpty(errorMessage))
-                {
-                    <div class="alert alert-danger mt-2">@errorMessage</div>
-                }
-            </div>
-        </div>
-
-        <div class="card-footer bg-transparent border-top-0 d-flex justify-content-between align-items-center mt-2 pt-0 pb-3 px-4">
-            <a href="/TransferenciaCliente/Index" class="btn btn-outline-secondary px-4">
-                <span class="bi bi-arrow-left"></span> Volver
-            </a>
-            <button type="button" class="btn btn-gradiente px-5" @onclick="GuardarTransferenciaCompleta">
-                <span class="bi bi-floppy"></span> Guardar
-            </button>
-        </div>
-
+        </EditForm>
     </div>
-
+</div>
 
 @code {
-
+    public Transferencia NuevaTransferencia { get; set; } = new Transferencia { Fecha = DateTime.Now };
     public List<Pedido> ListaPedidos { get; set; } = new List<Pedido>();
-    public Pedido pedido { get; set; } = new Pedido();
+
     public int IdCliente { get; set; }
-    public int IdPedido { get; set; }
+    public int IdPedido { get; set; } // Variable temporal para el select
+
+    private List<IBrowserFile> selectedFiles = new List<IBrowserFile>();
+    private string? errorMessage;
+    private const long MaxFileSize = 1024 * 1024 * 5; // 5MB
 
     protected override async Task OnInitializedAsync()
     {
-
+        // 1. OBTENER ID DEL CLIENTE LOGUEADO (Igual que en Pedidos)
         IdCliente = await GetClienteIdAsync();
-        ListaPedidos = await pedidosServices.Listar(p => p.PedidoId > 0);
-        ListaPedidos = ListaPedidos.Where(p => p.ClienteId == IdCliente).ToList();
 
+        if (IdCliente > 0)
+        {
+            // 2. Cargar solo los pedidos de ESTE cliente
+            ListaPedidos = await pedidosServices.Listar(p => p.ClienteId == IdCliente && (p.Estado == "Pendiente" || p.Estado == "Pendiente de Pago"));
+        }
+        else
+        {
+            errorMessage = "No se ha identificado un perfil de cliente para este usuario.";
+        }
     }
 
-    private Transferencia NuevaTransferencia { get; set; } = new Transferencia
+    public async Task<int> GetClienteIdAsync()
     {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var identityId = authState.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
-        Imagenes = new List<TransferenciaImagen>()
-    };
-    private List<IBrowserFile> selectedFiles = new List<IBrowserFile>();
-    private string? errorMessage;
+        if (string.IsNullOrEmpty(identityId)) return 0;
 
-
-    private const long MaxFileSize = 1024 * 1024 * 5;
-
+        return await _context.Cliente
+            .Where(c => c.UserId == identityId)
+            .Select(c => c.ClienteId)
+            .FirstOrDefaultAsync();
+    }
 
     private void HandleFileSelection(InputFileChangeEventArgs e)
     {
         selectedFiles.Clear();
         errorMessage = null;
-
         foreach (var file in e.GetMultipleFiles())
         {
             if (file.Size > MaxFileSize)
             {
-                errorMessage = $"El archivo '{file.Name}' excede el límite de 5MB.";
-                selectedFiles.Clear();
+                errorMessage = $"El archivo '{file.Name}' es muy grande (Máx 5MB).";
                 return;
             }
             selectedFiles.Add(file);
         }
     }
 
-    public async Task<int> GetClienteIdAsync()
-    {
-        // 1. Obtener el GUID (Identity User ID)
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        var identityId = authState.User
-            .FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-
-        if (string.IsNullOrEmpty(identityId))
-        {
-            return 0; // Usuario no logueado o ID no encontrado
-        }
-
-        // 2. Consultar la base de datos para obtener el ClienteId
-        return await _context.Cliente
-            .Where(c => c.UserId == identityId)
-            .Select(c => c.ClienteId) // Selecciona solo el ClienteId
-            .FirstOrDefaultAsync();    // Devuelve el ID (o 0 si no se encuentra)
-    }
-
     private async Task GuardarTransferenciaCompleta()
     {
+        if (IdCliente <= 0)
+        {
+            errorMessage = "Error: No hay cliente asociado.";
+            return;
+        }
+
+        // 1. PROCESAR IMÁGENES FÍSICAS
         string uploadsPath = Path.Combine(WebHostEnvironment.WebRootPath, "TransferenciaUploads");
-        Directory.CreateDirectory(uploadsPath);
+        if (!Directory.Exists(uploadsPath)) Directory.CreateDirectory(uploadsPath);
+
+        // Limpiamos la lista previa para no duplicar si le dan guardar 2 veces
+        NuevaTransferencia.Imagenes = new List<TransferenciaImagen>();
+
         foreach (var file in selectedFiles)
         {
-            string uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(file.Name);
-            string fullServerPath = Path.Combine(uploadsPath, uniqueFileName);
-
-
-
-            await using (var stream = new FileStream(fullServerPath, FileMode.Create))
+            try
             {
+                string uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(file.Name);
+                string fullServerPath = Path.Combine(uploadsPath, uniqueFileName);
 
-                await file.OpenReadStream(MaxFileSize).CopyToAsync(stream);
+                await using (var stream = new FileStream(fullServerPath, FileMode.Create))
+                {
+                    await file.OpenReadStream(MaxFileSize).CopyToAsync(stream);
+                }
+
+                // Ruta relativa para la BD
+                NuevaTransferencia.Imagenes.Add(new TransferenciaImagen { RutaImagen = $"/TransferenciaUploads/{uniqueFileName}" });
             }
-
-
-            string relativeDbPath = $"/TransferenciaUploads/{uniqueFileName}";
-
-            var imagenRegistro = new TransferenciaImagen
+            catch (Exception ex)
             {
-                RutaImagen = relativeDbPath
-            };
-
-
-            NuevaTransferencia.Imagenes.Add(imagenRegistro);
+                errorMessage = $"Error al subir imagen: {ex.Message}";
+                return;
+            }
         }
-        NuevaTransferencia.PedidoId = IdPedido;
 
+        // 2. ASIGNAR DATOS CLAVE
+        NuevaTransferencia.ClienteId = IdCliente; // <--- AQUÍ ESTÁ LA MAGIA
+
+        // (Opcional) Si seleccionó un pedido, guardamos la referencia en observaciones si no hay campo PedidoId en Transferencia
+        if (IdPedido > 0)
+        {
+            NuevaTransferencia.Observaciones += $" [Pago Pedido #{IdPedido}]";
+        }
+
+        // 3. GUARDAR EN BD
+        // Usamos el método simple Guardar(modelo) porque ya llenamos el ClienteId manualmente arriba
         bool guardado = await TransferenciaService.Guardar(NuevaTransferencia);
 
         if (guardado)
         {
-            if (IdPedido != null)
+            // 4. ACTUALIZAR ESTADO DEL PEDIDO (Si aplica)
+            if (IdPedido > 0)
             {
-                pedido = await pedidosServices.Buscar(IdPedido);
-                pedido.MontoTotal = -NuevaTransferencia.Monto;
-                await pedidosServices.Guardar(pedido);
+                var pedido = await pedidosServices.Buscar(IdPedido);
+                if (pedido != null)
+                {
+                    // Cambiamos el estado para indicar que ya pagó/envió comprobante
+                    pedido.Estado = "En Proceso";
+                    // OJO: No restamos el monto total porque eso alteraría la factura.
+                    // Lo correcto es cambiar el estado.
 
-                pedido = new Pedido();
+                    await pedidosServices.Guardar(pedido);
+                }
             }
 
-            NavigationManager.NavigateTo("/transferencias");
+            NavigationManager.NavigateTo("/PedidoCliente/Index"); // Volver a mis pedidos
         }
         else
         {
-            errorMessage = "Error al guardar los datos en la base de datos. Los archivos físicos pudieron haberse guardado.";
+            errorMessage = "Error al guardar en base de datos.";
         }
     }
 }

@@ -53,31 +53,88 @@
 
                 <hr class="border-secondary opacity-25" />
 
-                @* --- DETALLE --- *@
-                <div class="row align-items-end mb-3">
-                    <div class="col-md-4">
-                        <label class="form-label text-muted small fw-bold mb-1">Producto</label>
-                        <InputSelect class="form-select input-glass" @bind-Value="Detalle.ProductoId">
-                            <option value="0" selected disabled>Seleccione un producto</option>
-                            @foreach (var prod in ListaProductos)
-                            {
-                                <option value="@prod.ProductoId">@prod.NombreProducto</option>
-                            }
-                        </InputSelect>
-                    </div>
-                    <div class="col-md-2">
-                        <label class="form-label text-muted small fw-bold mb-1">Cantidad</label>
-                        <InputNumber class="form-control input-glass" @bind-Value="Detalle.Cantidad" />
+                @* --- DETALLE MEJORADO --- *@
+                <div class="card bg-light border-0 mb-3 p-3">
+                    <h6 class="text-muted fw-bold mb-3">Agregar Producto al Inventario</h6>
+
+                    @* Selección del Producto *@
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Producto</label>
+                            <InputSelect class="form-select input-glass" @bind-Value="Detalle.ProductoId">
+                                <option value="0" selected disabled>Seleccione un producto</option>
+                                @foreach (var prod in ListaProductos)
+                                {
+                                    <option value="@prod.ProductoId">@prod.NombreProducto (@prod.UnidadMedida)</option>
+                                }
+                            </InputSelect>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Modo de Entrada</label>
+                            <div class="btn-group w-100" role="group">
+                                <input type="radio" class="btn-check" name="btnradio" id="btnDirecta" autocomplete="off"
+                                       checked="@(TipoEntrada == "Directa")" @onclick='() => TipoEntrada = "Directa"'>
+                                <label class="btn btn-outline-secondary" for="btnDirecta">Directo</label>
+
+                                <input type="radio" class="btn-check" name="btnradio" id="btnPesaje" autocomplete="off"
+                                       checked="@(TipoEntrada == "Pesaje")" @onclick='() => TipoEntrada = "Pesaje"'>
+                                <label class="btn btn-outline-secondary" for="btnPesaje">Pesaje (Jaulas)</label>
+
+                                <input type="radio" class="btn-check" name="btnradio" id="btnConv" autocomplete="off"
+                                       checked="@(TipoEntrada == "Conversion")" @onclick='() => TipoEntrada = "Conversion"'>
+                                <label class="btn btn-outline-secondary" for="btnConv">Sacos/Cajas</label>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="col-md-2">
-                        <label class="form-label text-muted small fw-bold mb-1">Costo</label>
-                        <InputNumber class="form-control input-glass" @bind-Value="Costo" />
+                    @* Inputs Dinámicos según el Modo *@
+                    <div class="row align-items-end">
+
+                        @if (TipoEntrada == "Pesaje")
+                        {
+                            @* CALCULADORA PARA POLLOS / JAULAS *@
+                            <div class="col-md-3">
+                                <label class="form-label small text-muted">Peso Bruto (con Jaula)</label>
+                                <input type="number" class="form-control" @bind="PesoBruto" @bind:after="CalcularCantidad" />
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small text-muted">Peso Tara (Solo Jaula)</label>
+                                <input type="number" class="form-control" @bind="PesoTara" @bind:after="CalcularCantidad" />
+                            </div>
+                        }
+                        else if (TipoEntrada == "Conversion")
+                        {
+                            @* CALCULADORA PARA SACOS / CAJAS *@
+                            <div class="col-md-3">
+                                <label class="form-label small text-muted">Cant. Envases (Sacos/Cajas)</label>
+                                <input type="number" class="form-control" @bind="CantidadEmpaques" @bind:after="CalcularCantidad" />
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small text-muted">Contenido por Envase</label>
+                                <input type="number" class="form-control" @bind="ContenidoPorEmpaque" @bind:after="CalcularCantidad" placeholder="Lbs o Unid." />
+                            </div>
+                        }
+
+                        @* RESULTADO FINAL (Lo que se guarda en BD) *@
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold text-success">Cantidad Neta a Entrar</label>
+                            @* Si es calculado, lo ponemos readonly para que vean el resultado *@
+                            <InputNumber class="form-control input-glass fw-bold" @bind-Value="Detalle.Cantidad"
+                                         disabled="@(TipoEntrada != "Directa")" />
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold">Costo Unitario</label>
+                            <InputNumber class="form-control input-glass" @bind-Value="Costo" />
+                        </div>
                     </div>
-                    <div class="col-md-3">
-                        <button type="button" class="btn btn-gradiente w-100" @onclick="AgregarDetalle">
-                            <span class="bi bi-plus-lg"></span> Agregar
-                        </button>
+
+                    <div class="row mt-3">
+                        <div class="col-md-12 text-end">
+                            <button type="button" class="btn btn-gradiente px-4" @onclick="AgregarDetalle">
+                                <span class="bi bi-plus-lg"></span> Agregar a la Lista
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -140,7 +197,12 @@
     public List<Proveedor> ListaProveedores { get; set; } = new List<Proveedor>();
 
     public double Costo { get; set; } 
-
+    //Calculadora
+    public string TipoEntrada { get; set; } = "Directa";
+    public double PesoBruto { get; set; }
+    public double PesoTara { get; set; } // Peso de la jaula
+    public double CantidadEmpaques { get; set; }
+    public double ContenidoPorEmpaque { get; set; } //Libras 
 
     public string Mensaje { get; set; } = string.Empty;
 
@@ -181,6 +243,7 @@
             });
         }
         Detalle = new EntradaDetalle(); 
+        LimpiarAuxiliares();
     }
 
     public void EliminarDetalle(EntradaDetalle item)
@@ -213,5 +276,28 @@
         {
             Mensaje = "Error al intentar guardar la entrada.";
         }
+    }
+
+    //Metodo para  cakcular 
+    private void CalcularCantidad()
+    {
+        if (TipoEntrada == "Pesaje")
+        {
+            
+            Detalle.Cantidad = (int)Math.Round(PesoBruto - PesoTara);
+        }
+        else if (TipoEntrada == "Conversion")
+        {
+            
+            Detalle.Cantidad = (int)Math.Round(CantidadEmpaques * ContenidoPorEmpaque);
+        }
+    }
+    private void LimpiarAuxiliares()
+    {
+        PesoBruto = 0;
+        PesoTara = 0;
+        CantidadEmpaques = 0;
+        ContenidoPorEmpaque = 0;
+        TipoEntrada = "Directa";
     }
 }
