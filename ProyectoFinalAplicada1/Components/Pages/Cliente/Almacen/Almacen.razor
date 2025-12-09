@@ -41,7 +41,6 @@
     </div>
     <div class="row">
 
-        @* -- COLUMNA IZQUIERDA: PRODUCTOS (Sin cambios) -- *@
         <div class="col-lg-8 mt-4">
             <div class="row">
                 @foreach (var prod in ListaProductos)
@@ -74,16 +73,14 @@
             </div>
         </div>
 
-        @* -- COLUMNA DERECHA: CARRITO COLAPSABLE -- *@
         <div class="col-lg-4">
             <div class="card card-glass sticky-top shadow-lg" style="top: 20px; transition: all 0.3s ease;">
                 
-                @* CABECERA: Ahora tiene el botón para minimizar/maximizar *@
                 <div class="card-header bg-transparent d-flex justify-content-between align-items-center border-bottom border-success border-opacity-25">
                     <div class="fw-bold text-success">
                         <i class="bi bi-basket-fill"></i> Tu Canasta (@carritoService.Carrito.Sum(x => x.Cantidad))
                     </div>
-                    @* Botón Toggle *@
+                   
                     <button class="btn btn-sm btn-outline-success border-0" @onclick="ToggleCarrito">
                         @if (carritoExpandido)
                         {
@@ -96,7 +93,6 @@
                     </button>
                 </div>
 
-                @* CUERPO: Se oculta si 'carritoExpandido' es false *@
                 @if (carritoExpandido)
                 {
                     <div class="card-body" style="max-height: 60vh; overflow-y: auto;">
@@ -164,7 +160,7 @@
 @code {
     public List<Producto> ListaProductos { get; set; } = new List<Producto>();
 
-    
+
     private bool carritoExpandido = true;
     public string ValorFiltro { get; set; } = string.Empty;
     public string Filtro { get; set; } = string.Empty;
@@ -172,7 +168,8 @@
     protected override async Task OnInitializedAsync()
     {
         PageTitleService.SetTitle("Tienda");
-        ListaProductos = await productosService.Listar(p => p.Existencia > 0);
+
+        await Restablecer();
 
     }
 
@@ -195,6 +192,8 @@
             && p.NombreProducto.Contains(ValorFiltro, StringComparison.OrdinalIgnoreCase) )).ToList();
 
         }
+
+        lista = lista.Where(predicate => predicate.Existencia > 0).ToList();
 
         ListaProductos = lista;
 

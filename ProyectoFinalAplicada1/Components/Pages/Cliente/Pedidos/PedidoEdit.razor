@@ -47,18 +47,6 @@
 
                     </div>
 
-                    @* <div class="col-md-4 bg-light bg-opacity-50 rounded-3 p-3 border">
-                        <label class="form-label fw-bold mb-1">Estado del Pedido</label>
-                        <InputSelect class="form-select fw-bold text-center" 
-                                     @bind-Value="Pedido.Estado"
-                                     style="@ObtenerEstiloEstado(Pedido.Estado)">
-                            <option value="Pendiente" selected disabled>Pendiente 🕒</option>
-                            <option value="En Proceso" selected disabled>En Proceso 🍳</option>
-                            <option value="En Camino" selected disabled> En Camino 🛵</option>
-                            <option value="Entregado" selected disabled>Entregado ✅</option>
-                            <option value="Cancelado" selected disabled>Cancelado ❌</option>
-                        </InputSelect>
-                    </div> *@
                 </div>
 
                 <hr class="border-secondary opacity-25" />
@@ -105,9 +93,7 @@
       
             <div class="card-footer bg-transparent border-top-0 d-flex justify-content-between align-items-center mt-2 pt-0 pb-3 px-4">
                 <a href="/PedidoCliente/Index" class="btn btn-outline-secondary px-4">Volver</a>
-                @* <button type="submit" class="btn btn-gradiente px-5 shadow">
-                    Guardar Cambios
-                </button> *@
+                
             </div>
         </EditForm>
     </div>

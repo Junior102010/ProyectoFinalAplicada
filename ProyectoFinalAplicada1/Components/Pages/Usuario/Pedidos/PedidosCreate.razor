@@ -94,17 +94,19 @@
 
                     
                     <div class="col-md-3">
-                        <label class="form-label text-muted small fw-bold mb-1">Precio</label>
-                        <div class="input-group">
+                            <label class="form-label text-muted small fw-bold mb-1">Precio</label>
+                            <div class="input-group">
                             <span class="input-group-text bg-transparent border-end-0">$</span>
-                            <InputNumber class="form-control input-glass border-start-0" @bind-Value="Detalle.PrecioUnitario" />
+                            <InputNumber class="form-control input-glass border-start-0" @bind-Value="Detalle.PrecioUnitario" ParsingErrorMessage="El precio debe ser un número válido." readonly/>
+                            <ValidationMessage For="(() => Detalle.PrecioUnitario)" />
                         </div>
                     </div>
 
                     
                     <div class="col-md-2">
                         <label class="form-label text-muted small fw-bold mb-1" max="@Detalle.Cantidad">Cantidad</label>
-                        <InputNumber class="form-control input-glass" @bind-Value="Detalle.Cantidad" />
+                        <InputNumber class="form-control input-glass" @bind-Value="Detalle.Cantidad" ParsingErrorMessage="La Cantidad debe ser un número válido." />
+                        <ValidationMessage For="(() => Detalle.Cantidad)" />
                     </div>
 
                    
@@ -152,7 +154,7 @@
                     </table>
                 </div>
 
-                @* --- TOTALES --- *@
+                
                 <div class="row justify-content-end mt-3 me-2">
                     <div class="col-md-4 text-end p-3 rounded-3 bg-light bg-opacity-25 border border-secondary border-opacity-10">
                         <h5 class="fw-bold m-0">Total a Pagar: <span style="color: #3D5D35; font-size: 1.5rem;">@Pedido.MontoTotal.ToString("C2")</span></h5>
@@ -167,7 +169,6 @@
                 }
             </div>
 
-            @* --- FOOTER --- *@
             <div class="card-footer bg-transparent border-top-0 d-flex justify-content-between align-items-center mt-2 pt-0 pb-3 px-4">
                 <a href="/Pedido/Index" class="btn btn-outline-secondary px-4">
                     <i class="bi bi-arrow-left"></i> Volver
@@ -183,7 +184,7 @@
 @code {
     [SupplyParameterFromForm]
     public Pedido Pedido { get; set; } = new Pedido();
-    public PedidoDetalle Detalle { get; set; } = new PedidoDetalle();
+    public PedidoDetalle Detalle { get; set; } = new PedidoDetalle{Cantidad = 1};
 
     public List<Cliente> ListaClientes { get; set; } = new List<Cliente>();
     public List<Producto> ListaProductos { get; set; } = new List<Producto>();
@@ -196,7 +197,7 @@
         ListaClientes = await clientesService.Listar(c => c.ClienteId > 0);
         ListaProductos = await productosService.Listar(p => p.ProductoId > 0);
         Pedido.FechaPedido = DateTime.Now;
-        Pedido.Estado = "Pendiente"; // Estado inicial por defecto
+        Pedido.Estado = "Pendiente";
     }
 
     private void SeleccionarProducto(int idProducto)
@@ -205,7 +206,7 @@
         var prod = ListaProductos.FirstOrDefault(p => p.ProductoId == idProducto);
         if (prod != null)
         {
-            Detalle.PrecioUnitario = prod.Precio; // Asignar precio de venta automáticamente
+            Detalle.PrecioUnitario = prod.Precio; 
         }
     }
 
@@ -216,7 +217,7 @@
         if (Detalle.ProductoId <= 0) { Mensaje = "Seleccione un producto."; return; }
         if (Detalle.Cantidad <= 0) { Mensaje = "Cantidad inválida."; return; }
 
-        // Validar Stock
+        
         var enStock = ListaProductos.FirstOrDefault(p => p.ProductoId == Detalle.ProductoId);
         if (enStock != null && Detalle.Cantidad > enStock.Existencia)
         {
@@ -265,22 +266,12 @@
             return;
         }
 
-        // El servicio ya se encarga de guardar el pedido Y restar la existencia.
+        
         var guardado = await pedidosService.Guardar(Pedido);
 
         if (guardado)
         {
-            // ELIMINAR O COMENTAR ESTE BLOQUE FOREACH ENTERO
-            /* foreach (var producto in Pedido.Detalles)
-            {
-                if (producto.Producto != null)
-                {
-                    var pro = await productosService.Buscar(producto.Producto.ProductoId);
-                    pro.Existencia -= (int)producto.Cantidad;
-                    await productosService.Modificar(pro);
-                }
-            }
-            */
+           
 
             navigationManager.NavigateTo("/Pedido/Index");
         }
