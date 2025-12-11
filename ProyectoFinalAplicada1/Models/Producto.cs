@@ -7,21 +7,22 @@ public class Producto
     [Key]
     public int ProductoId { get; set; }
 
-    [Required(ErrorMessage = "El nombre es obligatorio")]
+    [Required]
     public string NombreProducto { get; set; }
 
-    [Required(ErrorMessage = "El costo es obligatorio")]
-    [Range(0.01, float.MaxValue, ErrorMessage = "El costo debe ser mayor a 0")]
+    [Required]
     public double Costo { get; set; }
 
-    [Required(ErrorMessage = "El precio es obligatorio")]
-    [Range(0.01, float.MaxValue, ErrorMessage = "El precio debe ser mayor a 0")]
+    [Required]
     public double Precio { get; set; }
 
-    [Required(ErrorMessage = "La Unidad es obligatorio")]
-    public string UnidadMedida { get; set; }
+    [Required(ErrorMessage = "El precio para empresas es obligatorio")]
+    [Range(1, 100000, ErrorMessage = "El precio debe ser mayor a 0")]
+    public double PrecioEmpresa { get; set; } 
 
-    [Required(ErrorMessage = "La categoria es obligatorio")]
+    [Required]
+    public string UnidadMedida { get; set; }
+    [Required]
     public string Categoria { get; set; }
 
     [Required]

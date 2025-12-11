@@ -52,8 +52,9 @@ builder.Services.AddScoped<ProveedoresServices>();
 builder.Services.AddScoped<PageTitleService>();
 builder.Services.AddScoped<TranferenciaServices>();
 builder.Services.AddScoped<CarritoService>();
-
-
+builder.Services.AddScoped<AbonosService>();
+builder.Services.AddScoped<AdminEmpresasService>();
+builder.Services.AddScoped<ConfiguracionService>();
 
 var app = builder.Build();
 

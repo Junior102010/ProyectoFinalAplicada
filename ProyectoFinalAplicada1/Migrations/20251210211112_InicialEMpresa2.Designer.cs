@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProyectoFinalAplicada1.DAL;
 
@@ -10,9 +11,11 @@ using ProyectoFinalAplicada1.DAL;
 namespace ProyectoFinalAplicada1.Migrations
 {
     [DbContext(typeof(Context))]
-    partial class ContextModelSnapshot : ModelSnapshot
+    [Migration("20251210211112_InicialEMpresa2")]
+    partial class InicialEMpresa2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.0");
@@ -100,6 +103,24 @@ namespace ProyectoFinalAplicada1.Migrations
                     b.ToTable("Cliente");
                 });
 
+            modelBuilder.Entity("ProyectoFinalAplicada.Models.CondicionPago", b =>
+                {
+                    b.Property<int>("CondicionPagoId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Descripcion")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("DiasCredito")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("CondicionPagoId");
+
+                    b.ToTable("CondicionPago");
+                });
+
             modelBuilder.Entity("ProyectoFinalAplicada.Models.Entrada", b =>
                 {
                     b.Property<int>("EntradaId")
@@ -147,6 +168,48 @@ namespace ProyectoFinalAplicada1.Migrations
                     b.ToTable("EntradaDetalles");
                 });
 
+            modelBuilder.Entity("ProyectoFinalAplicada.Models.ListaPrecio", b =>
+                {
+                    b.Property<int>("ListaPrecioId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("Activa")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("ListaPrecioId");
+
+                    b.ToTable("ListaPrecio");
+                });
+
+            modelBuilder.Entity("ProyectoFinalAplicada.Models.ListaPrecioDetalle", b =>
+                {
+                    b.Property<int>("DetalleId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ListaPrecioId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<double>("PrecioMayorista")
+                        .HasColumnType("REAL");
+
+                    b.Property<int>("ProductoId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("DetalleId");
+
+                    b.HasIndex("ListaPrecioId");
+
+                    b.HasIndex("ProductoId");
+
+                    b.ToTable("ListaPrecioDetalle");
+                });
+
             modelBuilder.Entity("ProyectoFinalAplicada.Models.Pedido", b =>
                 {
                     b.Property<int>("PedidoId")
@@ -164,10 +227,6 @@ namespace ProyectoFinalAplicada1.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("FechaPedido")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("MetodoPago")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<double>("MontoTotal")
@@ -237,9 +296,6 @@ namespace ProyectoFinalAplicada1.Migrations
                     b.Property<double>("Precio")
                         .HasColumnType("REAL");
 
-                    b.Property<double>("PrecioEmpresa")
-                        .HasColumnType("REAL");
-
                     b.Property<string>("UnidadMedida")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -268,26 +324,19 @@ namespace ProyectoFinalAplicada1.Migrations
                     b.ToTable("Proveedor");
                 });
 
-            modelBuilder.Entity("ProyectoFinalAplicada.Models.Sector", b =>
+            modelBuilder.Entity("ProyectoFinalAplicada.Models.TipoEmpresa", b =>
                 {
-                    b.Property<int>("SectorId")
+                    b.Property<int>("TipoEmpresaId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Municipio")
+                    b.Property<string>("Descripcion")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Nombre")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                    b.HasKey("TipoEmpresaId");
 
-                    b.Property<double>("PrecioEnvio")
-                        .HasColumnType("REAL");
-
-                    b.HasKey("SectorId");
-
-                    b.ToTable("Sector");
+                    b.ToTable("TipoEmpresa");
                 });
 
             modelBuilder.Entity("ProyectoFinalAplicada.Models.Transferencia", b =>
@@ -349,26 +398,6 @@ namespace ProyectoFinalAplicada1.Migrations
                     b.ToTable("TransferenciaImagenes");
                 });
 
-            modelBuilder.Entity("ProyectoFinalAplicada.Models.UnidadMedida", b =>
-                {
-                    b.Property<int>("UnidadId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Abreviatura")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Descripcion")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("UnidadId");
-
-                    b.ToTable("UnidadMedida");
-                });
-
             modelBuilder.Entity("ProyectoFinalAplicada.Models.Usuario", b =>
                 {
                     b.Property<int>("UsuarioId")
@@ -390,6 +419,21 @@ namespace ProyectoFinalAplicada1.Migrations
                     b.HasKey("UsuarioId");
 
                     b.ToTable("Usuario");
+                });
+
+            modelBuilder.Entity("ProyectoFinalAplicada.Models.ZonaComercial", b =>
+                {
+                    b.Property<int>("ZonaId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("NombreZona")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("ZonaId");
+
+                    b.ToTable("ZonaComercial");
                 });
 
             modelBuilder.Entity("ProyectoFinalAplicada.Models.Abono", b =>
@@ -428,6 +472,23 @@ namespace ProyectoFinalAplicada1.Migrations
                     b.HasOne("ProyectoFinalAplicada.Models.Entrada", null)
                         .WithMany("EntradaDetalles")
                         .HasForeignKey("EntradaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ProyectoFinalAplicada.Models.Producto", "Producto")
+                        .WithMany()
+                        .HasForeignKey("ProductoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Producto");
+                });
+
+            modelBuilder.Entity("ProyectoFinalAplicada.Models.ListaPrecioDetalle", b =>
+                {
+                    b.HasOne("ProyectoFinalAplicada.Models.ListaPrecio", null)
+                        .WithMany("Detalles")
+                        .HasForeignKey("ListaPrecioId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -500,6 +561,11 @@ namespace ProyectoFinalAplicada1.Migrations
             modelBuilder.Entity("ProyectoFinalAplicada.Models.Entrada", b =>
                 {
                     b.Navigation("EntradaDetalles");
+                });
+
+            modelBuilder.Entity("ProyectoFinalAplicada.Models.ListaPrecio", b =>
+                {
+                    b.Navigation("Detalles");
                 });
 
             modelBuilder.Entity("ProyectoFinalAplicada.Models.Pedido", b =>

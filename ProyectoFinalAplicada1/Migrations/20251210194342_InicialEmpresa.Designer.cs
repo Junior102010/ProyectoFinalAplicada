@@ -2,17 +2,20 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProyectoFinalAplicada1.Data;
 
 #nullable disable
 
-namespace ProyectoFinalAplicada1.Migrations
+namespace ProyectoFinalAplicada1.Migrations.ApplicationDb
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251210194342_InicialEmpresa")]
+    partial class InicialEmpresa
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.0");
@@ -176,13 +179,6 @@ namespace ProyectoFinalAplicada1.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("INTEGER");
 
-                    b.Property<bool>("EsEmpresa")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("EstadoCredito")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("INTEGER");
 
@@ -210,12 +206,6 @@ namespace ProyectoFinalAplicada1.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("RNC")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("RazonSocial")
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("Sector")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -225,9 +215,6 @@ namespace ProyectoFinalAplicada1.Migrations
 
                     b.Property<string>("TelefonoCliente")
                         .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("TelefonoNegocio")
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("TwoFactorEnabled")

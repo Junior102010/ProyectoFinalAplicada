@@ -6,8 +6,11 @@
 @using Microsoft.AspNetCore.Identity
 @using Microsoft.AspNetCore.WebUtilities
 @using ProyectoFinalAplicada1.Data
+
+
 @inject ProyectoFinalAplicada1.DAL.Context DbContext
 @inject PageTitleService PageTitleService
+@inject ConfiguracionService configService 
 
 @inject UserManager<ApplicationUser> UserManager
 @inject IUserStore<ApplicationUser> UserStore
@@ -19,7 +22,7 @@
 
 @rendermode InteractiveServer
 
-<PageTitle>Registro de Cliente</PageTitle>
+<PageTitle>Registro de Usuario</PageTitle>
 
 <div class="d-flex align-items-center justify-content-center min-vh-100 py-5" style="background-color: #F4EAD6;">
 
@@ -34,31 +37,69 @@
             </div>
 
             <h3 class="fw-bold mb-2" style="color: #3D5D35; letter-spacing: 1px;">CREAR CUENTA</h3>
-            <p class="text-muted small mb-4">Únete al club y realiza tus pedidos (Exclusivo El Factor)</p>
+            <p class="text-muted small mb-4">Únete al club y realiza tus pedidos</p>
 
             <EditForm Model="Input" method="post" OnValidSubmit="RegisterUser" FormName="register">
                 <DataAnnotationsValidator />
 
                 <div class="text-start px-2">
 
-                    @* --- DATOS PERSONALES --- *@
+                    @* --- SWITCH TIPO DE CUENTA --- *@
+                    <div class="d-flex justify-content-center mb-2">
+                        <div class="form-check form-switch p-2 rounded border" style="background-color: rgba(61,93,53,0.05); width: 100%;">
+                            <div class="d-flex justify-content-center align-items-center">
+                                <InputCheckbox @bind-Value="Input.EsEmpresa" class="form-check-input fs-4" id="switchEmpresa" style="cursor:pointer;" />
+                                <label class="form-check-label fw-bold ms-3 pt-1" for="switchEmpresa" style="color: #3D5D35; cursor:pointer;">
+                                    ¿Registrar como Negocio / Empresa?
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    @* --- DATOS GENERALES --- *@
                     <h5 class="fw-bold mt-4 mb-3 pb-2 border-bottom" style="color: #3D5D35; border-color: rgba(61,93,53,0.2) !important;">
-                        <i class="bi bi-person-lines-fill me-2"></i>DATOS PERSONALES
+                        <i class="bi @(Input.EsEmpresa ? "bi-building" : "bi-person-lines-fill") me-2"></i>
+                        @(Input.EsEmpresa ? "DATOS DEL NEGOCIO" : "DATOS PERSONALES")
                     </h5>
 
                     <div class="row g-3">
+                        @if (!Input.EsEmpresa)
+                        {
+                            @* --- CAMPOS PERSONA --- *@
+                            <div class="col-md-6">
+                                <label class="ms-3 mb-1 text-muted small fw-bold">NOMBRE</label>
+                                <InputText @bind-Value="Input.NombreCliente" class="form-control neo-input" placeholder="Ej: Juan" />
+                                <ValidationMessage For="() => Input.NombreCliente" class="text-danger small ms-3" />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="ms-3 mb-1 text-muted small fw-bold">APELLIDO</label>
+                                <InputText @bind-Value="Input.ApellidoCliente" class="form-control neo-input" placeholder="Ej: Pérez" />
+                                <ValidationMessage For="() => Input.ApellidoCliente" class="text-danger small ms-3" />
+                            </div>
+                        }
+                        else
+                        {
+                            @* --- CAMPOS EMPRESA --- *@
+                            <div class="col-md-6">
+                                <label class="ms-3 mb-1 text-muted small fw-bold">RAZÓN SOCIAL (NEGOCIO)</label>
+                                <InputText @bind-Value="Input.RazonSocial" class="form-control neo-input" placeholder="Ej: Comedor El Sazón" />
+                                <ValidationMessage For="() => Input.RazonSocial" class="text-danger small ms-3" />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="ms-3 mb-1 text-muted small fw-bold">RNC / CÉDULA</label>
+                                <InputText @bind-Value="Input.RNC" class="form-control neo-input" placeholder="RNC del negocio" />
+                                <ValidationMessage For="() => Input.RNC" class="text-danger small ms-3" />
+                            </div>
+                            <div class="col-md-12">
+                                <label class="ms-3 mb-1 text-muted small fw-bold">REPRESENTANTE (CONTACTO)</label>
+                                <InputText @bind-Value="Input.NombreCliente" class="form-control neo-input" placeholder="Nombre de quien recibe" />
+                                <ValidationMessage For="() => Input.NombreCliente" class="text-danger small ms-3" />
+                            </div>
+                        }
+
+                        @* --- COMUNES --- *@
                         <div class="col-md-6">
-                            <label class="ms-3 mb-1 text-muted small fw-bold">NOMBRE</label>
-                            <InputText @bind-Value="Input.NombreCliente" class="form-control neo-input" placeholder="Ej: Juan" />
-                            <ValidationMessage For="() => Input.NombreCliente" class="text-danger small ms-3" />
-                        </div>
-                        <div class="col-md-6">
-                            <label class="ms-3 mb-1 text-muted small fw-bold">APELLIDO</label>
-                            <InputText @bind-Value="Input.ApellidoCliente" class="form-control neo-input" placeholder="Ej: Pérez" />
-                            <ValidationMessage For="() => Input.ApellidoCliente" class="text-danger small ms-3" />
-                        </div>
-                        <div class="col-md-6">
-                            <label class="ms-3 mb-1 text-muted small fw-bold">TELÉFONO</label>
+                            <label class="ms-3 mb-1 text-muted small fw-bold">TELÉFONO / CELULAR</label>
                             <InputText @bind-Value="Input.TelefonoCliente" class="form-control neo-input" placeholder="809-000-0000" />
                             <ValidationMessage For="() => Input.TelefonoCliente" class="text-danger small ms-3" />
                         </div>
@@ -76,14 +117,12 @@
 
                     <div class="row g-3">
 
-                        @* 1. MUNICIPIO *@
+                        @* 1. MUNICIPIO (DINÁMICO) *@
                         <div class="col-md-6">
-                            <label class="ms-3 mb-1 text-muted small fw-bold">MUNICIPIO (M.T.S.)</label>
-
+                            <label class="ms-3 mb-1 text-muted small fw-bold">MUNICIPIO</label>
                             <div class="position-relative">
-                                @* Sin clases extrañas, solo neo-input para mantener el estilo base *@
                                 <InputSelect @bind-Value="SelectedMunicipio"
-                                             @bind-Value:after="ValidarMunicipio"
+                                             @bind-Value:after="FiltrarSectores"
                                              class="form-select neo-input"
                                              style="cursor: pointer; -webkit-appearance: none; appearance: none;">
                                     <option value="" selected disabled>Seleccione Municipio...</option>
@@ -92,48 +131,36 @@
                                         <option value="@m">@m</option>
                                     }
                                 </InputSelect>
-
-                                @* Icono Chevron *@
                                 <i class="bi bi-chevron-down position-absolute top-50 end-0 translate-middle-y me-3"
                                    style="color: #3D5D35; pointer-events: none;"></i>
                             </div>
-
-                            @if (!string.IsNullOrEmpty(ErrorMunicipio))
-                            {
-                                <div class="alert alert-danger mt-2 py-1 px-2 small shadow-sm">
-                                    <i class="bi bi-x-circle-fill"></i> @ErrorMunicipio
-                                </div>
-                            }
                         </div>
 
-                        @* 2. SECTOR *@
+                        @* 2. SECTOR (DINÁMICO DESDE BD) *@
                         <div class="col-md-6">
                             <label class="ms-3 mb-1 text-muted small fw-bold">SECTOR</label>
-
-                            @if (SectoresDisponibles.Any())
-                            {
-                                @* MODO ACTIVO: Lista desplegable *@
-                                <div class="position-relative">
-                                    <InputSelect @bind-Value="Input.Sector"
-                                                 class="form-select neo-input"
-                                                 style="-webkit-appearance: none; appearance: none; cursor: pointer;">
+                            <div class="position-relative">
+                                <InputSelect @bind-Value="Input.Sector"
+                                             class="form-select neo-input"
+                                             disabled="@(!EsMunicipioValido)"
+                                             style="@($"cursor: pointer; -webkit-appearance: none; appearance: none; background-color: {(EsMunicipioValido ? "white" : "#f8f9fa")};")">
+                                    
+                                    @if (!EsMunicipioValido)
+                                    {
+                                        <option value="" selected>Seleccione Municipio Primero...</option>
+                                    }
+                                    else
+                                    {
                                         <option value="" selected disabled>Seleccione su Sector</option>
-                                        @foreach (var s in SectoresDisponibles)
+                                        @foreach (var s in SectoresFiltrados)
                                         {
-                                            <option value="@s">@s</option>
+                                            <option value="@s.Nombre">@s.Nombre</option>
                                         }
-                                    </InputSelect>
-
-                                    <i class="bi bi-chevron-down position-absolute top-50 end-0 translate-middle-y me-3"
-                                       style="color: #3D5D35; pointer-events: none;"></i>
-                                </div>
-                            }
-                            else
-                            {
-                                @* MODO INACTIVO: Input deshabilitado simple *@
-                                <input type="text" class="form-control neo-input bg-light" disabled
-                                       placeholder="Seleccione Municipio..." />
-                            }
+                                    }
+                                </InputSelect>
+                                <i class="bi bi-chevron-down position-absolute top-50 end-0 translate-middle-y me-3"
+                                   style="color: #3D5D35; pointer-events: none;"></i>
+                            </div>
                             <ValidationMessage For="() => Input.Sector" class="text-danger small ms-3" />
                         </div>
 
@@ -178,7 +205,7 @@
                     <button type="submit" class="profile_button w-100 py-3 fw-bold fs-5 shadow-sm"
                             style="background: #C15349; color: white;"
                             disabled="@(!EsMunicipioValido)">
-                        <i class="bi bi-person-plus-fill me-2"></i> REGISTRARSE
+                        <i class="bi bi-check-circle-fill me-2"></i> @(Input.EsEmpresa ? "REGISTRAR NEGOCIO" : "REGISTRARSE")
                     </button>
                 </div>
 
@@ -189,7 +216,7 @@
                     </a>
                 </div>
 
-                <div style="height: 300px;"></div>
+                <div style="height: 100px;"></div>
 
             </EditForm>
         </div>
@@ -207,55 +234,79 @@
 
     private string? Message => identityErrors is null ? null : $"Error: {string.Join(", ", identityErrors.Select(error => error.Description))}";
 
-    // Lógica
+    // Lógica Dinámica
     private string SelectedMunicipio { get; set; } = "";
-    private string ErrorMunicipio { get; set; } = "";
     private bool EsMunicipioValido { get; set; } = false;
-    private List<string> SectoresDisponibles { get; set; } = new();
+    
+    // Listas cargadas desde BD
+    private List<Sector> TodosLosSectores { get; set; } = new();
+    private List<Sector> SectoresFiltrados { get; set; } = new();
+    
+    // Municipios únicos (podrían venir de BD también, pero los extraemos de los sectores)
+    private List<string> ListaMunicipios = new();
 
-    private List<string> ListaMunicipios = new()
-    {
-        "El Factor",
-        "Nagua",
-        "Cabrera",
-        "Río San Juan"
-    };
-
-    private List<string> SectoresElFactor = new()
-    {
-        "Centro del Pueblo", "Pueblo Nuevo", "El Barro", "Los Pajones",
-        "Los Indios", "Telanza", "San José"
-    };
-
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         PageTitleService.SetTitle("Registrar Cuenta");
         Input ??= new();
+        
+        // Cargar sectores desde la base de datos
+        TodosLosSectores = await configService.ListarSectores();
+        
+        // Extraer lista de municipios únicos disponibles
+        ListaMunicipios = TodosLosSectores.Select(s => s.Municipio).Distinct().ToList();
+        
+        // Si no hay municipios en BD, agregamos unos por defecto
+        if (!ListaMunicipios.Any())
+        {
+            ListaMunicipios = new() { "El Factor", "Nagua", "Cabrera" };
+        }
     }
 
-    private void ValidarMunicipio()
+    private void FiltrarSectores()
     {
-        if (SelectedMunicipio == "El Factor")
+        if (!string.IsNullOrEmpty(SelectedMunicipio))
         {
-            EsMunicipioValido = true;
-            ErrorMunicipio = "";
-            SectoresDisponibles = SectoresElFactor;
+            SectoresFiltrados = TodosLosSectores.Where(s => s.Municipio == SelectedMunicipio).ToList();
+            EsMunicipioValido = true; // Siempre válido si está en la lista
+            Input.Sector = ""; // Resetear selección
         }
         else
         {
             EsMunicipioValido = false;
-            ErrorMunicipio = $"Lo sentimos, no hay servicio en {SelectedMunicipio} por el momento.";
-            SectoresDisponibles = new();
-            Input.Sector = "";
+            SectoresFiltrados.Clear();
         }
     }
 
     public async Task RegisterUser(EditContext editContext)
     {
-        if (SelectedMunicipio != "El Factor")
+        if (string.IsNullOrEmpty(SelectedMunicipio))
         {
-            identityErrors = new List<IdentityError> { new IdentityError { Description = "Municipio no válido." } };
+            identityErrors = new List<IdentityError> { new IdentityError { Description = "Debe seleccionar un municipio." } };
             return;
+        }
+
+        // Validación condicional
+        if (Input.EsEmpresa)
+        {
+            if (string.IsNullOrWhiteSpace(Input.RazonSocial))
+            {
+                identityErrors = new List<IdentityError> { new IdentityError { Description = "La Razón Social es obligatoria para empresas." } };
+                return;
+            }
+            if (string.IsNullOrWhiteSpace(Input.RNC))
+            {
+                identityErrors = new List<IdentityError> { new IdentityError { Description = "El RNC es obligatorio para empresas." } };
+                return;
+            }
+        }
+        else // Cliente Normal
+        {
+            if (string.IsNullOrWhiteSpace(Input.ApellidoCliente))
+            {
+                identityErrors = new List<IdentityError> { new IdentityError { Description = "El apellido es obligatorio." } };
+                return;
+            }
         }
 
         var user = CreateUser();
@@ -263,6 +314,20 @@
         await UserStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
         var emailStore = GetEmailStore();
         await emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
+
+        // Campos personalizados
+        user.NombreCliente = Input.NombreCliente;
+        user.ApellidoCliente = Input.EsEmpresa ? "" : Input.ApellidoCliente;
+        user.TelefonoCliente = Input.TelefonoCliente;
+        user.Sector = $"{Input.Sector} ({SelectedMunicipio})"; // Guardamos Sector + Municipio
+        user.CalleCliente = Input.CalleCliente;
+        user.ViviendaCliente = Input.ViviendaCliente;
+        user.DescripcionCliente = Input.DescripcionCliente;
+        
+        user.EsEmpresa = Input.EsEmpresa;
+        user.RazonSocial = Input.RazonSocial;
+        user.RNC = Input.RNC;
+        user.TelefonoNegocio = Input.TelefonoCliente;
 
         var result = await UserManager.CreateAsync(user, Input.Password);
 
@@ -273,10 +338,10 @@
             var newCliente = new ProyectoFinalAplicada.Models.Cliente
             {
                 UserId = userId,
-                NombreCliente = Input.NombreCliente,
-                ApellidoCliente = Input.ApellidoCliente,
+                NombreCliente = Input.EsEmpresa ? Input.RazonSocial : Input.NombreCliente, 
+                ApellidoCliente = Input.EsEmpresa ? "" : Input.ApellidoCliente,
                 TelefonoCliente = Input.TelefonoCliente,
-                Sector = $"{Input.Sector} (El Factor)",
+                Sector = $"{Input.Sector} ({SelectedMunicipio})",
                 CalleCliente = Input.CalleCliente,
                 ViviendaCliente = Input.ViviendaCliente,
                 DescripcionCliente = Input.DescripcionCliente,
@@ -340,11 +405,13 @@
         [EmailAddress]
         public string Email { get; set; } = "";
 
-        [Required(ErrorMessage = "El nombre es obligatorio")]
-        public string NombreCliente { get; set; } = "";
-
-        [Required(ErrorMessage = "El apellido es obligatorio")]
+        public bool EsEmpresa { get; set; } = false;
+        public string RazonSocial { get; set; } = "";
+        public string RNC { get; set; } = "";
         public string ApellidoCliente { get; set; } = "";
+
+        [Required(ErrorMessage = "El nombre/contacto es obligatorio")]
+        public string NombreCliente { get; set; } = "";
 
         [Required(ErrorMessage = "El teléfono es obligatorio")]
         public string TelefonoCliente { get; set; } = "";

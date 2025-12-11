@@ -1,9 +1,13 @@
 ﻿@page "/PedidoCliente/Create"
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.EntityFrameworkCore
+@using ProyectoFinalAplicada1.Data
+@using Microsoft.AspNetCore.Identity
+
 @rendermode InteractiveServer
 @inject ProyectoFinalAplicada1.DAL.Context _context
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject UserManager<ApplicationUser> userManager
 
 @inject PedidosServices pedidosService
 @inject ClientesServices clientesService
@@ -28,13 +32,22 @@
 
             <div class="card-body">
 
-               
+                @* --- DATOS DE ENTREGA --- *@
                 <div class="row mb-4">
                     <div class="col-md-12">
                         <h6 class="fw-bold text-muted mb-3 border-bottom pb-2">
                             <i class="bi bi-person-lines-fill"></i> Datos de Entrega
                         </h6>
                     </div>
+
+                    @if (EsEmpresa)
+                    {
+                        <div class="col-12 mb-3">
+                            <div class="alert alert-info py-2">
+                                <i class="bi bi-building"></i> <strong>Cuenta Empresarial:</strong> @RazonSocial (RNC: @RNC)
+                            </div>
+                        </div>
+                    }
 
                     <div class="col-md-6 mb-3">
                         <label class="form-label text-muted small fw-bold mb-1">Nombre</label>
@@ -54,23 +67,15 @@
 
                     <div class="col-md-12">
                         <div class="form-check form-switch p-3 bg-warning bg-opacity-10 rounded border border-warning border-opacity-25 col-5 d-flex align-items-center">
-    
                             <label class="form-check-label fw-bold me-auto" for="chkDelivery">
                                 <i class="bi bi-bicycle"></i> Solicitar Delivery (+RD$ @CostoEnvio.ToString("N2"))
                             </label>
-
-                            <InputCheckbox 
-                                class="form-check-input ms-auto" 
-                                @bind-Value="Pedido.Delivery" 
-                                id="chkDelivery" 
-                                style="cursor: pointer;" 
-                                @oninput="ActualizarTotal" />
-
+                            <InputCheckbox class="form-check-input ms-auto" @bind-Value="Pedido.Delivery" id="chkDelivery" style="cursor: pointer;" @oninput="ActualizarTotal" />
                         </div>
                     </div>
                 </div>
 
-               
+                @* --- MÉTODO DE PAGO (MODIFICADO) --- *@
                 <div class="row mb-4">
                     <div class="col-md-12">
                         <h6 class="fw-bold text-muted mb-3 border-bottom pb-2">
@@ -83,33 +88,37 @@
                         <InputSelect class="form-select input-glass fw-bold text-primary" @bind-Value="MetodoPagoSeleccionado">
                             <option value="Efectivo">💵 Efectivo (Contra Entrega)</option>
                             <option value="Transferencia">🏦 Transferencia Bancaria</option>
+
+                            @* OPCIÓN DE CRÉDITO SOLO PARA EMPRESAS *@
+                            @if (EsEmpresa)
+                            {
+                                <option value="Credito" class="fw-bold text-success">💳 Crédito / A Cuenta (CXC)</option>
+                            }
                         </InputSelect>
                     </div>
 
-                    <div class="col-md-6">
+                    <div class="col-md-6 mt-2 mt-md-0">
                         @if (MetodoPagoSeleccionado == "Transferencia")
                         {
                             <div class="alert alert-info shadow-sm mb-0">
-                                <small>
-                                    <strong><i class="bi bi-info-circle"></i> Instrucciones:</strong><br />
-                                    Su pedido quedará en estado <strong>Pendiente de Pago</strong>.
-                                    Por favor realice la transferencia y envíe el comprobante vía WhatsApp o súbalo en su perfil.
-                                </small>
+                                <small><strong><i class="bi bi-info-circle"></i> Instrucciones:</strong> Su pedido quedará <strong>Pendiente de Pago</strong>. Envíe el comprobante por WhatsApp.</small>
+                            </div>
+                        }
+                        else if (MetodoPagoSeleccionado == "Credito")
+                        {
+                            <div class="alert alert-primary shadow-sm mb-0">
+                                <small><strong><i class="bi bi-credit-card-2-front"></i> Crédito Comercial:</strong> El monto se cargará a su cuenta por cobrar. Sujeto a límite de crédito.</small>
                             </div>
                         }
                         else
                         {
                             <div class="alert alert-success shadow-sm mb-0">
-                                <small>
-                                    <strong><i class="bi bi-check-circle"></i> Efectivo:</strong><br />
-                                    Pagará al momento de recibir su pedido.
-                                </small>
+                                <small><strong><i class="bi bi-check-circle"></i> Efectivo:</strong> Pagará al momento de recibir su pedido.</small>
                             </div>
                         }
                     </div>
                 </div>
 
-                
                 <h6 class="fw-bold text-muted mb-3 border-bottom pb-2 mt-4">
                     <i class="bi bi-cart3"></i> Resumen de Productos
                 </h6>
@@ -128,9 +137,7 @@
                             @foreach (var item in Pedido.Detalles)
                             {
                                 <tr style="border-bottom: 1px solid rgba(0,0,0,0.05);">
-                                    <td class="ps-3 fw-bold text-secondary">
-                                        @item.Producto?.NombreProducto
-                                    </td>
+                                    <td class="ps-3 fw-bold text-secondary">@item.Producto?.NombreProducto</td>
                                     <td class="text-center small">@item.PrecioUnitario.ToString("C2")</td>
                                     <td class="text-center fw-bold">@item.Cantidad</td>
                                     <td class="text-end pe-3 fw-bold text-success">@item.Importe.ToString("C2")</td>
@@ -165,9 +172,8 @@
                 }
             </div>
 
-           
             <div class="card-footer bg-transparent border-top-0 d-flex justify-content-between align-items-center mt-2 pt-0 pb-3 px-4">
-                <a href="/PedidoCliente/Index" class="btn btn-outline-secondary px-4">
+                <a href="/Tienda" class="btn btn-outline-secondary px-4">
                     <i class="bi bi-arrow-left"></i> Volver
                 </a>
                 <button type="submit" class="btn btn-gradiente px-5 py-3 shadow fs-5" disabled="@(!Pedido.Detalles.Any())">
@@ -189,18 +195,36 @@
     public string Mensaje { get; set; } = string.Empty;
     private const double CostoEnvio = 15.00;
 
+    public bool EsEmpresa { get; set; } = false;
+    public string RazonSocial { get; set; } = "";
+    public string RNC { get; set; } = "";
+
     protected override async Task OnInitializedAsync()
     {
         IdCliente = await GetClienteIdAsync();
+
+      
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var userPrincipal = authState.User;
+        if (userPrincipal.Identity != null && userPrincipal.Identity.IsAuthenticated)
+        {
+            var user = await userManager.GetUserAsync(userPrincipal);
+            if (user != null)
+            {
+                EsEmpresa = user.EsEmpresa;
+                RazonSocial = user.RazonSocial ?? "";
+                RNC = user.RNC ?? "";
+            }
+        }
 
         if (IdCliente > 0)
         {
             var cliente = await clientesService.Buscar(IdCliente);
             if (cliente != null)
             {
-                NombreClienteDisplay = $"{cliente.NombreCliente} {cliente.ApellidoCliente}";
+                NombreClienteDisplay = EsEmpresa ? RazonSocial : $"{cliente.NombreCliente} {cliente.ApellidoCliente}";
                 TelefonoClienteDisplay = cliente.TelefonoCliente;
-               
+
                 if (string.IsNullOrEmpty(Pedido.ReferenciaSitio))
                 {
                     Pedido.ReferenciaSitio = $"{cliente.Sector}, {cliente.CalleCliente} #{cliente.ViviendaCliente}";
@@ -208,10 +232,8 @@
             }
         }
 
-        
         if (carritoService.Carrito.Any())
         {
-            
             Pedido.Detalles = carritoService.Carrito.ToList();
             CalcularTotal();
         }
@@ -246,10 +268,9 @@
 
     public async Task Guardar()
     {
-      
         if (IdCliente <= 0)
         {
-            Mensaje = "Error: No se ha identificado su cuenta de cliente. Por favor contacte soporte.";
+            Mensaje = "Error: No se ha identificado su cuenta de cliente.";
             return;
         }
 
@@ -260,16 +281,40 @@
         }
 
        
-        Pedido.ClienteId = IdCliente;
-        Pedido.Cliente = null; 
+        if (EsEmpresa)
+        {
+            foreach (var item in Pedido.Detalles)
+            {
+                if (item.Producto?.UnidadMedida == "LB" && item.Cantidad < 25)
+                {
+                    Mensaje = $"Error: El producto '{item.Producto.NombreProducto}' requiere un mínimo de 25 Libras para aplicar el precio de mayorista.";
+                    return;
+                }
+            }
+        }
 
-        
+        Pedido.ClienteId = IdCliente;
+        Pedido.Cliente = null;
+        Pedido.MetodoPago = MetodoPagoSeleccionado;
+
+      
         if (MetodoPagoSeleccionado == "Transferencia")
         {
             Pedido.Estado = "Pendiente de Pago";
             Pedido.ReferenciaSitio += " [PAGO: TRANSFERENCIA]";
         }
-        else
+        else if (MetodoPagoSeleccionado == "Credito") 
+        {
+            
+            if (!EsEmpresa)
+            {
+                Mensaje = "Error: El pago a crédito solo está disponible para empresas autorizadas.";
+                return;
+            }
+            Pedido.Estado = "Enviado"; 
+            Pedido.ReferenciaSitio += " [CREDITO COMERCIAL]";
+        }
+        else 
         {
             Pedido.Estado = "Pendiente";
             Pedido.ReferenciaSitio += " [PAGO: EFECTIVO]";
@@ -277,15 +322,13 @@
 
         CalcularTotal();
 
-    
         foreach (var detalle in Pedido.Detalles)
         {
-            detalle.PedidoId = 0; 
-            detalle.DetalleId = 0; 
-            detalle.Producto = null; 
+            detalle.PedidoId = 0;
+            detalle.DetalleId = 0;
+            detalle.Producto = null;
         }
 
-      
         var guardado = await pedidosService.Guardar(Pedido);
 
         if (guardado)

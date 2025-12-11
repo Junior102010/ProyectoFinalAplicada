@@ -1,5 +1,7 @@
 ﻿@page "/Tienda"
 @using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Identity
+@using ProyectoFinalAplicada1.Data
 
 @rendermode InteractiveServer
 
@@ -7,49 +9,72 @@
 @inject CarritoService carritoService
 @inject NavigationManager navigationManager
 @inject PageTitleService PageTitleService
+@inject AuthenticationStateProvider authStateProvider
+@inject UserManager<ApplicationUser> userManager
 
 @attribute [Authorize(Roles = "Cliente")]
 
 <PageTitle>Almacén Virtual</PageTitle>
 
 <div class="container-fluid mt-4">
+    
+    @* AVISO SI ES EMPRESA *@
+    @if (EsEmpresa)
+    {
+        <div class="alert alert-info py-2 mb-3 shadow-sm border-0 d-flex align-items-center">
+            <i class="bi bi-building-fill text-primary me-2 fs-4"></i>
+            <div>
+                <strong>Modo Mayorista Activo:</strong> Precios especiales aplicados.<br />
+                <small class="fst-italic text-muted">* Nota: Los productos por libra (LB) requieren un mínimo de 25 unidades.</small>
+            </div>
+        </div>
+    }
+
     <div class="row">
-                <div class="col-4">
-                    <label class="form-label text-muted small fw-bold mb-1">Filtrar por Categoria</label>
-                     <InputSelect class="form-select input-glass" @bind-Value="Filtro">
-                            <option value="Ninguna">Ninguna</option>
-                            <option value="Carnes">Carnes</option>
-                            <option value="Granos">Granos</option>
-                            <option value="Verduras">Verduras</option>
-                            <option value="Vegetales">Vegetales</option>
-                            <option value="Ensaladas">Ensaladas</option>
-                            <option value="Frutas">Frutas</option>
-                            <option value="Sazones">Sazones</option>
-                            <option value="Víveres">Víveres</option>
-                        </InputSelect>
-                </div>
-               
-                <div class="col-md-4">
-                    <label class="form-label text-muted small fw-bold mb-1">Buscar</label>
-                    <div class="input-group">
-                        <input class="form-control input-glass" @bind="ValorFiltro" placeholder="Nombre del Producto..." />
-                        <button type="button" class="btn btn-outline-success bi bi-search" @onclick="Buscar"></button>
-                        <button type="button" class="btn btn-outline-secondary bi bi-arrow-counterclockwise" @onclick="Restablecer" title="Limpiar"></button>
-                    </div>
-                </div>
+        <div class="col-4">
+            <label class="form-label text-muted small fw-bold mb-1">Filtrar por Categoria</label>
+             <InputSelect class="form-select input-glass" @bind-Value="Filtro">
+                    <option value="Ninguna">Ninguna</option>
+                    <option value="Carnes">Carnes</option>
+                    <option value="Granos">Granos</option>
+                    <option value="Verduras">Verduras</option>
+                    <option value="Vegetales">Vegetales</option>
+                    <option value="Ensaladas">Ensaladas</option>
+                    <option value="Frutas">Frutas</option>
+                    <option value="Sazones">Sazones</option>
+                    <option value="Víveres">Víveres</option>
+                </InputSelect>
+        </div>
         
+        <div class="col-md-4">
+            <label class="form-label text-muted small fw-bold mb-1">Buscar</label>
+            <div class="input-group">
+                <input class="form-control input-glass" @bind="ValorFiltro" placeholder="Nombre del Producto..." />
+                <button type="button" class="btn btn-outline-success bi bi-search" @onclick="Buscar"></button>
+                <button type="button" class="btn btn-outline-secondary bi bi-arrow-counterclockwise" @onclick="Restablecer" title="Limpiar"></button>
+            </div>
+        </div>
     </div>
+
     <div class="row">
 
+        @* -- COLUMNA IZQUIERDA: PRODUCTOS -- *@
         <div class="col-lg-8 mt-4">
             <div class="row">
                 @foreach (var prod in ListaProductos)
                 {
+                    // Lógica visual del precio
+                    double precioMostrar = EsEmpresa ? prod.PrecioEmpresa : prod.Precio;
+
                     <div class="col-md-4 col-sm-6 mb-4">
                         <div class="card card-glass h-100 border-0 shadow-sm product-card">
                             
                             <div class="text-center p-3 bg-light rounded-top position-relative" style="height: 160px;">
                                 <img src="/imagenes/Logo.png" class="img-fluid" style="max-height: 100%; object-fit: contain; opacity: 0.8;" />
+                                @if (EsEmpresa)
+                                {
+                                    <span class="position-absolute top-0 end-0 badge bg-primary m-2">Mayorista</span>
+                                }
                             </div>
 
                             <div class="card-body d-flex flex-column">
@@ -58,7 +83,9 @@
                                     <span class="badge bg-secondary bg-opacity-25 text-dark border border-secondary border-opacity-25">
                                         @prod.UnidadMedida
                                     </span>
-                                    <h5 class="text-success fw-bold m-0">@prod.Precio.ToString("C0")</h5>
+                                    <h5 class="@(EsEmpresa ? "text-primary" : "text-success") fw-bold m-0">
+                                        @precioMostrar.ToString("C0")
+                                    </h5>
                                 </div>
 
                                 <div class="mt-auto pt-3">
@@ -73,6 +100,7 @@
             </div>
         </div>
 
+        @* -- COLUMNA DERECHA: CARRITO -- *@
         <div class="col-lg-4">
             <div class="card card-glass sticky-top shadow-lg" style="top: 20px; transition: all 0.3s ease;">
                 
@@ -80,7 +108,6 @@
                     <div class="fw-bold text-success">
                         <i class="bi bi-basket-fill"></i> Tu Canasta (@carritoService.Carrito.Sum(x => x.Cantidad))
                     </div>
-                   
                     <button class="btn btn-sm btn-outline-success border-0" @onclick="ToggleCarrito">
                         @if (carritoExpandido)
                         {
@@ -124,6 +151,11 @@
                                                 <i class="bi bi-trash-fill"></i>
                                             </button>
                                         </div>
+                                        @* Aviso si aplica mínimo *@
+                                        @if(EsEmpresa && item.Producto?.UnidadMedida == "LB")
+                                        {
+                                            <small class="text-primary d-block mt-1" style="font-size: 0.7rem;">Mínimo 25 LB aplicado</small>
+                                        }
                                     </li>
                                 }
                             </ul>
@@ -138,7 +170,6 @@
                     </div>
                 }
 
-                
                 <div class="card-footer bg-transparent border-top border-success border-opacity-25 pt-3">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5 class="text-muted m-0">Total:</h5>
@@ -159,24 +190,35 @@
 
 @code {
     public List<Producto> ListaProductos { get; set; } = new List<Producto>();
-
-
+    
     private bool carritoExpandido = true;
     public string ValorFiltro { get; set; } = string.Empty;
-    public string Filtro { get; set; } = string.Empty;
+    public string Filtro { get; set; } = "Ninguna";
+    
+    // --- LÓGICA EMPRESA ---
+    public bool EsEmpresa { get; set; } = false;
 
     protected override async Task OnInitializedAsync()
     {
         PageTitleService.SetTitle("Tienda");
+        ListaProductos = await productosService.Listar(p => p.Existencia > 0);
 
-        await Restablecer();
-
+        // Detectar Usuario y si es Empresa
+        var authState = await authStateProvider.GetAuthenticationStateAsync();
+        var userPrincipal = authState.User;
+        if(userPrincipal.Identity != null && userPrincipal.Identity.IsAuthenticated)
+        {
+            var user = await userManager.GetUserAsync(userPrincipal);
+            if(user != null)
+            {
+                EsEmpresa = user.EsEmpresa;
+            }
+        }
     }
 
     private async Task Buscar()
     {
-        var lista = await productosService.Listar(p => p.ProductoId > 0);
-
+        var lista = await productosService.Listar(p => p.Existencia > 0);
 
         if (!string.IsNullOrWhiteSpace(ValorFiltro) && Filtro.Equals("Ninguna"))
         {
@@ -190,13 +232,8 @@
         {
             lista = lista.Where((p => p.Categoria.Contains(Filtro, StringComparison.OrdinalIgnoreCase)
             && p.NombreProducto.Contains(ValorFiltro, StringComparison.OrdinalIgnoreCase) )).ToList();
-
         }
-
-        lista = lista.Where(predicate => predicate.Existencia > 0).ToList();
-
         ListaProductos = lista;
-
     }
 
     private async Task Restablecer()
@@ -205,18 +242,23 @@
         Filtro = "Ninguna";
         await Buscar();
     }
-    private void ToggleCarrito()
-    {
-        carritoExpandido = !carritoExpandido;
-    }
+    private void ToggleCarrito() => carritoExpandido = !carritoExpandido;
 
     private void AgregarAlCarrito(Producto prod)
     {
+        // 1. Determinar precio (Normal o Empresa)
+        double precioAUsar = EsEmpresa ? prod.PrecioEmpresa : prod.Precio;
+        
+        // 2. Regla de negocio: Si es Empresa y LB, comenzamos con 25.
+        int cantidadInicial = (EsEmpresa && prod.UnidadMedida == "LB") ? 25 : 1;
+
         var itemExistente = carritoService.Carrito.FirstOrDefault(p => p.ProductoId == prod.ProductoId);
 
         if (itemExistente != null)
         {
             itemExistente.Cantidad++;
+            // Actualizamos precio por si acaso
+            itemExistente.PrecioUnitario = precioAUsar; 
             itemExistente.Importe = itemExistente.Cantidad * itemExistente.PrecioUnitario;
         }
         else
@@ -225,12 +267,11 @@
             {
                 ProductoId = prod.ProductoId,
                 Producto = prod,
-                Cantidad = 1,
-                PrecioUnitario = prod.Precio,
-                Importe = prod.Precio
+                Cantidad = cantidadInicial, // Aquí entra el 25
+                PrecioUnitario = precioAUsar,
+                Importe = cantidadInicial * precioAUsar
             };
             carritoService.AgregarItem(item);
-            
             
             if (!carritoExpandido) carritoExpandido = true;
         }
@@ -244,7 +285,10 @@
 
     private void DisminuirCantidad(PedidoDetalle item)
     {
-        if (item.Cantidad > 1)
+        // 3. Regla de negocio: Validar límite inferior
+        int limiteMinimo = (EsEmpresa && item.Producto?.UnidadMedida == "LB") ? 25 : 1;
+
+        if (item.Cantidad > limiteMinimo)
         {
             item.Cantidad--;
             item.Importe = item.Cantidad * item.PrecioUnitario;
@@ -255,13 +299,7 @@
         }
     }
 
-    private void EliminarItem(PedidoDetalle item)
-    {
-        carritoService.Carrito.Remove(item);
-    }
+    private void EliminarItem(PedidoDetalle item) => carritoService.Carrito.Remove(item);
 
-    private void IrAPagar()
-    {
-        navigationManager.NavigateTo("/PedidoCliente/Create");
-    }
+    private void IrAPagar() => navigationManager.NavigateTo("/PedidoCliente/Create");
 }

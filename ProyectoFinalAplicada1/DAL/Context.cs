@@ -3,6 +3,7 @@ using ProyectoFinalAplicada.Models;
 using ProyectoFinalAplicada1.Data;
 
 
+
 namespace ProyectoFinalAplicada1.DAL;
 
 public class Context : DbContext
@@ -30,6 +31,10 @@ public class Context : DbContext
     public DbSet<Transferencia> Transferencia { get; set; }
 
     public DbSet<EntradaDetalle> EntradaDetalles { get; set; }
+    public DbSet<Abono> Abono { get; set; }
+    public DbSet<UnidadMedida> UnidadMedida { get; set; }
+    public DbSet<Sector> Sector { get; set; }
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
