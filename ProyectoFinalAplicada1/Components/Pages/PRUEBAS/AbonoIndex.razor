@@ -84,7 +84,7 @@
                                     </td>
 
                                     <td class="text-center">
-                                        @* BOTÓN QUE LLEVA AL CREAR CON EL ID PRESELECCIONADO *@
+                                        
                                         <a href="/Abono/Create/@item.Cliente.ClienteId" class="btn btn-sm btn-outline-primary rounded-pill px-3 shadow-sm">
                                             <i class="bi bi-cash-coin"></i> Abonar
                                         </a>
@@ -106,7 +106,7 @@
     protected override async Task OnInitializedAsync()
     {
         PageTitleService.SetTitle("Cuentas por Cobrar");
-        // Cargamos la lista especial desde el servicio
+    
         ListaDeudas = await abonosService.ObtenerReporteDeudas();
         Cargando = false;
     }

@@ -1,4 +1,4 @@
-﻿@page "/Admin/ValidacionEmpresas"
+﻿@page "/Admin/Mayoristas"
 
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Identity
@@ -25,7 +25,14 @@
             <span class="badge bg-success bg-opacity-25 text-success fs-6 px-3 py-2 border border-success">
                 Total Empresas: @ListaEmpresas.Count
             </span>
+            <a href="/Abono/Index" type="button" class="btn btn-outline-success bi bi-coin"> Abonar</a>
+            
         </div>
+        <div class="row">
+
+            
+        </div>
+        
 
         <div class="card-body">
             @if (Cargando)
@@ -140,7 +147,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        PageTitleService.SetTitle("Validar Empresas");
+        PageTitleService.SetTitle("Moyoristas");
         await CargarDatos();
     }
 
