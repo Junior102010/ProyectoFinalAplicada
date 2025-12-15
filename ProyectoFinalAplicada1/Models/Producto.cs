@@ -13,7 +13,9 @@ public class Producto
     [Required]
     public double Costo { get; set; }
 
-    [Required]
+    [Required(ErrorMessage = "El precio para cliente es obligatorio")]
+    [Range(1, 100000, ErrorMessage = "El precio debe ser mayor a 0")]
+
     public double Precio { get; set; }
 
     [Required(ErrorMessage = "El precio para empresas es obligatorio")]
