@@ -21,9 +21,7 @@ public class Pedido
     [ForeignKey("ClienteId")]
     public Cliente? Cliente { get; set; }
 
-    [Required(ErrorMessage = "El monto total es obligatorio.")]
     [Range(0.01, double.MaxValue, ErrorMessage = "El Monto Total debe ser mayor que cero.")]
-    [DataType(DataType.Currency)]
     public double MontoTotal { get; set; }
 
     [Required(ErrorMessage = "El método de pago es obligatorio.")]
@@ -37,9 +35,8 @@ public class Pedido
     [Required(ErrorMessage = "Debe especificar si requiere Delivery (true/false).")]
     public bool Delivery { get; set; }
 
-    [Required(ErrorMessage = "La referencia del sitio es obligatoria.")]
-    [StringLength(250, MinimumLength = 5, ErrorMessage = "La Referencia del sitio debe tener entre 5 y 250 caracteres.")]
-    public string? ReferenciaSitio { get; set; }
+    [StringLength(250, ErrorMessage = "La referencia no puede exceder los 250 caracteres.")]
+    public string? ReferenciaSitio { get; set; } 
 
     public ICollection<PedidoDetalle> Detalles { get; set; } = new List<PedidoDetalle>();
 }
