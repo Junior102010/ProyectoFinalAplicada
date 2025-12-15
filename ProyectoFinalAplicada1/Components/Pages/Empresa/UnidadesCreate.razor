@@ -1,9 +1,10 @@
-﻿@page "/Unidades/Create"
-@page "/Unidades/Edit/{UnidadId:int}"
+﻿@page "/Logistica/Unidades/Create"
+@page "/Logistica/Unidades/Edit/{UnidadId:int}"
 
 @inject ConfiguracionService configService
 @inject NavigationManager navigationManager
 @inject PageTitleService PageTitleService
+@using Microsoft.AspNetCore.Authorization
 
 @rendermode InteractiveServer
 @attribute [Authorize(Roles = "Administrador")]
@@ -12,21 +13,20 @@
 
 <div class="container">
     <div class="card card-glass rounded-4 p-2 shadow-sm mx-auto" style="max-width: 500px;">
-        
+
         <div class="card-header bg-transparent border-0 text-center pb-0">
             <h4 class="fw-bold text-primary">
-                <i class="bi @(UnidadId > 0 ? "bi-pencil-square" : "bi-plus-circle")"></i> 
+                <i class="bi @(UnidadId > 0 ? "bi-pencil-square" : "bi-plus-circle")"></i>
                 @(UnidadId > 0 ? "Editar Unidad" : "Nueva Unidad")
             </h4>
         </div>
 
-        @* IMPORTANTE: FormName único para evitar el error de POST *@
         <EditForm Model="Unidad" OnValidSubmit="Guardar" FormName="GestionUnidades">
             <DataAnnotationsValidator />
 
             <div class="card-body">
+
                 
-                @* Descripción *@
                 <div class="mb-4">
                     <label class="form-label text-muted fw-bold small">DESCRIPCIÓN</label>
                     <div class="input-group">
@@ -36,7 +36,7 @@
                     <ValidationMessage For="() => Unidad.Descripcion" />
                 </div>
 
-                @* Abreviatura *@
+                
                 <div class="mb-4">
                     <label class="form-label text-muted fw-bold small">ABREVIATURA</label>
                     <div class="input-group">
@@ -50,7 +50,8 @@
             </div>
 
             <div class="card-footer bg-transparent border-0 d-flex justify-content-between pb-3 px-4">
-                <a href="/Unidades/Index" class="btn btn-outline-secondary px-4">
+               
+                <a href="/Logistica/Unidades" class="btn btn-outline-secondary px-4">
                     <i class="bi bi-arrow-left"></i> Volver
                 </a>
                 <button type="submit" class="btn btn-gradiente px-5 shadow-sm">
@@ -83,7 +84,7 @@
             else
             {
                 
-                navigationManager.NavigateTo("/Unidades/Index");
+                navigationManager.NavigateTo("/Logistica/Unidades");
             }
         }
     }
@@ -94,9 +95,8 @@
 
         if (guardado)
         {
-           
-            navigationManager.NavigateTo("/Unidades/Index");
+            
+            navigationManager.NavigateTo("/Logistica/Unidades");
         }
-        
     }
 }

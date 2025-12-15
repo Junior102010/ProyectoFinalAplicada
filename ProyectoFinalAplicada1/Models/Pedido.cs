@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System;
-using System.Collections.Generic;
+
 
 namespace ProyectoFinalAplicada.Models;
 
@@ -10,36 +9,23 @@ public class Pedido
     [Key]
     public int PedidoId { get; set; }
 
-    [Required(ErrorMessage = "La fecha del pedido es obligatoria.")]
-    [DataType(DataType.DateTime)]
+    [Required]
     public DateTime FechaPedido { get; set; } = DateTime.Now;
-
-    [Required(ErrorMessage = "Debe seleccionar un cliente.")]
-    [Range(1, int.MaxValue, ErrorMessage = "El ID del cliente debe ser un valor positivo.")]
+    [Required]
     public int ClienteId { get; set; }
-
     [ForeignKey("ClienteId")]
     public Cliente? Cliente { get; set; }
-
-    [Required(ErrorMessage = "El monto total es obligatorio.")]
-    [Range(0.01, double.MaxValue, ErrorMessage = "El Monto Total debe ser mayor que cero.")]
-    [DataType(DataType.Currency)]
+    [Required]
     public double MontoTotal { get; set; }
-
-    [Required(ErrorMessage = "El método de pago es obligatorio.")]
-    [StringLength(50, MinimumLength = 3, ErrorMessage = "El Método de Pago debe tener entre 3 y 50 caracteres.")]
+    [Required]
     public string MetodoPago { get; set; } = "Efectivo";
-
-    [Required(ErrorMessage = "El estado del pedido es obligatorio.")]
-    [StringLength(50, MinimumLength = 5, ErrorMessage = "El Estado debe tener entre 5 y 50 caracteres.")]
+    [Required]
     public string Estado { get; set; } = "Pendiente";
-
-    [Required(ErrorMessage = "Debe especificar si requiere Delivery (true/false).")]
+    [Required]
     public bool Delivery { get; set; }
-
-    [Required(ErrorMessage = "La referencia del sitio es obligatoria.")]
-    [StringLength(250, MinimumLength = 5, ErrorMessage = "La Referencia del sitio debe tener entre 5 y 250 caracteres.")]
+    [Required]
     public string? ReferenciaSitio { get; set; }
 
     public ICollection<PedidoDetalle> Detalles { get; set; } = new List<PedidoDetalle>();
+
 }

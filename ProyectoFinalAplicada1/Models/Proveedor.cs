@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ProyectoFinalAplicada.Models;
 
@@ -8,14 +7,27 @@ public class Proveedor
     [Key]
     public int ProveedorId { get; set; }
 
-    [Required(ErrorMessage = "Campo obligatorio")]
-    public string Nombre { get; set; }
+    [Required(ErrorMessage = "La fecha es obligatoria")]
+    public DateTime FechaRegistro { get; set; } = DateTime.Now;
 
-    [Required(ErrorMessage = "El teléfono es obligatorio.")]
-    [RegularExpression(@"^(809|829|849)-\d{3}-\d{4}$",
-        ErrorMessage = "El teléfono debe tener el formato 809-000-0000 y comenzar con 809, 829 o 849.")]
-    public string Telefono { get; set; }
+    [Required(ErrorMessage = "El nombre es obligatorio")]
+    public string Nombre { get; set; } = string.Empty;
 
-    [ForeignKey("CategoriaId")]
-    public ICollection<Categoria> ProveedorDetalle { get; set; } = new List<Categoria>();
+    [Required(ErrorMessage = "El RNC es obligatorio")]
+    [StringLength(11, MinimumLength = 11, ErrorMessage = "El RNC debe tener 11 dígitos")]
+    public string RNC { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "El correo es obligatorio")]
+    [EmailAddress(ErrorMessage = "Formato de correo inválido")]
+    public string Email { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "La dirección es obligatoria")]
+    public string Direccion { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "El teléfono es obligatorio")]
+    [RegularExpression(@"^\d{3}-\d{3}-\d{4}$", ErrorMessage = "Formato: 000-000-0000")]
+    public string Telefono { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Indique los días de entrega")]
+    public string DiasEntrega { get; set; } = string.Empty; 
 }

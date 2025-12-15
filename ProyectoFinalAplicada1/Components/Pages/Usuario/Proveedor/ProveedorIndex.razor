@@ -10,7 +10,6 @@
 
 <PageTitle>Registro de Proveedores</PageTitle>
 
-
 <div class="container">
     <div class="card card-glass rounded-4 p-2">
         <div class="card-body">
@@ -21,6 +20,7 @@
                     <InputSelect class="form-select input-glass" @bind-Value="Filtro">
                         <option value="" selected disabled>Elija una opción</option>
                         <option value="Nombre">Nombre</option>
+                        <option value="RNC">RNC</option>
                         <option value="Telefono">Teléfono</option>
                     </InputSelect>
                 </div>
@@ -33,7 +33,7 @@
                         <button type="button" class="btn btn-outline-secondary bi bi-arrow-counterclockwise" @onclick="Restablecer"></button>
                     </div>
                 </div>
-                
+
                 <div class="col-md-1"></div>
 
                 <div class="col-md-4 text-end">
@@ -43,13 +43,14 @@
                 </div>
             </div>
 
-
             <div class="table-responsive">
                 <table class="table table-hover bg-transparent align-middle">
                     <thead class="text-black" style="background-color: rgba(0,0,0,0.03); border-bottom: 2px solid rgba(0,0,0,0.1);">
                         <tr>
                             <th class="py-3 ps-3">ID</th>
+                            <th class="py-3">RNC</th>
                             <th class="py-3">Nombre</th>
+                            <th class="py-3">Email</th>
                             <th class="py-3 text-center">Teléfono</th>
                             <th class="py-3 text-center">Opciones</th>
                         </tr>
@@ -59,7 +60,9 @@
                         {
                             <tr style="border-bottom: 1px solid rgba(0,0,0,0.05);">
                                 <td class="ps-3 fw-bold text-muted">@item.ProveedorId</td>
+                                <td>@item.RNC</td>
                                 <td>@item.Nombre</td>
+                                <td>@item.Email</td>
                                 <td class="text-center">@item.Telefono</td>
                                 <td class="text-center">
                                     <a href="/Proveedor/Edit/@item.ProveedorId" class="btn btn-sm btn-outline-success border-0 bi bi-pencil-square fs-5"></a>
@@ -69,7 +72,7 @@
                         @if (!ListaProveedores.Any())
                         {
                             <tr>
-                                <td colspan="4" class="text-center text-muted py-4">No hay proveedores registrados.</td>
+                                <td colspan="6" class="text-center text-muted py-4">No hay proveedores registrados.</td>
                             </tr>
                         }
                     </tbody>
@@ -100,6 +103,8 @@
         {
             if (Filtro == "Nombre")
                 ListaProveedores = await proveedoresService.Listar(p => p.Nombre.ToLower().Contains(ValorFiltro.ToLower()));
+            else if (Filtro == "RNC")
+                ListaProveedores = await proveedoresService.Listar(p => p.RNC.Contains(ValorFiltro));
             else if (Filtro == "Telefono")
                 ListaProveedores = await proveedoresService.Listar(p => p.Telefono.Contains(ValorFiltro));
         }

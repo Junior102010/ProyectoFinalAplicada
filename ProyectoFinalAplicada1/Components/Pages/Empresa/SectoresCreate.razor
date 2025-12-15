@@ -1,11 +1,10 @@
-﻿@page "/Sectores/Create"
-@page "/Sectores/Edit/{SectorId:int}"
+﻿@page "/Logistica/Sectores/Create"
+@page "/Logistica/Sectores/Edit/{SectorId:int}"
 
 @using Microsoft.AspNetCore.Authorization
 
 @inject ConfiguracionService configService
 @inject NavigationManager navigationManager
-
 @inject PageTitleService PageTitleService
 
 @rendermode InteractiveServer
@@ -27,8 +26,7 @@
             <DataAnnotationsValidator />
 
             <div class="card-body">
-
-                @* Municipio *@
+               
                 <div class="mb-4">
                     <label class="form-label text-muted fw-bold small">MUNICIPIO</label>
                     <div class="input-group">
@@ -44,18 +42,17 @@
                     <ValidationMessage For="() => Sector.Municipio" />
                 </div>
 
-                @* Nombre del Sector *@
+               
                 <div class="mb-4">
                     <label class="form-label text-muted fw-bold small">NOMBRE DEL SECTOR / BARRIO</label>
                     <InputText class="form-control input-glass" @bind-Value="Sector.Nombre" placeholder="Ej: Pueblo Nuevo, El Barro..." />
                     <ValidationMessage For="() => Sector.Nombre" />
                 </div>
-
-
             </div>
 
             <div class="card-footer bg-transparent border-0 d-flex justify-content-between pb-3 px-4">
-                <a href="/Sectores/Index" class="btn btn-outline-secondary px-4">
+               
+                <a href="/Logistica/Sectores" class="btn btn-outline-secondary px-4">
                     <i class="bi bi-arrow-left"></i> Volver
                 </a>
                 <button type="submit" class="btn btn-gradiente px-5 shadow-sm">
@@ -80,7 +77,6 @@
 
         if (SectorId > 0)
         {
-            // Buscamos para editar
             var encontrado = await configService.BuscarSector(SectorId);
             if (encontrado != null)
             {
@@ -88,8 +84,8 @@
             }
             else
             {
-             
-                navigationManager.NavigateTo("/Sectores/Index");
+                
+                navigationManager.NavigateTo("/Logistica/Sectores");
             }
         }
     }
@@ -97,12 +93,10 @@
     public async Task Guardar()
     {
         var guardado = await configService.GuardarSector(Sector);
-
         if (guardado)
         {
            
-            navigationManager.NavigateTo("/Sectores/Index");
+            navigationManager.NavigateTo("/Logistica/Sectores");
         }
-
     }
 }

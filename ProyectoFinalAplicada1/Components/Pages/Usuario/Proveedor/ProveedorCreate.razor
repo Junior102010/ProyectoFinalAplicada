@@ -2,7 +2,6 @@
 @using Microsoft.AspNetCore.Authorization
 @rendermode InteractiveServer
 
-
 @inject ProveedoresServices proveedoresService
 @inject NavigationManager navigationManager
 @inject PageTitleService PageTitleService
@@ -11,31 +10,68 @@
 
 <PageTitle>Nuevo Proveedor</PageTitle>
 
-<SectionContent SectionName="TituloPagina">
-    <div class="d-flex justify-content-center w-100">
-        <h3 class="m-0 fw-bold">Nuevo Proveedor</h3>
-    </div>
-</SectionContent>
 
 <div class="container">
-    <div class="card card-glass rounded-4 p-2" style="max-width: 700px; margin: auto;">
+    <div class="card card-glass rounded-4 p-2" style="max-width: 800px; margin: auto;">
         
         <EditForm Model="Proveedor" OnValidSubmit="Guardar" FormName="CrearProveedorForm">
             <DataAnnotationsValidator />
             
             <div class="card-body">
-                @* Nombre *@
-                <div class="mb-3">
-                    <label class="form-label fw-bold text-muted">Nombre</label>
-                    <InputText class="form-control input-glass" @bind-Value="Proveedor.Nombre" placeholder="Ej: Distribuidora XYZ" />
-                    <ValidationMessage For="(() => Proveedor.Nombre)" />
+               
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold text-muted">Fecha Registro</label>
+                        <InputDate class="form-control input-glass" @bind-Value="Proveedor.FechaRegistro" />
+                        <ValidationMessage For="(() => Proveedor.FechaRegistro)" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold text-muted">RNC</label>
+                        <InputText class="form-control input-glass" @bind-Value="Proveedor.RNC" placeholder="Ej: 10100000000" />
+                        <ValidationMessage For="(() => Proveedor.RNC)" />
+                    </div>
                 </div>
 
-                @* Teléfono *@
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold text-muted">Nombre / Razón Social</label>
+                        <InputText class="form-control input-glass" @bind-Value="Proveedor.Nombre" placeholder="Ej: Distribuidora XYZ" />
+                        <ValidationMessage For="(() => Proveedor.Nombre)" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold text-muted">Teléfono</label>
+                        <InputText class="form-control input-glass" @bind-Value="Proveedor.Telefono" placeholder="Ej: 809-555-1234" />
+                        <ValidationMessage For="(() => Proveedor.Telefono)" />
+                    </div>
+                </div>
+
+               
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold text-muted">Correo Electrónico</label>
+                        <InputText class="form-control input-glass" @bind-Value="Proveedor.Email" placeholder="contacto@empresa.com" />
+                        <ValidationMessage For="(() => Proveedor.Email)" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold text-muted">Días de Entrega</label>
+                        <InputSelect class="form-select input-glass" @bind-Value="Proveedor.DiasEntrega">
+                            <option value="" disabled selected>Seleccione...</option>
+                            <option value="Diario">Diario</option>
+                            <option value="Lunes y Jueves">Lunes y Jueves</option>
+                            <option value="Martes y Viernes">Martes y Viernes</option>
+                            <option value="Fines de Semana">Fines de Semana</option>
+                            <option value="A Requerimiento">A Requerimiento</option>
+                        </InputSelect>
+                        <ValidationMessage For="(() => Proveedor.DiasEntrega)" />
+                    </div>
+                </div>
+
+               
                 <div class="mb-3">
-                    <label class="form-label fw-bold text-muted">Teléfono</label>
-                    <InputText class="form-control input-glass" @bind-Value="Proveedor.Telefono" placeholder="Ej: 809-555-1234" />
-                    <ValidationMessage For="(() => Proveedor.Telefono)" />
+                    <label class="form-label fw-bold text-muted">Dirección</label>
+                    <InputTextArea class="form-control input-glass" @bind-Value="Proveedor.Direccion" rows="2" placeholder="Dirección del local..." />
+                    <ValidationMessage For="(() => Proveedor.Direccion)" />
                 </div>
 
                 @if (!string.IsNullOrEmpty(Mensaje))
@@ -59,14 +95,14 @@
 
     protected override void OnInitialized()
     {
-        PageTitleService.SetTitle("Crear Producto");
-     
+        PageTitleService.SetTitle("Crear Proveedor");
+       
+        if (Proveedor.FechaRegistro == default) Proveedor.FechaRegistro = DateTime.Now;
     }
 
     public async Task Guardar()
     {
         Mensaje = string.Empty;
-        
         
         if (await proveedoresService.ExisteNombre(Proveedor.Nombre))
         {
