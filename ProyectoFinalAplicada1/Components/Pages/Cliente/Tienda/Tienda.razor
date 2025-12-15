@@ -18,7 +18,6 @@
 
 <div class="container-fluid mt-4">
     
-    @* AVISO SI ES EMPRESA *@
     @if (EsEmpresa)
     {
         <div class="alert alert-info py-2 mb-3 shadow-sm border-0 d-flex align-items-center">
@@ -100,7 +99,7 @@
             </div>
         </div>
 
-        @* -- COLUMNA DERECHA: CARRITO -- *@
+        
         <div class="col-lg-4">
             <div class="card card-glass sticky-top shadow-lg" style="top: 20px; transition: all 0.3s ease;">
                 
@@ -151,7 +150,7 @@
                                                 <i class="bi bi-trash-fill"></i>
                                             </button>
                                         </div>
-                                        @* Aviso si aplica mínimo *@
+                                        
                                         @if(EsEmpresa && item.Producto?.UnidadMedida == "LB")
                                         {
                                             <small class="text-primary d-block mt-1" style="font-size: 0.7rem;">Mínimo 25 LB aplicado</small>
@@ -195,7 +194,7 @@
     public string ValorFiltro { get; set; } = string.Empty;
     public string Filtro { get; set; } = "Ninguna";
     
-    // --- LÓGICA EMPRESA ---
+    
     public bool EsEmpresa { get; set; } = false;
 
     protected override async Task OnInitializedAsync()
@@ -203,7 +202,7 @@
         PageTitleService.SetTitle("Tienda");
         ListaProductos = await productosService.Listar(p => p.Existencia > 0);
 
-        // Detectar Usuario y si es Empresa
+        
         var authState = await authStateProvider.GetAuthenticationStateAsync();
         var userPrincipal = authState.User;
         if(userPrincipal.Identity != null && userPrincipal.Identity.IsAuthenticated)
@@ -246,10 +245,10 @@
 
     private void AgregarAlCarrito(Producto prod)
     {
-        // 1. Determinar precio (Normal o Empresa)
+        
         double precioAUsar = EsEmpresa ? prod.PrecioEmpresa : prod.Precio;
         
-        // 2. Regla de negocio: Si es Empresa y LB, comenzamos con 25.
+       
         int cantidadInicial = (EsEmpresa && prod.UnidadMedida == "LB") ? 25 : 1;
 
         var itemExistente = carritoService.Carrito.FirstOrDefault(p => p.ProductoId == prod.ProductoId);
@@ -257,7 +256,7 @@
         if (itemExistente != null)
         {
             itemExistente.Cantidad++;
-            // Actualizamos precio por si acaso
+            
             itemExistente.PrecioUnitario = precioAUsar; 
             itemExistente.Importe = itemExistente.Cantidad * itemExistente.PrecioUnitario;
         }
@@ -267,7 +266,7 @@
             {
                 ProductoId = prod.ProductoId,
                 Producto = prod,
-                Cantidad = cantidadInicial, // Aquí entra el 25
+                Cantidad = cantidadInicial, 
                 PrecioUnitario = precioAUsar,
                 Importe = cantidadInicial * precioAUsar
             };
@@ -285,7 +284,7 @@
 
     private void DisminuirCantidad(PedidoDetalle item)
     {
-        // 3. Regla de negocio: Validar límite inferior
+        
         int limiteMinimo = (EsEmpresa && item.Producto?.UnidadMedida == "LB") ? 25 : 1;
 
         if (item.Cantidad > limiteMinimo)
