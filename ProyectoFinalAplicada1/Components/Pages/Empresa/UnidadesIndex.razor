@@ -1,8 +1,9 @@
-﻿@page "/Unidades/Index"
+﻿@page "/Logistica/Unidades"
 
 @inject ConfiguracionService configService
 @inject NavigationManager navigationManager
 @inject PageTitleService PageTitleService
+@using Microsoft.AspNetCore.Authorization
 
 @attribute [Authorize(Roles = "Administrador")]
 
@@ -17,9 +18,14 @@
                 <p class="text-muted small mb-0">Defina cómo se venden sus productos (Libras, Cajas, etc).</p>
             </div>
 
-            <a href="/Unidades/Create" class="btn btn-gradiente px-4 shadow-sm">
-                <i class="bi bi-plus-lg"></i> Nueva Unidad
-            </a>
+            <div class="btn-group">
+                <a href="/Logistica/Index" class="btn btn-outline-secondary shadow-sm me-2">
+                    <i class="bi bi-arrow-left"></i> Volver
+                </a>
+                <a href="/Logistica/Unidades/Create" class="btn btn-gradiente px-4 shadow-sm">
+                    <i class="bi bi-plus-lg"></i> Nueva Unidad
+                </a>
+            </div>
         </div>
 
         <div class="card-body">
@@ -60,7 +66,8 @@
 
                                     <td class="text-center">
                                         <div class="btn-group">
-                                            <a href="/Unidades/Edit/@item.UnidadId" class="btn btn-sm btn-outline-primary border-0" title="Editar">
+                                            @* RUTA AJUSTADA *@
+                                            <a href="/Logistica/Unidades/Edit/@item.UnidadId" class="btn btn-sm btn-outline-primary border-0" title="Editar">
                                                 <i class="bi bi-pencil-square fs-5"></i>
                                             </a>
                                             <button class="btn btn-sm btn-outline-danger border-0" @onclick="() => Eliminar(item)" title="Eliminar">
@@ -104,9 +111,7 @@
         var eliminado = await configService.EliminarUnidad(unidad.UnidadId);
         if (eliminado)
         {
-           
             await Cargar();
         }
-      
     }
 }

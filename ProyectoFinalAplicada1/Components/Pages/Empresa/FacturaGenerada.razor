@@ -1,8 +1,8 @@
 ﻿@page "/Factura/Details/{PedidoId:int}"
+@rendermode InteractiveServer
 
 @inject PedidosServices pedidosService
 @inject NavigationManager navigationManager
-@inject IJSRuntime JSRuntime
 
 <PageTitle>Factura @(FacturaActual?.CodigoFactura ?? "Detalle")</PageTitle>
 
@@ -22,7 +22,8 @@ else
             <a href="/Pedido/Index" class="btn btn-secondary">
                 <i class="bi bi-arrow-left"></i> Volver
             </a>
-            <button class="btn btn-primary" @onclick="Imprimir">
+
+            <button class="btn btn-primary" onclick="window.print()">
                 <i class="bi bi-printer"></i> Imprimir Factura
             </button>
         </div>
@@ -74,8 +75,7 @@ else
                                 <tr>
                                     <td>
                                         <span class="fw-bold text-dark">@detalle.Producto?.NombreProducto</span>
-                                   
-                                    </td>
+                                                            </td>
                                     <td class="text-center">@detalle.Cantidad</td>
                                     <td class="text-end">@detalle.PrecioUnitario.ToString("C2")</td>
                                     <td class="text-end">@detalle.Importe.ToString("C2")</td>
@@ -127,10 +127,5 @@ else
         {
             FacturaActual = await pedidosService.BuscarFacturaPorPedido(PedidoId);
         }
-    }
-
-    private async Task Imprimir()
-    {
-        await JSRuntime.InvokeVoidAsync("print");
     }
 }
